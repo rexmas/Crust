@@ -1,0 +1,6 @@
+framework module Pods_CrustTests {
+  umbrella header "Pods-CrustTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
