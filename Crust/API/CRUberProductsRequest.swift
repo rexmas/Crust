@@ -8,13 +8,32 @@ protocol CRUberRequestProtocol {
     
     var requestUrl : String { get }
     var HTTPMethod : CRHTTPMethod { get }
+    var queryParameters : [ String : AnyObject ] { get }
     
     func send()
 }
 
 class CRUberRequest : CRUberRequestProtocol {
+    
+    let host = "https://api.uber.com/v1/"
+    
     func send() {
-        let URL = NSURL(string: self.requestUrl)!
+        
+        var paramsArray : Array<String> = Array()
+        
+        for (key, value) in self.queryParameters {
+            paramsArray.append(key + "=" + value.description)
+        }
+        
+        var fullPath = host + self.requestUrl
+        
+        if paramsArray.count > 0 {
+            
+            let params = "&".join(paramsArray)
+            fullPath = fullPath + "?" + params
+        }
+        
+        let URL = NSURL(string: fullPath)!
         let mutableURLRequest = NSMutableURLRequest(URL: URL)
         mutableURLRequest.HTTPMethod = self.HTTPMethod.rawValue
         
@@ -36,6 +55,13 @@ class CRUberRequest : CRUberRequestProtocol {
         }
     }
     
+    var queryParameters : [ String : AnyObject ] {
+        get {
+            assertionFailure("Must override in subclass")
+            return Dictionary<String, AnyObject>()
+        }
+    }
+    
     var HTTPMethod : CRHTTPMethod {
         get {
             assertionFailure("Must override in subclass")
@@ -47,7 +73,16 @@ class CRUberRequest : CRUberRequestProtocol {
 class CRUberProductsRequest : CRUberRequest {
     override var requestUrl : String {
         get {
-            return "https://api.uber.com/v1/products?latitude=37.775&longitude=-122"
+            return "products"
+        }
+    }
+    
+    override var queryParameters : [ String : AnyObject ] {
+        get {
+            return [
+                "latitude" : 37.775,
+                "longitude" : -122
+            ]
         }
     }
     
@@ -61,7 +96,18 @@ class CRUberProductsRequest : CRUberRequest {
 class CRUberPriceEstimatesRequest : CRUberRequest {
     override var requestUrl : String {
         get {
-            return "https://api.uber.com/v1/estimates/price?start_latitude=37.775&start_longitude=-122&end_latitude=38&end_longitude=-122"
+            return "estimates/price"
+        }
+    }
+    
+    override var queryParameters : [ String : AnyObject ] {
+        get {
+            return [
+                "start_latitude" : 37.775,
+                "start_longitude" : -122,
+                "end_latitude" : 38,
+                "end_longitude" : -122
+            ]
         }
     }
     
@@ -76,7 +122,16 @@ class CRUberPriceEstimatesRequest : CRUberRequest {
 class CRUberTimeEstimatesRequest : CRUberRequest {
     override var requestUrl : String {
         get {
-            return "https://api.uber.com/v1/estimates/time?start_latitude=37.775&start_longitude=-122"
+            return "estimates/time"
+        }
+    }
+    
+    override var queryParameters : [ String : AnyObject ] {
+        get {
+            return [
+                "start_latitude" : 37.775,
+                "start_longitude" : -122
+            ]
         }
     }
     
@@ -90,7 +145,18 @@ class CRUberTimeEstimatesRequest : CRUberRequest {
 class CRUberPromotionsRequest : CRUberRequest {
     override var requestUrl : String {
         get {
-            return "https://api.uber.com/v1/promotions?start_latitude=37.775&start_longitude=-122&end_latitude=38&end_longitude=-122"
+            return "promotions"
+        }
+    }
+    
+    override var queryParameters : [ String : AnyObject ] {
+        get {
+            return [
+                "start_latitude" : 37.775,
+                "start_longitude" : -122,
+                "end_latitude" : 38,
+                "end_longitude" : -122
+            ]
         }
     }
     
