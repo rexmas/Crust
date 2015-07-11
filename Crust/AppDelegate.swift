@@ -17,8 +17,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         let uberProductsRequest = CRUberProductsRequest()
-        uberProductsRequest.lookupLocationData()
+        uberProductsRequest.send()
+        
+        let uberPriceEstimatesRequest = CRUberPriceEstimatesRequest()
+        uberPriceEstimatesRequest.send()
+        
+        let uberTimeEstimatesRequest = CRUberTimeEstimatesRequest()
+        uberTimeEstimatesRequest.send()
+        
+        let uberPromotionsRequest = CRUberPromotionsRequest()
+        uberPromotionsRequest.send()
         return true
+      
     }
 
     func applicationWillResignActive(application: UIApplication) {
