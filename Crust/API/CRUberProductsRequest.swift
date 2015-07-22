@@ -27,7 +27,7 @@ extension CRUberRequest {
         var paramsArray : Array<String> = Array()
         
         for (key, value) in self.queryParameters  {
-            paramsArray.append(key + "=" + "\(value)") // TODO: Not this!
+            paramsArray.append(key + "=" + "\(value)") // TODO: Not this! (FIST)
         }
         
         var fullPath = host + self.requestUrl
