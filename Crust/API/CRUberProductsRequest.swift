@@ -4,8 +4,9 @@ enum CRHTTPMethod : String {
     case GET = "GET"
 }
 
-protocol CRUberRequestProtocol {
+protocol CRUberRequest {
     
+    var host : String { get }
     var requestUrl : String { get }
     var HTTPMethod : CRHTTPMethod { get }
     var queryParameters : [ String : AnyObject ] { get }
@@ -13,16 +14,20 @@ protocol CRUberRequestProtocol {
     func send()
 }
 
-class CRUberRequest : CRUberRequestProtocol {
+extension CRUberRequest {
     
-    let host = "https://api.uber.com/v1/"
+    var host : String {
+        get {
+            return "https://api.uber.com/v1/"
+        }
+    }
     
     func send() {
         
         var paramsArray : Array<String> = Array()
         
-        for (key, value) in self.queryParameters {
-            paramsArray.append(key + "=" + value.description)
+        for (key, value) in self.queryParameters  {
+            paramsArray.append(key + "=" + "\(value)") // TODO: Not this!
         }
         
         var fullPath = host + self.requestUrl
@@ -47,37 +52,16 @@ class CRUberRequest : CRUberRequestProtocol {
                 print(error)
         }
     }
-    
-    var requestUrl : String {
-        get {
-            assertionFailure("Must override in subclass")
-            return ""
-        }
-    }
-    
-    var queryParameters : [ String : AnyObject ] {
-        get {
-            assertionFailure("Must override in subclass")
-            return Dictionary<String, AnyObject>()
-        }
-    }
-    
-    var HTTPMethod : CRHTTPMethod {
-        get {
-            assertionFailure("Must override in subclass")
-            return CRHTTPMethod.GET
-        }
-    }
 }
 
-class CRUberProductsRequest : CRUberRequest {
-    override var requestUrl : String {
+struct CRUberProductsRequest : CRUberRequest {
+    var requestUrl : String {
         get {
             return "products"
         }
     }
     
-    override var queryParameters : [ String : AnyObject ] {
+    var queryParameters : [ String : AnyObject ] {
         get {
             return [
                 "latitude" : 37.775,
@@ -86,21 +70,21 @@ class CRUberProductsRequest : CRUberRequest {
         }
     }
     
-    override var HTTPMethod : CRHTTPMethod {
+    var HTTPMethod : CRHTTPMethod {
         get {
             return CRHTTPMethod.GET
         }
     }
 }
 
-class CRUberPriceEstimatesRequest : CRUberRequest {
-    override var requestUrl : String {
+struct CRUberPriceEstimatesRequest : CRUberRequest {
+    var requestUrl : String {
         get {
             return "estimates/price"
         }
     }
     
-    override var queryParameters : [ String : AnyObject ] {
+    var queryParameters : [ String : AnyObject ] {
         get {
             return [
                 "start_latitude" : 37.775,
@@ -111,7 +95,7 @@ class CRUberPriceEstimatesRequest : CRUberRequest {
         }
     }
     
-    override var HTTPMethod : CRHTTPMethod {
+    var HTTPMethod : CRHTTPMethod {
         get {
             return CRHTTPMethod.GET
         }
@@ -119,14 +103,14 @@ class CRUberPriceEstimatesRequest : CRUberRequest {
 }
 
 
-class CRUberTimeEstimatesRequest : CRUberRequest {
-    override var requestUrl : String {
+struct CRUberTimeEstimatesRequest : CRUberRequest {
+    var requestUrl : String {
         get {
             return "estimates/time"
         }
     }
     
-    override var queryParameters : [ String : AnyObject ] {
+    var queryParameters : [ String : AnyObject ] {
         get {
             return [
                 "start_latitude" : 37.775,
@@ -135,21 +119,21 @@ class CRUberTimeEstimatesRequest : CRUberRequest {
         }
     }
     
-    override var HTTPMethod : CRHTTPMethod {
+    var HTTPMethod : CRHTTPMethod {
         get {
             return CRHTTPMethod.GET
         }
     }
 }
 
-class CRUberPromotionsRequest : CRUberRequest {
-    override var requestUrl : String {
+struct CRUberPromotionsRequest : CRUberRequest {
+    var requestUrl : String {
         get {
             return "promotions"
         }
     }
     
-    override var queryParameters : [ String : AnyObject ] {
+    var queryParameters : [ String : AnyObject ] {
         get {
             return [
                 "start_latitude" : 37.775,
@@ -160,7 +144,7 @@ class CRUberPromotionsRequest : CRUberRequest {
         }
     }
     
-    override var HTTPMethod : CRHTTPMethod {
+    var HTTPMethod : CRHTTPMethod {
         get {
             return CRHTTPMethod.GET
         }
