@@ -1,34 +1,35 @@
-//
-//  AppDelegate.swift
-//  Crust
-//
-//  Created by Lucas Swift on 5/6/15.
-//  Copyright (c) 2015 Lucas Swift. All rights reserved.
-//
-
 import UIKit
+
+private let kDefaultLatitude = 37.775
+private let kDefaultLongitude = -122.0
+private let kDefaultEndLatitude = 38.0
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
-        let uberProductsRequest = CRUberProductsRequest()
+        
+        let uberProductsRequest = CRUberProductsRequest(withLatitude: kDefaultLatitude,
+            longitude: kDefaultLongitude)
         uberProductsRequest.send()
         
-        let uberPriceEstimatesRequest = CRUberPriceEstimatesRequest()
+        let uberPriceEstimatesRequest = CRUberPriceEstimatesRequest(withStartLatitude: kDefaultLatitude,
+            startLongitude: kDefaultLongitude,
+            endLatitude: kDefaultEndLatitude, endLongitude: kDefaultLongitude)
         uberPriceEstimatesRequest.send()
         
-        let uberTimeEstimatesRequest = CRUberTimeEstimatesRequest()
+        let uberTimeEstimatesRequest = CRUberTimeEstimatesRequest(withStartLatitude: kDefaultLatitude, startLongitude: kDefaultLongitude)
         uberTimeEstimatesRequest.send()
         
-        let uberPromotionsRequest = CRUberPromotionsRequest()
+        let uberPromotionsRequest = CRUberPromotionsRequest(withStartLatitude: kDefaultLatitude,
+            startLongitude: kDefaultLongitude,
+            endLatitude: kDefaultEndLatitude,
+            endLongitude: kDefaultLongitude)
         uberPromotionsRequest.send()
+        
         return true
-      
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -52,7 +53,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
 }
 

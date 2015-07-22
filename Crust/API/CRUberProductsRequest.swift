@@ -55,6 +55,15 @@ extension CRUberRequest {
 }
 
 struct CRUberProductsRequest : CRUberRequest {
+    
+    var latitude : Double
+    var longitude : Double
+    
+    init(withLatitude latitude : Double, longitude : Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+    
     var requestUrl : String {
         get {
             return "products"
@@ -64,8 +73,8 @@ struct CRUberProductsRequest : CRUberRequest {
     var queryParameters : [ String : AnyObject ] {
         get {
             return [
-                "latitude" : 37.775,
-                "longitude" : -122
+                "latitude" : latitude,
+                "longitude" : longitude
             ]
         }
     }
@@ -78,6 +87,24 @@ struct CRUberProductsRequest : CRUberRequest {
 }
 
 struct CRUberPriceEstimatesRequest : CRUberRequest {
+    
+    var startLatitude : Double
+    var startLongitude : Double
+    var endLatitude : Double
+    var endLongitude : Double
+    
+    init(withStartLatitude
+        startLatitude : Double,
+        startLongitude : Double,
+        endLatitude : Double,
+        endLongitude: Double) {
+            
+            self.startLatitude = startLatitude
+            self.startLongitude = startLongitude
+            self.endLatitude = endLatitude
+            self.endLongitude = endLongitude
+    }
+    
     var requestUrl : String {
         get {
             return "estimates/price"
@@ -87,10 +114,10 @@ struct CRUberPriceEstimatesRequest : CRUberRequest {
     var queryParameters : [ String : AnyObject ] {
         get {
             return [
-                "start_latitude" : 37.775,
-                "start_longitude" : -122,
-                "end_latitude" : 38,
-                "end_longitude" : -122
+                "start_latitude" : startLatitude,
+                "start_longitude" : startLongitude,
+                "end_latitude" : endLatitude,
+                "end_longitude" : endLongitude
             ]
         }
     }
@@ -104,6 +131,18 @@ struct CRUberPriceEstimatesRequest : CRUberRequest {
 
 
 struct CRUberTimeEstimatesRequest : CRUberRequest {
+    
+    var startLatitude : Double
+    var startLongitude : Double
+    
+    init(withStartLatitude
+        startLatitude : Double,
+        startLongitude : Double) {
+            
+            self.startLatitude = startLatitude
+            self.startLongitude = startLongitude
+    }
+    
     var requestUrl : String {
         get {
             return "estimates/time"
@@ -113,8 +152,8 @@ struct CRUberTimeEstimatesRequest : CRUberRequest {
     var queryParameters : [ String : AnyObject ] {
         get {
             return [
-                "start_latitude" : 37.775,
-                "start_longitude" : -122
+                "start_latitude" : startLatitude,
+                "start_longitude" : startLongitude
             ]
         }
     }
@@ -127,6 +166,24 @@ struct CRUberTimeEstimatesRequest : CRUberRequest {
 }
 
 struct CRUberPromotionsRequest : CRUberRequest {
+    
+    var startLatitude : Double
+    var startLongitude : Double
+    var endLatitude : Double
+    var endLongitude : Double
+    
+    init(withStartLatitude
+        startLatitude : Double,
+        startLongitude : Double,
+        endLatitude : Double,
+        endLongitude: Double) {
+            
+            self.startLatitude = startLatitude
+            self.startLongitude = startLongitude
+            self.endLatitude = endLatitude
+            self.endLongitude = endLongitude
+    }
+    
     var requestUrl : String {
         get {
             return "promotions"
@@ -136,10 +193,10 @@ struct CRUberPromotionsRequest : CRUberRequest {
     var queryParameters : [ String : AnyObject ] {
         get {
             return [
-                "start_latitude" : 37.775,
-                "start_longitude" : -122,
-                "end_latitude" : 38,
-                "end_longitude" : -122
+                "start_latitude" : startLatitude,
+                "start_longitude" : startLongitude,
+                "end_latitude" : endLatitude,
+                "end_longitude" : endLongitude
             ]
         }
     }
