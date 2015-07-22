@@ -42,9 +42,9 @@ class CRUberRequest : CRUberRequestProtocol {
         
         Alamofire.request(mutableURLRequest)
             .response { (request, response, data, error) in
-                println(request)
-                println(response)
-                println(error)
+                print(request)
+                print(response)
+                print(error)
         }
     }
     
