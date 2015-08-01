@@ -1,10 +1,10 @@
 import Alamofire
 
 enum CRHTTPMethod : String {
-    case GET = "GET"
+    case GET
 }
 
-protocol CRUberRequest {
+protocol CRRequest {
     
     var host: String { get }
     var requestUrl: String { get }
@@ -14,7 +14,7 @@ protocol CRUberRequest {
     func send()
 }
 
-extension CRUberRequest {
+extension CRRequest {
     
     var host: String {
         return "https://api.uber.com/v1/"
@@ -52,7 +52,7 @@ extension CRUberRequest {
     }
 }
 
-struct CRUberProductsRequest : CRUberRequest {
+struct CRUberProductsRequest : CRRequest {
     
     var latitude: Double
     var longitude: Double
@@ -78,7 +78,7 @@ struct CRUberProductsRequest : CRUberRequest {
     }
 }
 
-struct CRUberPriceEstimatesRequest : CRUberRequest {
+struct CRUberPriceEstimatesRequest : CRRequest {
     
     var startLatitude: Double
     var startLongitude: Double
@@ -115,8 +115,7 @@ struct CRUberPriceEstimatesRequest : CRUberRequest {
     }
 }
 
-
-struct CRUberTimeEstimatesRequest : CRUberRequest {
+struct CRUberTimeEstimatesRequest : CRRequest {
     
     var startLatitude: Double
     var startLongitude: Double
@@ -145,7 +144,7 @@ struct CRUberTimeEstimatesRequest : CRUberRequest {
     }
 }
 
-struct CRUberPromotionsRequest : CRUberRequest {
+struct CRUberPromotionsRequest : CRRequest {
     
     var startLatitude: Double
     var startLongitude: Double
@@ -181,6 +180,3 @@ struct CRUberPromotionsRequest : CRUberRequest {
         return CRHTTPMethod.GET
     }
 }
-
-
-
