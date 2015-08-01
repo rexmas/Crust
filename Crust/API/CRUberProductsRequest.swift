@@ -6,25 +6,23 @@ enum CRHTTPMethod : String {
 
 protocol CRUberRequest {
     
-    var host : String { get }
-    var requestUrl : String { get }
-    var HTTPMethod : CRHTTPMethod { get }
-    var queryParameters : [ String : AnyObject ] { get }
+    var host: String { get }
+    var requestUrl: String { get }
+    var HTTPMethod: CRHTTPMethod { get }
+    var queryParameters: [ String : AnyObject ] { get }
     
     func send()
 }
 
 extension CRUberRequest {
     
-    var host : String {
-        get {
-            return "https://api.uber.com/v1/"
-        }
+    var host: String {
+        return "https://api.uber.com/v1/"
     }
     
     func send() {
         
-        var paramsArray : Array<String> = Array()
+        var paramsArray: Array<String> = Array()
         
         for (key, value) in self.queryParameters  {
             paramsArray.append(key + "=" + "\(value)") // TODO: Not this! (FIST)
@@ -56,47 +54,41 @@ extension CRUberRequest {
 
 struct CRUberProductsRequest : CRUberRequest {
     
-    var latitude : Double
-    var longitude : Double
+    var latitude: Double
+    var longitude: Double
     
-    init(withLatitude latitude : Double, longitude : Double) {
+    init(withLatitude latitude: Double, longitude: Double) {
         self.latitude = latitude
         self.longitude = longitude
     }
     
-    var requestUrl : String {
-        get {
-            return "products"
-        }
+    var requestUrl: String {
+        return "products"
     }
     
-    var queryParameters : [ String : AnyObject ] {
-        get {
-            return [
-                "latitude" : latitude,
-                "longitude" : longitude
-            ]
-        }
+    var queryParameters: [ String : AnyObject ] {
+        return [
+            "latitude" : latitude,
+            "longitude" : longitude
+        ]
     }
     
-    var HTTPMethod : CRHTTPMethod {
-        get {
-            return CRHTTPMethod.GET
-        }
+    var HTTPMethod: CRHTTPMethod {
+        return CRHTTPMethod.GET
     }
 }
 
 struct CRUberPriceEstimatesRequest : CRUberRequest {
     
-    var startLatitude : Double
-    var startLongitude : Double
-    var endLatitude : Double
-    var endLongitude : Double
+    var startLatitude: Double
+    var startLongitude: Double
+    var endLatitude: Double
+    var endLongitude: Double
     
     init(withStartLatitude
-        startLatitude : Double,
-        startLongitude : Double,
-        endLatitude : Double,
+        startLatitude: Double,
+        startLongitude: Double,
+        endLatitude: Double,
         endLongitude: Double) {
             
             self.startLatitude = startLatitude
@@ -105,77 +97,65 @@ struct CRUberPriceEstimatesRequest : CRUberRequest {
             self.endLongitude = endLongitude
     }
     
-    var requestUrl : String {
-        get {
-            return "estimates/price"
-        }
+    var requestUrl: String {
+        return "estimates/price"
     }
     
-    var queryParameters : [ String : AnyObject ] {
-        get {
-            return [
-                "start_latitude" : startLatitude,
-                "start_longitude" : startLongitude,
-                "end_latitude" : endLatitude,
-                "end_longitude" : endLongitude
-            ]
-        }
+    var queryParameters: [ String : AnyObject ] {
+        return [
+            "start_latitude" : startLatitude,
+            "start_longitude" : startLongitude,
+            "end_latitude" : endLatitude,
+            "end_longitude" : endLongitude
+        ]
     }
     
-    var HTTPMethod : CRHTTPMethod {
-        get {
-            return CRHTTPMethod.GET
-        }
+    var HTTPMethod: CRHTTPMethod {
+        return CRHTTPMethod.GET
     }
 }
 
 
 struct CRUberTimeEstimatesRequest : CRUberRequest {
     
-    var startLatitude : Double
-    var startLongitude : Double
+    var startLatitude: Double
+    var startLongitude: Double
     
     init(withStartLatitude
-        startLatitude : Double,
-        startLongitude : Double) {
+        startLatitude: Double,
+        startLongitude: Double) {
             
             self.startLatitude = startLatitude
             self.startLongitude = startLongitude
     }
     
-    var requestUrl : String {
-        get {
-            return "estimates/time"
-        }
+    var requestUrl: String {
+        return "estimates/time"
     }
     
-    var queryParameters : [ String : AnyObject ] {
-        get {
-            return [
-                "start_latitude" : startLatitude,
-                "start_longitude" : startLongitude
-            ]
-        }
+    var queryParameters: [ String : AnyObject ] {
+        return [
+            "start_latitude" : startLatitude,
+            "start_longitude" : startLongitude
+        ]
     }
     
-    var HTTPMethod : CRHTTPMethod {
-        get {
-            return CRHTTPMethod.GET
-        }
+    var HTTPMethod: CRHTTPMethod {
+        return CRHTTPMethod.GET
     }
 }
 
 struct CRUberPromotionsRequest : CRUberRequest {
     
-    var startLatitude : Double
-    var startLongitude : Double
-    var endLatitude : Double
-    var endLongitude : Double
+    var startLatitude: Double
+    var startLongitude: Double
+    var endLatitude: Double
+    var endLongitude: Double
     
     init(withStartLatitude
-        startLatitude : Double,
-        startLongitude : Double,
-        endLatitude : Double,
+        startLatitude: Double,
+        startLongitude: Double,
+        endLatitude: Double,
         endLongitude: Double) {
             
             self.startLatitude = startLatitude
@@ -184,27 +164,21 @@ struct CRUberPromotionsRequest : CRUberRequest {
             self.endLongitude = endLongitude
     }
     
-    var requestUrl : String {
-        get {
-            return "promotions"
-        }
+    var requestUrl: String {
+        return "promotions"
     }
     
-    var queryParameters : [ String : AnyObject ] {
-        get {
-            return [
-                "start_latitude" : startLatitude,
-                "start_longitude" : startLongitude,
-                "end_latitude" : endLatitude,
-                "end_longitude" : endLongitude
-            ]
-        }
+    var queryParameters: [ String : AnyObject ] {
+        return [
+            "start_latitude" : startLatitude,
+            "start_longitude" : startLongitude,
+            "end_latitude" : endLatitude,
+            "end_longitude" : endLongitude
+        ]
     }
     
-    var HTTPMethod : CRHTTPMethod {
-        get {
-            return CRHTTPMethod.GET
-        }
+    var HTTPMethod: CRHTTPMethod {
+        return CRHTTPMethod.GET
     }
 }
 
