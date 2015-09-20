@@ -1,6 +1,0 @@
-framework module SwiftyJSON {
-  umbrella header "Pods-Crust-SwiftyJSON-umbrella.h"
-
-  export *
-  module * { export * }
-}
