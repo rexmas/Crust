@@ -32,7 +32,7 @@ extension CRRequest {
         
         if paramsArray.count > 0 {
             
-            let params = "&".join(paramsArray)
+            let params = paramsArray.joinWithSeparator("&")
             fullPath = fullPath + "?" + params
         }
         
