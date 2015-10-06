@@ -53,9 +53,7 @@ code_sign_if_enabled() {
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework 'Pods-CrustTests/Alamofire.framework'
-  install_framework 'Pods-CrustTests/SwiftyJSON.framework'
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework 'Pods-CrustTests/Alamofire.framework'
-  install_framework 'Pods-CrustTests/SwiftyJSON.framework'
 fi
