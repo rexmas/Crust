@@ -1,4 +1,4 @@
-import RealmSwift
+import Realm
 
 class Company: Object {
     

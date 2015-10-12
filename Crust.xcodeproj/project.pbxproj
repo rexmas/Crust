@@ -22,7 +22,8 @@
 		26951C2C1AFB401B007B0E07 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26951C2B1AFB401B007B0E07 /* Images.xcassets */; };
 		26951C2F1AFB401B007B0E07 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26951C2D1AFB401B007B0E07 /* LaunchScreen.xib */; };
 		26951C3B1AFB401B007B0E07 /* RealmMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26951C3A1AFB401B007B0E07 /* RealmMappingTests.swift */; };
-		2E5716AC2A58AF8D482E80E4 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69217840C166BBAD301629D /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		2E5716AC2A58AF8D482E80E4 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69217840C166BBAD301629D /* Pods.framework */; };
+		8F73A3B22E30737255BA728C /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69217840C166BBAD301629D /* Pods.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F73A3B22E30737255BA728C /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,9 +232,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 26951C411AFB401B007B0E07 /* Build configuration list for PBXNativeTarget "CrustTests" */;
 			buildPhases = (
+				A984C4E9BF73520000A8B645 /* Check Pods Manifest.lock */,
 				26951C301AFB401B007B0E07 /* Sources */,
 				26951C311AFB401B007B0E07 /* Frameworks */,
 				26951C321AFB401B007B0E07 /* Resources */,
+				8077A5756898EBFFCBAB5FCF /* Embed Pods Frameworks */,
+				A52F300DB7B0FB2EBFBA22CA /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -318,6 +323,36 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		8077A5756898EBFFCBAB5FCF /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A52F300DB7B0FB2EBFBA22CA /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		A8CE5E92A625729135A7EDC0 /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -331,6 +366,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A984C4E9BF73520000A8B645 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		C82F8DDC1CF9BC9559E3EB03 /* Copy Pods Resources */ = {
@@ -516,6 +566,7 @@
 		};
 		26951C421AFB401B007B0E07 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F9CE242D69705864C0D5EE1B /* Pods.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -532,6 +583,7 @@
 		};
 		26951C431AFB401B007B0E07 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E9BE561C101621E8C640AAE /* Pods.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";

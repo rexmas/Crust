@@ -1,5 +1,5 @@
 import XCTest
-import RealmSwift
+import Realm
 
 extension RealmMappingTests {
 }
