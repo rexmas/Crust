@@ -1,11 +1,3 @@
-//
-//  Company.swift
-//  Crust
-//
-//  Created by Lucas Swift on 10/8/15.
-//  Copyright © 2015 Lucas Swift. All rights reserved.
-//
-
 import RealmSwift
 
 class Company: Object {

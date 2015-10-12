@@ -1,15 +1,10 @@
-//
-//  CrustTests.swift
-//  CrustTests
-//
-//  Created by Lucas Swift on 5/6/15.
-//  Copyright (c) 2015 Lucas Swift. All rights reserved.
-//
-
-import UIKit
 import XCTest
+import RealmSwift
 
-class CrustTests: XCTestCase {
+extension RealmMappingTests {
+}
+
+class RealmMappingTests: XCTestCase {
     
     override func setUp() {
         super.setUp()

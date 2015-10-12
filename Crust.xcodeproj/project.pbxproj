@@ -10,6 +10,9 @@
 		1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF3F1BC38BE600D4EAD8 /* JSON.swift */; settings = {ASSET_TAGS = (); }; };
 		1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF421BC38C4A00D4EAD8 /* Utilities.swift */; settings = {ASSET_TAGS = (); }; };
 		171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */; };
+		17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */; settings = {ASSET_TAGS = (); }; };
+		17F960011BCB39C400CC6D4A /* MappingOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */; settings = {ASSET_TAGS = (); }; };
+		17F960021BCB39C400CC6D4A /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFF1BCB39C400CC6D4A /* User.swift */; settings = {ASSET_TAGS = (); }; };
 		268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268068E11B47080C0076C226 /* CRUberProductsRequest.swift */; };
 		268134941BC7816C0079F8D3 /* Employee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268134931BC7816C0079F8D3 /* Employee.swift */; settings = {ASSET_TAGS = (); }; };
 		268134961BC781BC0079F8D3 /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268134951BC781BC0079F8D3 /* Company.swift */; settings = {ASSET_TAGS = (); }; };
@@ -18,7 +21,7 @@
 		26951C2A1AFB401B007B0E07 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26951C281AFB401B007B0E07 /* Main.storyboard */; };
 		26951C2C1AFB401B007B0E07 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 26951C2B1AFB401B007B0E07 /* Images.xcassets */; };
 		26951C2F1AFB401B007B0E07 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 26951C2D1AFB401B007B0E07 /* LaunchScreen.xib */; };
-		26951C3B1AFB401B007B0E07 /* CrustTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26951C3A1AFB401B007B0E07 /* CrustTests.swift */; };
+		26951C3B1AFB401B007B0E07 /* RealmMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26951C3A1AFB401B007B0E07 /* RealmMappingTests.swift */; };
 		2E5716AC2A58AF8D482E80E4 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B69217840C166BBAD301629D /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
@@ -36,6 +39,9 @@
 		1710BF3F1BC38BE600D4EAD8 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		1710BF421BC38C4A00D4EAD8 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRRequest.swift; sourceTree = "<group>"; };
+		17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRMapper.swift; sourceTree = "<group>"; };
+		17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingOperator.swift; sourceTree = "<group>"; };
+		17F95FFF1BCB39C400CC6D4A /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		268068E11B47080C0076C226 /* CRUberProductsRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUberProductsRequest.swift; sourceTree = "<group>"; };
 		268134931BC7816C0079F8D3 /* Employee.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Employee.swift; sourceTree = "<group>"; };
 		268134951BC781BC0079F8D3 /* Company.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
@@ -48,7 +54,7 @@
 		26951C2E1AFB401B007B0E07 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		26951C341AFB401B007B0E07 /* CrustTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CrustTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26951C391AFB401B007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		26951C3A1AFB401B007B0E07 /* CrustTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrustTests.swift; sourceTree = "<group>"; };
+		26951C3A1AFB401B007B0E07 /* RealmMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmMappingTests.swift; sourceTree = "<group>"; };
 		9E9BE561C101621E8C640AAE /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		B69217840C166BBAD301629D /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9CE242D69705864C0D5EE1B /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -87,6 +93,16 @@
 				1710BF421BC38C4A00D4EAD8 /* Utilities.swift */,
 			);
 			path = Utilities;
+			sourceTree = "<group>";
+		};
+		17F95FFC1BCB39C400CC6D4A /* Mapper */ = {
+			isa = PBXGroup;
+			children = (
+				17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */,
+				17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */,
+				17F95FFF1BCB39C400CC6D4A /* User.swift */,
+			);
+			path = Mapper;
 			sourceTree = "<group>";
 		};
 		268068E01B4702A80076C226 /* API */ = {
@@ -132,6 +148,7 @@
 			children = (
 				268068E01B4702A80076C226 /* API */,
 				1710BF3E1BC38BCF00D4EAD8 /* JSON */,
+				17F95FFC1BCB39C400CC6D4A /* Mapper */,
 				268134921BC780C30079F8D3 /* Realm */,
 				1710BF411BC38C3B00D4EAD8 /* Utilities */,
 				26951C241AFB401A007B0E07 /* AppDelegate.swift */,
@@ -155,7 +172,7 @@
 		26951C371AFB401B007B0E07 /* CrustTests */ = {
 			isa = PBXGroup;
 			children = (
-				26951C3A1AFB401B007B0E07 /* CrustTests.swift */,
+				26951C3A1AFB401B007B0E07 /* RealmMappingTests.swift */,
 				26951C381AFB401B007B0E07 /* Supporting Files */,
 			);
 			path = CrustTests;
@@ -338,6 +355,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */,
 				1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */,
 				171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */,
 				1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */,
@@ -345,7 +363,9 @@
 				268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */,
 				26951C271AFB401A007B0E07 /* ViewController.swift in Sources */,
 				26951C251AFB401A007B0E07 /* AppDelegate.swift in Sources */,
+				17F960011BCB39C400CC6D4A /* MappingOperator.swift in Sources */,
 				268134961BC781BC0079F8D3 /* Company.swift in Sources */,
+				17F960021BCB39C400CC6D4A /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,7 +373,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26951C3B1AFB401B007B0E07 /* CrustTests.swift in Sources */,
+				26951C3B1AFB401B007B0E07 /* RealmMappingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

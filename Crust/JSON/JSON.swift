@@ -1,5 +1,4 @@
 import Foundation
-import Swiftz
 
 public enum JSONValue : CustomStringConvertible {
     case JSONArray([JSONValue])
