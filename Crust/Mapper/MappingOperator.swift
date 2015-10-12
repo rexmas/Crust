@@ -19,7 +19,7 @@ infix operator <- { associativity right }
 // MARK:- Objects with Basic types
 
 /// Object of Basic type
-public func <- <T: CRFieldType, C: CRMappingContext>(inout field: T, map:(key: CRMappingKey, context: C)) -> C {
+public func <- <T: JSONable, C: CRMappingContext>(inout field: T, map:(key: CRMappingKey, context: C)) -> C {
     
     if case .Error(_)? = map.context.result {
         return map.context

@@ -1,3 +1,5 @@
+import Foundation
+
 // TODO: Let's see if we can replace this with throws everywhere.
 public enum Result<T> {
     case Value(T)
@@ -17,18 +19,18 @@ public protocol CRMappingKey {
 //    func asJSON() -> Result<JSONValue>
 //}
 
-extension Dictionary where Key : String, Value : JSON, Value.J == Value {
+extension Dictionary where Value : JSONable, Value.J == Value {
     
-    public static func toJSON(x: Dictionary<Key, Value>) -> JSONValue {
+    public static func toJSON(x: Dictionary<String, Value>) -> JSONValue {
         return JDictionary<Value, Value>.toJSON(x)
     }
     
-    public static func fromJSON(x: JSONValue) -> Dictionary<Key, Value>? {
+    public static func fromJSON(x: JSONValue) -> Dictionary<String, Value>? {
         return JDictionary<Value, Value>.fromJSON(x)
     }
 }
 
-extension Set where Element : JSON, Element.J == Element {
+extension Set where Element : JSONable, Element.J == Element {
     
     public static func toJSON(x: Set<Element>) -> JSONValue {
         let array = Array(x)
@@ -67,7 +69,7 @@ extension Set where Element : JSON, Element.J == Element {
 //    }
 //}
 
-extension Array where Element : JSON, Element.J == Element {
+extension Array where Element : JSONable, Element.J == Element {
     
     public func toJSON(x: Array<Element>) -> JSONValue {
         return JArray<Element, Element>.toJSON(x)

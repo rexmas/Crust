@@ -1,4 +1,4 @@
-import Realm
+import RealmSwift
 
 class Company: Object {
     
@@ -6,7 +6,7 @@ class Company: Object {
     dynamic var uuid: String?
     dynamic var foundingDate: NSDate?
     dynamic var founder: Employee?
-    dynamic var pendingLawsuits: Int64?
+    dynamic var pendingLawsuits: NSNumber?  // Int64
     
 // Specify properties to ignore (Realm won't persist these)
     
