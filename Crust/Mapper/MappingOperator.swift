@@ -23,7 +23,7 @@ infix operator <- { associativity right }
 // Object of Basic type
 public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     
-    if case .Error(_)? = map.context.result {
+    guard map.context.error == nil else {
         return map.context
     }
     
@@ -31,16 +31,15 @@ public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T,
     case .ToJSON:
         let json = map.context.json
         map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
-        map.context.result = .Value(json)
     case .FromJSON:
         do {
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
             } else {
-                map.context.result = Result.Error(NSError(domain: "", code: 0, userInfo: nil))
+                throw NSError(domain: "", code: 0, userInfo: nil)
             }
         } catch let error as NSError {
-            map.context.result = Result.Error(error)
+            map.context.error = error
         }
     }
     
@@ -48,7 +47,7 @@ public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T,
 }
 
 // Map to JSON with field as optional type.
-func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
+private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
     
     if let field = field {
         let result = T.toJSON(field)
@@ -61,7 +60,7 @@ func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field:
 }
 
 // TODO: Have a map for optional fields. .Null will map to `nil`.
-func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T) throws {
+private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T) throws {
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson

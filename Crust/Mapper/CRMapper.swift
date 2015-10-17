@@ -123,8 +123,8 @@ public enum CRMapping : CRMappingKey {
 public class CRMappingContext {
     public var json: JSONValue
     public var object: Mappable
-    public var dir: MappingDirection
-    public var result: Result<Any>? // TODO: Probably just change to optional error.
+    public private(set) var dir: MappingDirection
+    public internal(set) var error: ErrorType?
     
     init(withObject object:Mappable, json: JSONValue, direction: MappingDirection) {
         self.dir = direction
@@ -136,25 +136,29 @@ public class CRMappingContext {
 // Global methods caller uses to perform mappings.
 public struct CRMapper<T: Mappable> {
     
-    func mapFromJSONToObject(json: JSONValue) -> Result<Any> {
+    func mapFromJSONToObject(json: JSONValue) throws -> T {
         let object = getInstance()
-        return mapFromJSON(json, toObject: object)
+        return try mapFromJSON(json, toObject: object)
     }
     
-    func mapFromJSON(json: JSONValue, var toObject object: T) -> Result<Any> {
+    func mapFromJSON(json: JSONValue, var toObject object: T) throws -> T {
         let context = CRMappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        object.mapping(context)
-        return context.result!
+        try performMappingWithObject(&object, context: context)
+        return object
     }
     
-    func mapFromObjectToJSON(object: T) -> Result<Any> {
+    func mapFromObjectToJSON(var object: T) throws -> JSONValue {
         let context = CRMappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        return performMappingWithObject(object, context: context)
+        try performMappingWithObject(&object, context: context)
+        return context.json
     }
     
-    internal func performMappingWithObject(var object: T, context: CRMappingContext) -> Result<Any> {
+    internal func performMappingWithObject(inout object: T, context: CRMappingContext) throws {
         object.mapping(context)
-        return context.result!
+        if let error = context.error {
+            throw error
+        }
+        context.object = object
     }
     
     internal func getInstance() -> T {
