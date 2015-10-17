@@ -73,22 +73,93 @@ public enum JSONValue : CustomStringConvertible {
         return try JSONValue.decode(string.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
     }
     
-    public var description : String {
+    subscript(index: JSONKeypath) -> JSONValue? {
         get {
-            switch self {
-            case .JSONNull():
-                return "JSONNull()"
-            case let .JSONBool(b):
-                return "JSONBool(\(b))"
-            case let .JSONString(s):
-                return "JSONString(\(s))"
-            case let .JSONNumber(n):
-                return "JSONNumber(\(n))"
-            case let .JSONObject(o):
-                return "JSONObject(\(o))"
-            case let .JSONArray(a):
-                return "JSONArray(\(a))"
+            return self[index.keyPath]
+        }
+        set(newValue) {
+            self[index.keyPath] = newValue
+        }
+    }
+    
+    subscript(index: String) -> JSONValue? {
+        get {
+            let components = index.componentsSeparatedByString(".")
+            return self[components]
+        }
+        set(newValue) {
+            let components = index.componentsSeparatedByString(".")
+            self[components] = newValue
+        }
+    }
+    
+    subscript(index: [String]) -> JSONValue? {
+        get {
+            guard let key = index.first else {
+                return self
             }
+            
+            let keys = index.dropFirst()
+            switch self {
+            case .JSONObject(let obj):
+                if let next = obj[key] {
+                    return next[Array(keys)]
+                } else {
+                    return nil
+                }
+            case .JSONArray(let arr):
+                return .JSONArray(arr.flatMap { $0[index] })
+            default:
+                return nil
+            }
+        }
+        set (newValue) {
+            guard let key = index.first else {
+                return
+            }
+            
+            if index.count == 1 {
+                switch self {
+                case .JSONObject(var obj):
+                    if (newValue != nil) {
+                        obj.updateValue(newValue!, forKey: key)
+                    } else {
+                        obj.removeValueForKey(key)
+                    }
+                    self = .JSONObject(obj)
+                default:
+                    return
+                }
+            }
+            
+            let keys = index.dropFirst()
+            switch self {
+            case .JSONObject(var obj):
+                if var next = obj[key] {
+                    next[Array(keys)] = newValue
+                    obj.updateValue(next, forKey: key)
+                    self = .JSONObject(obj)
+                }
+            default:
+                return
+            }
+        }
+    }
+    
+    public var description : String {
+        switch self {
+        case .JSONNull():
+            return "JSONNull()"
+        case let .JSONBool(b):
+            return "JSONBool(\(b))"
+        case let .JSONString(s):
+            return "JSONString(\(s))"
+        case let .JSONNumber(n):
+            return "JSONNumber(\(n))"
+        case let .JSONObject(o):
+            return "JSONObject(\(o))"
+        case let .JSONArray(a):
+            return "JSONArray(\(a))"
         }
     }
 }
@@ -188,7 +259,24 @@ public func !=(lhs : JSONValue, rhs : JSONValue) -> Bool {
 //    return error("Cannot find object at keypath \(rhs) in JSON object \(rhs).")
 //}
 
-/// Protocols
+// MARK: - Protocols
+// MARK: - JSONKeypath
+
+public protocol JSONKeypath {
+    var keyPath: String { get }
+}
+
+extension String : JSONKeypath {
+    public var keyPath: String {
+        return self
+    }
+}
+
+extension Int : JSONKeypath {
+    public var keyPath: String {
+        return String(self)
+    }
+}
 
 // TODO: May need to remove the typealias and just return Any if
 // Array conversion turns out to be too cumbersome.
