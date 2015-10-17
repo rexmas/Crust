@@ -8,12 +8,13 @@ struct User : Mappable {
     }
     
     static func foreignKeys() -> Array<CRMappingKey> {
-        return [ "Blah" ]
+        return [ "Blah" as! CRMappingKey ]
     }
     
     mutating func mapping(context: CRMappingContext) {
         
-        blah <- CRMapping.Transform("Blah", "Blah") >*<
+        // TODO: fix compiler error. Likely do to operator precedence.
+//        blah <- CRMapping.Transform("Blah", "Blah") >*<
         derp <- "Derp" >*<
         context
     }

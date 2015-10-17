@@ -1,11 +1,5 @@
 import Foundation
 
-// TODO: Let's see if we can replace this with throws everywhere.
-public enum Result<T> {
-    case Value(T)
-    case Error(NSError) // TODO: Maybe switch over to ErrorType.
-}
-
 public enum MappingDirection {
     case FromJSON
     case ToJSON

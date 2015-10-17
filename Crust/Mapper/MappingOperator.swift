@@ -50,8 +50,7 @@ public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T,
 private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
     
     if let field = field {
-        let result = T.toJSON(field)
-        json[key] = result
+        json[key] = T.toJSON(field)
     } else {
         json[key] = .JSONNull()
     }
