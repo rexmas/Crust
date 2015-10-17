@@ -5,6 +5,8 @@ use_frameworks!
 pod 'Alamofire'
 pod 'RealmSwift'
 
+link_with 'Crust', 'CrustTests'
+
 target 'Crust' do
 end
 
