@@ -1,6 +1,6 @@
 import RealmSwift
 
-class Employee: Object {
+public class Employee: Object {
     
     dynamic var employer: Company?
     dynamic var uuid: String?
@@ -9,10 +9,4 @@ class Employee: Object {
     dynamic var salary: NSNumber?               // Int64
     dynamic var isEmployeeOfMonth: NSNumber?    // Bool
     dynamic var percentYearlyRaise: NSNumber?   // Double
-    
-// Specify properties to ignore (Realm won't persist these)
-    
-//  override static func ignoredProperties() -> [String] {
-//    return []
-//  }
 }
