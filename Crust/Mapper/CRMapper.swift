@@ -3,7 +3,7 @@ import Foundation
 // TODO: Let's see if we can replace this with throws everywhere.
 public enum Result<T> {
     case Value(T)
-    case Error(NSError)
+    case Error(NSError) // TODO: Maybe switch over to ErrorType.
 }
 
 public enum MappingDirection {
@@ -11,13 +11,7 @@ public enum MappingDirection {
     case ToJSON
 }
 
-public protocol CRMappingKey {
-    var keyPath: String { get }
-}
-
-//public protocol CRFieldType : JSON {
-//    func asJSON() -> Result<JSONValue>
-//}
+public protocol CRMappingKey : JSONKeypath { }
 
 extension Dictionary where Value : JSONable, Value.J == Value {
     
@@ -110,18 +104,6 @@ extension Array where Element : JSONable, Element.J == Element {
 //    }
 //}
 
-extension Int : CRMappingKey {
-    public var keyPath: String {
-        return String(self)
-    }
-}
-
-extension String : CRMappingKey {
-    public var keyPath: String {
-        return self
-    }
-}
-
 public enum CRMapping : CRMappingKey {
     case ForeignKey(CRMappingKey)
     case Transform(CRMappingKey, String) // TODO: Second element should be Transform type to define later
@@ -138,28 +120,11 @@ public enum CRMapping : CRMappingKey {
     }
 }
 
-//extension JSONValue {
-//    subscript(key: CRMappingKey) -> JSONValue? {
-//        get {
-//            let components = key.keyPath.componentsSeparatedByString(".")
-//            let value: JSONValue? = (self <? JSONKeypath.init(components))
-//            return self <? JSONKeypath.init(components)
-////            let components = key.keyPath.componentsSeparatedByString(".").map { $0 as JSONSubscriptType }
-////            let json = self[Array(components)]
-////            return json
-//        }
-//        set {
-//            let components = key.keyPath.componentsSeparatedByString(".").map { $0 as JSONSubscriptType }
-//            self[Array(components)] = newValue
-//        }
-//    }
-//}
-
 public class CRMappingContext {
     public var json: JSONValue
     public var object: Mappable
     public var dir: MappingDirection
-    public var result: Result<Any>?
+    public var result: Result<Any>? // TODO: Probably just change to optional error.
     
     init(withObject object:Mappable, json: JSONValue, direction: MappingDirection) {
         self.dir = direction
@@ -168,7 +133,7 @@ public class CRMappingContext {
     }
 }
 
-/// Global methods caller uses to perform mappings.
+// Global methods caller uses to perform mappings.
 public struct CRMapper<T: Mappable> {
     
     func mapFromJSONToObject(json: JSONValue) -> Result<Any> {
