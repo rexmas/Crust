@@ -22,6 +22,39 @@ infix operator <- { associativity right }
 
 // Object of Basic type
 public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+    return mapField(&field, map: map)
+}
+
+public func <- <T: JSONable, C: CRMappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+    return mapField(&field, map: map)
+}
+
+public func mapField<T: JSONable, C: CRMappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    switch map.context.dir {
+    case .ToJSON:
+        let json = map.context.json
+        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
+    case .FromJSON:
+        do {
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: nil)
+            }
+        } catch let error as NSError {
+            map.context.error = error
+        }
+    }
+    
+    return map.context
+}
+
+public func mapField<T: JSONable, C: CRMappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
@@ -60,6 +93,20 @@ private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromFiel
 
 // TODO: Have a map for optional fields. .Null will map to `nil`.
 private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T) throws {
+    
+    if let fromJson = T.fromJSON(json) {
+        field = fromJson
+    } else {
+        throw NSError(domain: "CRMappingDomain", code: -1, userInfo: nil)
+    }
+}
+
+private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T?) throws {
+    
+    if case .JSONNull = json {
+        field = nil
+        return
+    }
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson

@@ -8,7 +8,7 @@ struct User : Mappable {
     }
     
     static func foreignKeys() -> Array<CRMappingKey> {
-        return [ "Blah" as! CRMappingKey ]
+        return [ "Blah" as CRMappingKey ]
     }
     
     mutating func mapping(context: CRMappingContext) {

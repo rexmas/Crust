@@ -131,37 +131,36 @@ public class CRMappingContext {
     }
 }
 
-// Global methods caller uses to perform mappings.
-public struct CRMapper<T: Mappable> {
+// Global method caller used to perform mappings.
+public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T, T == U.AdaptorKind.BaseType> {
     
-    func mapFromJSONToObject(json: JSONValue) throws -> T {
-        let object = getInstance()
-        return try mapFromJSON(json, toObject: object)
+    func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
+        let object = getInstance(mapping)
+        return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    func mapFromJSON(json: JSONValue, var toObject object: T) throws -> T {
+    func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
         let context = CRMappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        try performMappingWithObject(&object, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return object
     }
     
-    func mapFromObjectToJSON(var object: T) throws -> JSONValue {
+    func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
         let context = CRMappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        try performMappingWithObject(&object, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return context.json
     }
     
-    internal func performMappingWithObject(inout object: T, context: CRMappingContext) throws {
-        object.mapping(context)
+    internal func performMappingWithObject(inout object: T, mapping: U, context: CRMappingContext) throws {
+        mapping.mapping(object, context: context)
         if let error = context.error {
             throw error
         }
         context.object = object
     }
     
-    internal func getInstance() -> T {
-        // TODO: Find by foreignKeys else...
-        return T.newInstance() as! T
+    internal func getInstance(mapping: U) -> T {
+        return mapping.adaptor.createObject(T.self)
     }
 }
 
@@ -172,7 +171,7 @@ extension Employee: Mappable {
 class EmployeeMapping : Mapping {
     var adaptor: RealmAdaptor
     var primaryKeys: Array<CRMappingKey> {
-        [ "uuid" ]
+        return [ "uuid" ]
     }
     
     init(adaptor: RealmAdaptor) {
@@ -181,30 +180,33 @@ class EmployeeMapping : Mapping {
     
     func mapping(tomap: Employee, context: CRMappingContext) {
         
-//        (tomap.employer) <- ("employer", CRMappingContext)
-        tomap.uuid <- ("uuid", CRMappingContext)
-//        (tomap.name) <- ("name", CRMappingContext)
-//        (tomap.joinDate) <- ("joinDate", CRMappingContext)
-//        (tomap.salary) <- ("data.salary", CRMappingContext)
-//        (tomap.isEmployeeOfMonth) <- ("data.is_employee_of_month", CRMappingContext)
-//        (tomap.percentYearlyRaise) <- ("data.percent_yearly_raise", CRMappingContext)
+//        tomap.employer <- "employer" >*<
+        //        var i: NSDate?
+        //        mapField(&i, map: (key: "joinDate", context: context))
+        
+        tomap.joinDate <- "joinDate"  >*<
+        tomap.uuid <- "uuid" >*<
+        tomap.name <- "name" >*<
+        tomap.joinDate <- "joinDate"  >*<
+        tomap.salary <- "data.salary"  >*<
+        tomap.isEmployeeOfMonth <- "data.is_employee_of_month"  >*<
+        tomap.percentYearlyRaise <- "data.percent_yearly_raise" >*<
+        context
     }
 }
 
-protocol Mapping {
+public protocol Mapping {
     typealias MappedObject: Mappable
     typealias AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
     var primaryKeys: Array<CRMappingKey> { get }
     
-    mutating func mapping(tomap: MappedObject, context: CRMappingContext)
+    func mapping(tomap: MappedObject, context: CRMappingContext)
 }
 
+// Do we need this in the end?
 public protocol Mappable {
-    static func newInstance() -> Self
-    static func primaryKeys() -> Array<CRMappingKey>
-    mutating func mapping(context: CRMappingContext)
 }
 
 public protocol Adaptor {
@@ -213,7 +215,7 @@ public protocol Adaptor {
     
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
-    func createObject(obj: BaseType) -> BaseType
+    func createObject(objType: BaseType.Type) -> BaseType
     func deleteObject(obj: BaseType)
     
     // TODO: Add threading model here or in separate protocol.
@@ -234,8 +236,8 @@ class RealmAdaptor : Adaptor {
         self.init(realm: try Realm())
     }
     
-    func createObject(obj: BaseType) -> BaseType {
-        return Object()
+    func createObject(objType: BaseType.Type) -> BaseType {
+        return objType.init()
     }
     
     func deleteObject(obj: BaseType) {
@@ -263,5 +265,5 @@ class RealmAdaptor : Adaptor {
     }
 }
 
-// Have something along the lines of.
+// For Network lib have something along the lines of. Will need to properly handle the typing constraints.
 // func registerMapping(mapping: Mapping, forPath path: URLPath)
