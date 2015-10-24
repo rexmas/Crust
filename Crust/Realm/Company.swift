@@ -6,5 +6,5 @@ public class Company: Object {
     dynamic var uuid: String?
     dynamic var foundingDate: NSDate?
     dynamic var founder: Employee?
-    dynamic var pendingLawsuits: NSNumber?  // Int64
+    dynamic var pendingLawsuits: Int = 0
 }

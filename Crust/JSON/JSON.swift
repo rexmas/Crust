@@ -8,7 +8,7 @@ public enum JSONValue : CustomStringConvertible {
     case JSONBool(Bool)
     case JSONNull()
     
-    private func values() -> NSObject {
+    public func values() -> NSObject {
         switch self {
         case let .JSONArray(xs):
             return NSArray(array: xs.map { $0.values() })
@@ -25,13 +25,27 @@ public enum JSONValue : CustomStringConvertible {
         }
     }
     
-    init(object: AnyObject) throws {
+    public init(object: Any) throws {
         switch object {
+        case let array as Array<Any>:
+            let jsonValues = try array.map {
+                return try JSONValue(object: $0)
+            }
+            self = .JSONArray(jsonValues)
+            
         case let array as NSArray:
             let jsonValues = try array.map {
                 return try JSONValue(object: $0)
             }
             self = .JSONArray(jsonValues)
+            
+        case let dict as Dictionary<String, Any>:
+            var jsonValues = [String : JSONValue]()
+            for (key, val) in dict {
+                let x = try JSONValue(object: val)
+                jsonValues[key] = x
+            }
+            self = .JSONObject(jsonValues)
             
         case let dict as NSDictionary:
             var jsonValues = [String : JSONValue]()

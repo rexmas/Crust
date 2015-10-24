@@ -10,6 +10,7 @@
 		1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF3F1BC38BE600D4EAD8 /* JSON.swift */; };
 		1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF421BC38C4A00D4EAD8 /* Utilities.swift */; };
 		171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */; };
+		176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */; };
 		17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */; };
 		17F960011BCB39C400CC6D4A /* MappingOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */; };
 		17F960021BCB39C400CC6D4A /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFF1BCB39C400CC6D4A /* User.swift */; };
@@ -39,6 +40,7 @@
 		1710BF3F1BC38BE600D4EAD8 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		1710BF421BC38C4A00D4EAD8 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRRequest.swift; sourceTree = "<group>"; };
+		176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeMappingTests.swift; sourceTree = "<group>"; };
 		17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRMapper.swift; sourceTree = "<group>"; };
 		17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingOperator.swift; sourceTree = "<group>"; };
 		17F95FFF1BCB39C400CC6D4A /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				26951C381AFB401B007B0E07 /* Supporting Files */,
+				176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */,
 			);
 			path = CrustTests;
 			sourceTree = "<group>";
@@ -252,7 +255,7 @@
 		26951C171AFB401A007B0E07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0700;
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "Lucas Swift";
 				TargetAttributes = {
@@ -420,6 +423,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +571,7 @@
 			baseConfigurationReference = F9CE242D69705864C0D5EE1B /* Pods.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -575,6 +580,7 @@
 				INFOPLIST_FILE = CrustTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Crust.app/Crust";
 			};
 			name = Debug;
@@ -584,6 +590,7 @@
 			baseConfigurationReference = 9E9BE561C101621E8C640AAE /* Pods.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CrustTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";

@@ -1,4 +1,5 @@
 import Foundation
+import RealmSwift
 
 public enum MappingDirection {
     case FromJSON
@@ -161,22 +162,84 @@ public struct CRMapper<T: Mappable> {
     }
 }
 
-public protocol Mappable  {
-    static func newInstance() -> Mappable
-    static func foreignKeys() -> Array<CRMappingKey>
+extension Employee: Mappable {
+    
+}
+
+class EmployeeMapping : Mapping {
+    func mapping(tomap: Employee, context: CRMappingContext) {
+        
+    }
+}
+
+public protocol Mappable {
+    static func newInstance() -> Self
+    static func primaryKeys() -> Array<CRMappingKey>
     mutating func mapping(context: CRMappingContext)
 }
 
-protocol Adaptor {
-    func fetchObjectForForeignKeys(keys: Array<CRMappingKey>) -> Mappable
-    func deleteObject<T: Mappable>(obj: T)
+public protocol Adaptor {
+    typealias BaseType
+    typealias ResultsType: CollectionType
+    
+    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
+    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
+    func createObject(obj: BaseType) -> BaseType
+    func deleteObject(obj: BaseType)
+}
+
+class RealmAdaptor : Adaptor {
+    
+    typealias BaseType = Object
+    typealias ResultsType = Results<Object>
+    
+    var realm: Realm
+    
+    init(realm: Realm) {
+        self.realm = realm
+    }
+    
+    convenience init() throws {
+        self.init(realm: try Realm())
+    }
+    
+    func createObject(obj: BaseType) -> BaseType {
+        return Object()
+    }
+    
+    func deleteObject(obj: BaseType) {
+        realm.write {
+            self.realm.delete(obj)
+        }
+    }
+    
+    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType? {
+        
+        var predicates = Array<NSPredicate>()
+        for (key, value) in keyValues {
+            let predicate = NSPredicate(format: "%@ = %@", key, value)
+            predicates.append(predicate)
+        }
+        
+        let andPredicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: predicates)
+        
+        return fetchObjectsWithType(type, predicate: andPredicate).first
+    }
+    
+    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType {
+        
+        return realm.objects(type).filter(predicate)
+    }
 }
 
 protocol Mapping {
-    var adaptor: Adaptor { get }
+    typealias MappedObject: Mappable
+    typealias AdaptorKind: Adaptor
+    
+    var adaptor: AdaptorKind { get }
     
     func foreignKeys() -> Array<CRMappingKey>
-    mutating func mapping<T: Mappable>(tomap: T, context: CRMappingContext)
+    mutating func mapping(tomap: MappedObject, context: CRMappingContext)
 }
 
 // Have something along the lines of.
