@@ -8,12 +8,12 @@ public enum JSONValue : CustomStringConvertible {
     case JSONBool(Bool)
     case JSONNull()
     
-    public func values() -> NSObject {
+    public func values() -> AnyObject {
         switch self {
         case let .JSONArray(xs):
-            return NSArray(array: xs.map { $0.values() })
+            return xs.map { $0.values() }
         case let .JSONObject(xs):
-            return NSDictionary(dictionary: xs.mapValues { $0.values() })
+            return xs.mapValues { $0.values() }
         case let .JSONNumber(n):
             return NSNumber(double: n)
         case let .JSONString(s):
@@ -54,7 +54,7 @@ public enum JSONValue : CustomStringConvertible {
                 jsonValues[key as! String] = x
             }
             self = .JSONObject(jsonValues)
-            
+        
         case let val as NSNumber:
             if val.isBool {
                 self = .JSONBool(val.boolValue)
@@ -292,6 +292,8 @@ extension Int : JSONKeypath {
     }
 }
 
+// MARK: - JSONable
+
 // TODO: May need to remove the typealias and just return Any if
 // Array conversion turns out to be too cumbersome.
 
@@ -307,19 +309,36 @@ public protocol JSONEncodable {
 
 public protocol JSONable : JSONDecodable, JSONEncodable { }
 
-// instances
-
-extension NSArray : JSONable {
-    public static func fromJSON(x: JSONValue) -> NSArray? {
+extension Dictionary : JSONDecodable {
+    public static func fromJSON(x: JSONValue) -> Dictionary.J? {
         switch x {
-        case .JSONArray:
-            return x.values() as? NSArray
+        case .JSONObject:
+            return x.values() as? Dictionary<String, Value>
         default:
             return nil
         }
     }
     
-    public static func toJSON(x: NSArray) -> JSONValue {
+    public static func toJSON(x: Dictionary) -> JSONValue {
+        do {
+            return try JSONValue(object: x)
+        } catch {
+            return JSONValue.JSONNull()
+        }
+    }
+}
+
+extension Array : JSONable {
+    public static func fromJSON(x: JSONValue) -> Array? {
+        switch x {
+        case .JSONArray:
+            return x.values() as? Array
+        default:
+            return nil
+        }
+    }
+    
+    public static func toJSON(x: Array) -> JSONValue {
         do {
             return try JSONValue(object: x)
         } catch {
@@ -387,8 +406,8 @@ extension NSNumber : JSONable {
         }
     }
     
-    public class func toJSON(xs : NSNumber) -> JSONValue {
-        return JSONValue.JSONNumber(Double(xs))
+    public class func toJSON(x : NSNumber) -> JSONValue {
+        return JSONValue.JSONNumber(Double(x))
     }
 }
 
@@ -402,12 +421,26 @@ extension String : JSONable {
         }
     }
     
-    public static func toJSON(xs : String) -> JSONValue {
-        return JSONValue.JSONString(xs)
+    public static func toJSON(x : String) -> JSONValue {
+        return JSONValue.JSONString(x)
     }
 }
 
-// or unit...
+extension NSDate : JSONable {
+    public static func fromJSON(x: JSONValue) -> NSDate? {
+        switch x {
+        case let .JSONString(string):
+            return NSDate.fromISOString(string)
+        default:
+            return nil
+        }
+    }
+    
+    public static func toJSON(x: NSDate) -> JSONValue {
+        return .JSONString(x.toISOString())
+    }
+}
+
 extension NSNull : JSONable {
     public class func fromJSON(x : JSONValue) -> NSNull? {
         switch x {
@@ -423,7 +456,9 @@ extension NSNull : JSONable {
     }
 }
 
-// container types should be split
+// MARK: - Specialized Containers
+// Container types should be split.
+
 public struct JArrayFrom<A, B : JSONDecodable where B.J == A> : JSONDecodable {
     public typealias J = [A]
     
@@ -512,27 +547,3 @@ public struct JDictionary<A, B : JSONable where B.J == A> : JSONable {
         return JSONValue.JSONObject(xs.mapValues { B.toJSON($0) })
     }
 }
-
-
-/// MARK: Implementation Details
-
-//private func resolveKeypath(lhs : Dictionary<String, JSONValue>, rhs : JSONKeypath) -> JSONValue? {
-//    if rhs.path.isEmpty {
-//        return .None
-//    }
-//    
-//    switch rhs.path.match {
-//    case .Nil:
-//        return .None
-//    case let .Cons(hd, tl):
-//        if let o = lhs[hd] {
-//            switch o {
-//            case let .JSONObject(d) where rhs.path.count > 1:
-//                return resolveKeypath(d, rhs: JSONKeypath(tl))
-//            default:
-//                return o
-//            }
-//        }
-//        return .None
-//    }
-//}

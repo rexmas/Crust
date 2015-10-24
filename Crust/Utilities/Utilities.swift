@@ -28,3 +28,34 @@ extension Dictionary {
         return outDict
     }
 }
+
+// Consider using SwiftDate library.
+public extension NSDateFormatter {
+    
+    class func ISODateFormatter() -> NSDateFormatter {
+        struct Static {
+            static let dateFormatter = NSDateFormatter()
+            static var onceToken: dispatch_once_t = 0
+        }
+        dispatch_once(&Static.onceToken) {
+            Static.dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+            Static.dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
+            Static.dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        }
+        
+        return Static.dateFormatter
+    }
+}
+
+public extension NSDate {
+    
+    class func fromISOString(ISOString: String) -> NSDate? {
+        let dateFromatter = NSDateFormatter.ISODateFormatter()
+        return dateFromatter.dateFromString(ISOString)
+    }
+    
+    func toISOString() -> String {
+        let dateFromatter = NSDateFormatter.ISODateFormatter()
+        return dateFromatter.stringFromDate(self)
+    }
+}

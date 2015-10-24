@@ -8,6 +8,9 @@ public enum MappingDirection {
 
 public protocol CRMappingKey : JSONKeypath { }
 
+extension String : CRMappingKey { }
+extension Int : CRMappingKey { }
+
 extension Dictionary where Value : JSONable, Value.J == Value {
     
     public static func toJSON(x: Dictionary<String, Value>) -> JSONValue {
@@ -167,9 +170,35 @@ extension Employee: Mappable {
 }
 
 class EmployeeMapping : Mapping {
+    var adaptor: RealmAdaptor
+    var primaryKeys: Array<CRMappingKey> {
+        [ "uuid" ]
+    }
+    
+    init(adaptor: RealmAdaptor) {
+        self.adaptor = adaptor
+    }
+    
     func mapping(tomap: Employee, context: CRMappingContext) {
         
+//        (tomap.employer) <- ("employer", CRMappingContext)
+        tomap.uuid <- ("uuid", CRMappingContext)
+//        (tomap.name) <- ("name", CRMappingContext)
+//        (tomap.joinDate) <- ("joinDate", CRMappingContext)
+//        (tomap.salary) <- ("data.salary", CRMappingContext)
+//        (tomap.isEmployeeOfMonth) <- ("data.is_employee_of_month", CRMappingContext)
+//        (tomap.percentYearlyRaise) <- ("data.percent_yearly_raise", CRMappingContext)
     }
+}
+
+protocol Mapping {
+    typealias MappedObject: Mappable
+    typealias AdaptorKind: Adaptor
+    
+    var adaptor: AdaptorKind { get }
+    var primaryKeys: Array<CRMappingKey> { get }
+    
+    mutating func mapping(tomap: MappedObject, context: CRMappingContext)
 }
 
 public protocol Mappable {
@@ -186,6 +215,8 @@ public protocol Adaptor {
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
     func createObject(obj: BaseType) -> BaseType
     func deleteObject(obj: BaseType)
+    
+    // TODO: Add threading model here or in separate protocol.
 }
 
 class RealmAdaptor : Adaptor {
@@ -230,16 +261,6 @@ class RealmAdaptor : Adaptor {
         
         return realm.objects(type).filter(predicate)
     }
-}
-
-protocol Mapping {
-    typealias MappedObject: Mappable
-    typealias AdaptorKind: Adaptor
-    
-    var adaptor: AdaptorKind { get }
-    
-    func foreignKeys() -> Array<CRMappingKey>
-    mutating func mapping(tomap: MappedObject, context: CRMappingContext)
 }
 
 // Have something along the lines of.

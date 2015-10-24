@@ -57,7 +57,8 @@ class EmployeeStub {
             "joinDate" : joinDate,
             "data" : [
                 "salary" : salary,
-                "is_employee_of_month" : isEmployeeOfMonth
+                "is_employee_of_month" : isEmployeeOfMonth,
+                "percent_yearly_raise" : percentYearlyRaise
             ]
         ]
     }
