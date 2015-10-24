@@ -11,7 +11,7 @@ struct User : Mappable {
         return [ "Blah" as CRMappingKey ]
     }
     
-    mutating func mapping(context: CRMappingContext) {
+    mutating func mapping(context: MappingContext) {
         
         // TODO: fix compiler error. Likely do to operator precedence.
 //        blah <- CRMapping.Transform("Blah", "Blah") >*<
