@@ -28,15 +28,26 @@ class EmployeeMappingTests: XCTestCase {
     func testJsonToEmployee() {
         
         XCTAssertEqual(realm!.objects(Employee).count, 0)
-        let jsonObj = EmployeeStub().generateJsonObject()
-        let employeeJson = try! JSONValue(object: jsonObj)
+        let employeeStub = EmployeeStub()
+        let employeeJson = try! JSONValue(object: employeeStub.generateJsonObject())
         let mapper = CRMapper<Employee, EmployeeMapping>()
         let employee = try! mapper.mapFromJSONToNewObject(employeeJson, mapping: EmployeeMapping(adaptor: adaptor!))
         
         self.adaptor!.saveObjects([ employee ])
         
         XCTAssertEqual(realm!.objects(Employee).count, 1)
+        XCTAssertTrue(employeeStub.matches(employee))
     }
+}
+
+infix operator ||= { associativity right }
+func ||= (inout left: Bool, right: Bool) {
+    left = left || right
+}
+
+infix operator &&= { associativity right }
+func &&= (inout left: Bool, right: Bool) {
+    left = left && right
 }
 
 class EmployeeStub {
@@ -64,5 +75,17 @@ class EmployeeStub {
                 "percent_yearly_raise" : percentYearlyRaise
             ]
         ]
+    }
+    
+    func matches(object: Employee) -> Bool {
+        var matches = true
+        matches &&= self.uuid == object.uuid
+        matches &&= self.name == object.name
+        matches &&= floor(self.joinDate.timeIntervalSinceReferenceDate) == object.joinDate.timeIntervalSinceReferenceDate
+        matches &&= self.salary == object.salary
+        matches &&= self.isEmployeeOfMonth == object.isEmployeeOfMonth
+        matches &&= self.percentYearlyRaise == object.percentYearlyRaise
+        
+        return matches
     }
 }
