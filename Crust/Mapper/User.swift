@@ -3,7 +3,7 @@ struct User : Mappable {
     var blah: Int
     var array: Array<Any>
     
-    static func newInstance() -> Mappable {
+    static func newInstance() -> User {
         return User(derp: "", blah: 0, array: [])
     }
     

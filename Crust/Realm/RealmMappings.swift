@@ -1,10 +1,10 @@
 import Foundation
 import RealmSwift
 
-class RealmAdaptor : Adaptor {
+public class RealmAdaptor : Adaptor {
     
-    typealias BaseType = Object
-    typealias ResultsType = Results<Object>
+    public typealias BaseType = Object
+    public typealias ResultsType = Results<Object>
     
     var realm: Realm
     
@@ -16,17 +16,17 @@ class RealmAdaptor : Adaptor {
         self.init(realm: try Realm())
     }
     
-    func createObject(objType: BaseType.Type) -> BaseType {
+    public func createObject(objType: BaseType.Type) -> BaseType {
         return objType.init()
     }
     
-    func deleteObject(obj: BaseType) {
+    public func deleteObject(obj: BaseType) {
         realm.write {
             self.realm.delete(obj)
         }
     }
     
-    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType? {
+    public func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType? {
         
         var predicates = Array<NSPredicate>()
         for (key, value) in keyValues {
@@ -39,7 +39,7 @@ class RealmAdaptor : Adaptor {
         return fetchObjectsWithType(type, predicate: andPredicate).first
     }
     
-    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType {
+    public func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType {
         
         return realm.objects(type).filter(predicate)
     }
@@ -47,9 +47,10 @@ class RealmAdaptor : Adaptor {
 
 extension Employee: Mappable { }
 
-class EmployeeMapping : Mapping {
-    var adaptor: RealmAdaptor
-    var primaryKeys: Array<CRMappingKey> {
+public class EmployeeMapping : Mapping {
+    
+    public var adaptor: RealmAdaptor
+    public var primaryKeys: Array<CRMappingKey> {
         return [ "uuid" ]
     }
     
@@ -57,7 +58,7 @@ class EmployeeMapping : Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(tomap: Employee, context: MappingContext) {
+    public func mapping(tomap: Employee, context: MappingContext) {
         
         tomap.joinDate              <- "joinDate"  >*<
         tomap.uuid                  <- "uuid" >*<

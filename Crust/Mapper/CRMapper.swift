@@ -66,7 +66,9 @@ public class MappingContext {
 }
 
 // Global method caller used to perform mappings.
-public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T, T == U.AdaptorKind.BaseType> {
+public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
+    
+    init() { }
     
     func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
         let object = getInstance(mapping)
@@ -94,7 +96,9 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T, T == U
     }
     
     internal func getInstance(mapping: U) -> T {
-        return mapping.adaptor.createObject(T.self)
+        // NOTE: This sux but `T: U.AdaptorKind.BaseType` throws a compiler error as of 7.1 Xcode
+        // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
+        return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
     }
 }
 
