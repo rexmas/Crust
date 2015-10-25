@@ -1,4 +1,5 @@
 import Foundation
+import RealmSwift
 
 public enum MappingDirection {
     case FromJSON
@@ -7,98 +8,10 @@ public enum MappingDirection {
 
 public protocol CRMappingKey : JSONKeypath { }
 
-extension Dictionary where Value : JSONable, Value.J == Value {
-    
-    public static func toJSON(x: Dictionary<String, Value>) -> JSONValue {
-        return JDictionary<Value, Value>.toJSON(x)
-    }
-    
-    public static func fromJSON(x: JSONValue) -> Dictionary<String, Value>? {
-        return JDictionary<Value, Value>.fromJSON(x)
-    }
-}
+extension String : CRMappingKey { }
+extension Int : CRMappingKey { }
 
-extension Set where Element : JSONable, Element.J == Element {
-    
-    public static func toJSON(x: Set<Element>) -> JSONValue {
-        let array = Array(x)
-        return JArray<Element, Element>.toJSON(array)
-    }
-    
-    public static func fromJSON(x: JSONValue) -> Set<Element>? {
-        if let array = JArray<Element, Element>.fromJSON(x) {
-            return Set(array)
-        } else {
-            return nil
-        }
-    }
-}
-
-//extension Array : JSON {
-//    
-//    public static func toJSON(xs: Array) -> JSONValue {
-//        for x in xs {
-//            switch x {
-//            case is JSON:
-//            break
-//            default:
-//            break
-//            }
-//        }
-//        return self.toJSON(self)
-//    }
-//    
-//    public static func fromJSON(x: JSONValue) -> Array? {
-//        <#code#>
-//    }
-//    
-//    func toJSON<T: JSON>(x: Array<T>) -> JSONValue {
-//        
-//    }
-//}
-
-extension Array where Element : JSONable, Element.J == Element {
-    
-    public func toJSON(x: Array<Element>) -> JSONValue {
-        return JArray<Element, Element>.toJSON(x)
-    }
-    
-    public func fromJSON(x: JSONValue) -> Array? {
-        return JArray<Element, Element>.fromJSON(x)
-    }
-}
-
-//extension Array : CRFieldType {
-//    public func asJSON() -> Result<JSONValue> {
-//        
-//        switch Element.self {
-//        case is CRFieldType.Type:
-//            
-//            var resultArray = Array<JSONValue>()
-//            
-//            for val in self {
-//                let val = val as! CRFieldType
-//                let result = val.asJSON()
-//                
-//                switch result {
-//                case .Value(let val):
-//                    print(val)
-//                    resultArray.append(val)
-//                    print(resultArray)
-//                case .Error(_):
-//                    return result
-//                }
-//            }
-//            print(resultArray)
-//            return Result.Value(JSONValue.JSONArray(resultArray))
-//            
-//        default:
-//            return Result.Error(NSError(domain: "", code: 0, userInfo: nil))
-//        }
-//    }
-//}
-
-public enum CRMapping : CRMappingKey {
+public enum KeyExtensions : CRMappingKey {
     case ForeignKey(CRMappingKey)
     case Transform(CRMappingKey, String) // TODO: Second element should be Transform type to define later
     
@@ -114,7 +27,33 @@ public enum CRMapping : CRMappingKey {
     }
 }
 
-public class CRMappingContext {
+public protocol Mapping {
+    typealias MappedObject: Mappable
+    typealias AdaptorKind: Adaptor
+    
+    var adaptor: AdaptorKind { get }
+    var primaryKeys: Array<CRMappingKey> { get }
+    
+    func mapping(tomap: MappedObject, context: MappingContext)
+}
+
+// Do we need this in the end?
+public protocol Mappable { }
+
+public protocol Adaptor {
+    typealias BaseType
+    typealias ResultsType: CollectionType
+    
+    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
+    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
+    func createObject(objType: BaseType.Type) -> BaseType
+    func deleteObject(obj: BaseType)
+    func saveObjects(objects: [ BaseType ])
+    
+    // TODO: Add threading model here or in separate protocol.
+}
+
+public class MappingContext {
     public var json: JSONValue
     public var object: Mappable
     public private(set) var dir: MappingDirection
@@ -127,57 +66,42 @@ public class CRMappingContext {
     }
 }
 
-// Global methods caller uses to perform mappings.
-public struct CRMapper<T: Mappable> {
+// Global method caller used to perform mappings.
+public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
     
-    func mapFromJSONToObject(json: JSONValue) throws -> T {
-        let object = getInstance()
-        return try mapFromJSON(json, toObject: object)
+    public init() { }
+    
+    public func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
+        let object = getInstance(mapping)
+        return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    func mapFromJSON(json: JSONValue, var toObject object: T) throws -> T {
-        let context = CRMappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        try performMappingWithObject(&object, context: context)
+    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
+        let context = MappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return object
     }
     
-    func mapFromObjectToJSON(var object: T) throws -> JSONValue {
-        let context = CRMappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        try performMappingWithObject(&object, context: context)
+    public func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
+        let context = MappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return context.json
     }
     
-    internal func performMappingWithObject(inout object: T, context: CRMappingContext) throws {
-        object.mapping(context)
+    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext) throws {
+        mapping.mapping(object, context: context)
         if let error = context.error {
             throw error
         }
         context.object = object
     }
     
-    internal func getInstance() -> T {
-        // TODO: Find by foreignKeys else...
-        return T.newInstance() as! T
+    internal func getInstance(mapping: U) -> T {
+        // NOTE: This sux but `T: U.AdaptorKind.BaseType` throws a compiler error as of 7.1 Xcode
+        // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
+        return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
     }
 }
 
-public protocol Mappable  {
-    static func newInstance() -> Mappable
-    static func foreignKeys() -> Array<CRMappingKey>
-    mutating func mapping(context: CRMappingContext)
-}
-
-protocol Adaptor {
-    func fetchObjectForForeignKeys(keys: Array<CRMappingKey>) -> Mappable
-    func deleteObject<T: Mappable>(obj: T)
-}
-
-protocol Mapping {
-    var adaptor: Adaptor { get }
-    
-    func foreignKeys() -> Array<CRMappingKey>
-    mutating func mapping<T: Mappable>(tomap: T, context: CRMappingContext)
-}
-
-// Have something along the lines of.
+// For Network lib have something along the lines of. Will need to properly handle the typing constraints.
 // func registerMapping(mapping: Mapping, forPath path: URLPath)

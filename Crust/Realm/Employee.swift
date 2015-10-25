@@ -2,11 +2,11 @@ import RealmSwift
 
 public class Employee: Object {
     
-    dynamic var employer: Company?
-    dynamic var uuid: String?
-    dynamic var name: String?
-    dynamic var joinDate: NSDate?
-    dynamic var salary: NSNumber?               // Int64
-    dynamic var isEmployeeOfMonth: NSNumber?    // Bool
-    dynamic var percentYearlyRaise: NSNumber?   // Double
+    public dynamic var employer: Company?
+    public dynamic var uuid: String = ""
+    public dynamic var name: String = ""
+    public dynamic var joinDate: NSDate = NSDate()
+    public var salary: Int = 0
+    public var isEmployeeOfMonth: Bool = false
+    public var percentYearlyRaise: Double = 0.0
 }
