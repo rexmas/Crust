@@ -15,5 +15,6 @@ class CompanyMappingTests: RealmMappingTest {
         self.adaptor!.saveObjects([ object ])
         
         XCTAssertEqual(realm!.objects(Company).count, 1)
+        XCTAssertTrue(stub.matches(object))
     }
 }

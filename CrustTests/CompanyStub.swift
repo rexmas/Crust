@@ -14,11 +14,12 @@ class CompanyStub {
         
     }
     
-    func generateJsonObject() -> Dictionary<String, Any> {
+    func generateJsonObject() -> Dictionary<String, AnyObject> {
+        
         return [
             "uuid" : uuid,
             "name" : name,
-            "employees" : employees.map { $0.generateJsonObject },
+            "employees" : employees.map { $0.generateJsonObject() } as NSArray,
             "data" : [
                 "lawsuits" : [
                     "pending" : pendingLawsuits

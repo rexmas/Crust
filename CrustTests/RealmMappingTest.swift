@@ -2,7 +2,7 @@ import XCTest
 import Crust
 import RealmSwift
 
-class RealmMappingTest: XCTest {
+class RealmMappingTest: XCTestCase {
     var realm: Realm?
     var adaptor: RealmAdaptor?
     

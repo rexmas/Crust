@@ -7,14 +7,14 @@ class EmployeeMappingTests: RealmMappingTest {
     func testJsonToEmployee() {
         
         XCTAssertEqual(realm!.objects(Employee).count, 0)
-        let employeeStub = EmployeeStub()
-        let employeeJson = try! JSONValue(object: employeeStub.generateJsonObject())
+        let stub = EmployeeStub()
+        let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = CRMapper<Employee, EmployeeMapping>()
-        let employee = try! mapper.mapFromJSONToNewObject(employeeJson, mapping: EmployeeMapping(adaptor: adaptor!))
+        let object = try! mapper.mapFromJSONToNewObject(json, mapping: EmployeeMapping(adaptor: adaptor!))
         
-        self.adaptor!.saveObjects([ employee ])
+        self.adaptor!.saveObjects([ object ])
         
         XCTAssertEqual(realm!.objects(Employee).count, 1)
-        XCTAssertTrue(employeeStub.matches(employee))
+        XCTAssertTrue(stub.matches(object))
     }
 }

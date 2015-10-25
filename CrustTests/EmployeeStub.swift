@@ -15,7 +15,7 @@ class EmployeeStub {
         
     }
     
-    func generateJsonObject() -> Dictionary<String, Any> {
+    func generateJsonObject() -> Dictionary<String, AnyObject> {
         return [
             "uuid" : uuid,
             "name" : name,
