@@ -70,7 +70,8 @@ public enum JSONValue : CustomStringConvertible {
             
         default:
             // TODO: Generate an enum of standard errors.
-            throw NSError(domain: "CRJSONErrorDomain", code: -1000, userInfo: nil);
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "\(object.dynamicType) cannot be converted to JSON" ]
+            throw NSError(domain: "CRJSONErrorDomain", code: -1000, userInfo: userInfo)
         }
     }
     

@@ -48,6 +48,7 @@ public protocol Adaptor {
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
     func createObject(objType: BaseType.Type) -> BaseType
     func deleteObject(obj: BaseType)
+    func saveObjects(objects: [ BaseType ])
     
     // TODO: Add threading model here or in separate protocol.
 }
@@ -68,20 +69,20 @@ public class MappingContext {
 // Global method caller used to perform mappings.
 public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
     
-    init() { }
+    public init() { }
     
-    func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
+    public func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
         let object = getInstance(mapping)
         return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
+    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
         try performMappingWithObject(&object, mapping: mapping, context: context)
         return object
     }
     
-    func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
+    public func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
         let context = MappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
         try performMappingWithObject(&object, mapping: mapping, context: context)
         return context.json

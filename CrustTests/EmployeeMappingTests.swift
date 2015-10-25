@@ -5,6 +5,7 @@ import RealmSwift
 class EmployeeMappingTests: XCTestCase {
     
     var realm: Realm?
+    var adaptor: RealmAdaptor?
 
     override func setUp() {
         super.setUp()
@@ -15,6 +16,8 @@ class EmployeeMappingTests: XCTestCase {
         // there's nothing that needs to be cleaned up.
         Realm.Configuration.defaultConfiguration.inMemoryIdentifier = self.name
         realm = try! Realm()
+        
+        adaptor = RealmAdaptor(realm: realm!)
     }
     
     override func tearDown() {
@@ -24,37 +27,37 @@ class EmployeeMappingTests: XCTestCase {
     
     func testJsonToEmployee() {
         
-        XCTAssertEqual(realm!.objects(Employee), 0)
-        var employeeJson = try! JSONValue(object: EmployeeStub().generateJsonObject())
+        XCTAssertEqual(realm!.objects(Employee).count, 0)
+        let jsonObj = EmployeeStub().generateJsonObject()
+        let employeeJson = try! JSONValue(object: jsonObj)
+        let mapper = CRMapper<Employee, EmployeeMapping>()
+        let employee = try! mapper.mapFromJSONToNewObject(employeeJson, mapping: EmployeeMapping(adaptor: adaptor!))
         
-        XCTAssertEqual(realm!.objects(Employee), 1)
+        self.adaptor!.saveObjects([ employee ])
+        
+        XCTAssertEqual(realm!.objects(Employee).count, 1)
     }
 }
 
 class EmployeeStub {
 
 //    var employer: CompanyStub?
-    var uuid: String?
-    var name: String?
-    var joinDate: NSDate?
-    var salary: NSNumber?               // Int64
-    var isEmployeeOfMonth: NSNumber?    // Bool
-    var percentYearlyRaise: NSNumber?   // Double
+    var uuid: String = NSUUID().UUIDString
+    var name: String = "John"
+    var joinDate: NSDate = NSDate()
+    var salary: NSNumber = 44                   // Int64
+    var isEmployeeOfMonth: NSNumber = false     // Bool
+    var percentYearlyRaise: NSNumber = 0.5      // Double
     
     init() {
-        uuid = NSUUID().UUIDString
-        name = "John"
-        joinDate = NSDate()
-        salary = 44
-        isEmployeeOfMonth = false
-        percentYearlyRaise = 0.5
+        
     }
     
-    func generateJsonObject() -> Dictionary<String, Any?> {
+    func generateJsonObject() -> Dictionary<String, Any> {
         return [
             "uuid" : uuid,
             "name" : name,
-            "joinDate" : joinDate,
+            "joinDate" : joinDate.toISOString(),
             "data" : [
                 "salary" : salary,
                 "is_employee_of_month" : isEmployeeOfMonth,

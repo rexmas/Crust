@@ -8,16 +8,22 @@ public class RealmAdaptor : Adaptor {
     
     var realm: Realm
     
-    init(realm: Realm) {
+    public init(realm: Realm) {
         self.realm = realm
     }
     
-    convenience init() throws {
+    public convenience init() throws {
         self.init(realm: try Realm())
     }
     
     public func createObject(objType: BaseType.Type) -> BaseType {
         return objType.init()
+    }
+    
+    public func saveObjects(objects: [BaseType]) {
+        self.realm.write {
+            self.realm.add(objects)
+        }
     }
     
     public func deleteObject(obj: BaseType) {
@@ -47,14 +53,18 @@ public class RealmAdaptor : Adaptor {
 
 extension Employee: Mappable { }
 
-public class EmployeeMapping : Mapping {
+public protocol RealmMapping : Mapping {
+    init(adaptor: RealmAdaptor)
+}
+
+public class EmployeeMapping : RealmMapping {
     
     public var adaptor: RealmAdaptor
     public var primaryKeys: Array<CRMappingKey> {
         return [ "uuid" ]
     }
     
-    init(adaptor: RealmAdaptor) {
+    public required init(adaptor: RealmAdaptor) {
         self.adaptor = adaptor
     }
     
