@@ -25,6 +25,24 @@ public enum JSONValue : CustomStringConvertible {
         }
     }
     
+    public init<T>(array: Array<T>) throws {
+        let jsonValues = try array.map {
+            return try JSONValue(object: $0)
+        }
+        self = .JSONArray(jsonValues)
+    }
+    
+    public init<V>(dict: Dictionary<String, V>) throws {
+        var jsonValues = [String : JSONValue]()
+        for (key, val) in dict {
+            let x = try JSONValue(object: val)
+            jsonValues[key] = x
+        }
+        self = .JSONObject(jsonValues)
+    }
+    
+    // NOTE: Would be nice to figure out a generic recursive way of solving this.
+    // Array<Dictionary<String, Any>> doesn't seem to work. Maybe case eval on generic param too?
     public init(object: Any) throws {
         switch object {
         case let array as Array<Any>:
@@ -322,7 +340,7 @@ extension Dictionary : JSONable {
     
     public static func toJSON(x: Dictionary.J) -> JSONValue {
         do {
-            return try JSONValue(object: x)
+            return try JSONValue(dict: x)
         } catch {
             return JSONValue.JSONNull()
         }
@@ -341,7 +359,7 @@ extension Array : JSONable {
     
     public static func toJSON(x: Array) -> JSONValue {
         do {
-            return try JSONValue(object: x)
+            return try JSONValue(array: x)
         } catch {
             return JSONValue.JSONNull()
         }

@@ -2,9 +2,10 @@ import RealmSwift
 
 public class Company: Object {
     
-    let employees = List<Employee>()
-    dynamic var uuid: String = ""
-    dynamic var foundingDate: NSDate = NSDate()
-    dynamic var founder: Employee?
-    dynamic var pendingLawsuits: Int = 0
+    public let employees = List<Employee>()
+    public dynamic var uuid: String = ""
+    public dynamic var name: String = ""
+    public dynamic var foundingDate: NSDate = NSDate()
+    public dynamic var founder: Employee?
+    public dynamic var pendingLawsuits: Int = 0
 }

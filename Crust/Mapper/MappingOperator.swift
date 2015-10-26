@@ -16,7 +16,13 @@ public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
 
 infix operator <- { associativity right }
 
+// Map arbitrary object.
 public func <- <T: JSONable, C: MappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+    return mapField(&field, map: map)
+}
+
+// Map a Mappable.
+public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
     return mapField(&field, map: map)
 }
 
@@ -27,33 +33,13 @@ public func <- <T: JSONable, C: MappingContext where T == T.J>(inout field: T?, 
     return mapField(&field, map: map)
 }
 
-// MARK: - Map value funcs
-
-public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
-    
-    guard map.context.error == nil else {
-        return map.context
-    }
-    
-    switch map.context.dir {
-    case .ToJSON:
-        let json = map.context.json
-        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
-    case .FromJSON:
-        do {
-            if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field)
-            } else {
-                throw NSError(domain: "", code: 0, userInfo: nil)
-            }
-        } catch let error as NSError {
-            map.context.error = error
-        }
-    }
-    
-    return map.context
+public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+    return mapField(&field, map: map)
 }
 
+// MARK: - Map funcs
+
+// Arbitrary object.
 public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     
     guard map.context.error == nil else {
@@ -79,6 +65,100 @@ public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field:
     return map.context
 }
 
+// Arbitrary Optional.
+public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    switch map.context.dir {
+    case .ToJSON:
+        let json = map.context.json
+        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
+    case .FromJSON:
+        do {
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: nil)
+            }
+        } catch let error as NSError {
+            map.context.error = error
+        }
+    }
+    
+    return map.context
+}
+
+// Mappable.
+public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    guard case .Mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
+        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
+        return map.context
+    }
+    
+    do {
+        switch map.context.dir {
+        case .ToJSON:
+            let json = map.context.json
+            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+        case .FromJSON:
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping)
+            } else {
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
+            }
+        }
+    } catch let error as NSError {
+        map.context.error = error
+    }
+    
+    return map.context
+}
+
+// TODO: Maybe we can just make Optional: Mappable and then this redudancy can safely go away...
+public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    guard case .Mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
+        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
+        return map.context
+    }
+    
+    do {
+        switch map.context.dir {
+        case .ToJSON:
+            let json = map.context.json
+            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+        case .FromJSON:
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping)
+            } else {
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
+            }
+        }
+    } catch let error as NSError {
+        map.context.error = error
+    }
+    
+    return map.context
+}
+
+// MARK: - To JSON
+
 private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
     
     if let field = field {
@@ -89,6 +169,19 @@ private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromFiel
     
     return json
 }
+
+private func mapToJson<T: Mappable, U: Mapping where U.MappedObject == T>(var json: JSONValue, fromField field: T?, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue {
+    
+    guard let field = field else {
+        json[key] = .JSONNull()
+        return json
+    }
+    
+    json[key] = try CRMapper<T, U>().mapFromObjectToJSON(field, mapping: mapping)
+    return json
+}
+
+// MARK: - From JSON
 
 private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T) throws {
     
@@ -111,4 +204,21 @@ private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toFi
     } else {
         throw NSError(domain: "CRMappingDomain", code: -1, userInfo: nil)
     }
+}
+
+private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T, mapping: U) throws {
+    
+    let mapper = CRMapper<T, U>()
+    field = try mapper.mapFromJSONToNewObject(json, mapping: mapping)
+}
+
+private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T?, mapping: U) throws {
+    
+    if case .JSONNull = json {
+        field = nil
+        return
+    }
+    
+    let mapper = CRMapper<T, U>()
+    field = try mapper.mapFromJSONToNewObject(json, mapping: mapping)
 }
