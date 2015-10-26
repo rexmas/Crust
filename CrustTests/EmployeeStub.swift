@@ -3,7 +3,7 @@ import Crust
 
 class EmployeeStub {
     
-    //    var employer: CompanyStub?
+    var employer: CompanyStub?
     var uuid: String = NSUUID().UUIDString
     var name: String = "John"
     var joinDate: NSDate = NSDate()
@@ -16,10 +16,12 @@ class EmployeeStub {
     }
     
     func generateJsonObject() -> Dictionary<String, AnyObject> {
+        let company = employer?.generateJsonObject()
         return [
             "uuid" : uuid,
             "name" : name,
             "joinDate" : joinDate.toISOString(),
+            "company" :  company == nil ? NSNull() : company! as NSDictionary,
             "data" : [
                 "salary" : salary,
                 "is_employee_of_month" : isEmployeeOfMonth,
@@ -36,6 +38,9 @@ class EmployeeStub {
         matches &&= salary == object.salary
         matches &&= isEmployeeOfMonth == object.isEmployeeOfMonth
         matches &&= percentYearlyRaise == object.percentYearlyRaise
+        if let employer = employer {
+            matches &&= (employer.matches(object.employer!))
+        }
         
         return matches
     }

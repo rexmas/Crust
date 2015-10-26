@@ -94,8 +94,10 @@ public class CompanyMapping : RealmMapping {
     }
     
     public func mapping(tomap: Company, context: MappingContext) {
+        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
-        tomap.employees             <- .Mapping("employees", EmployeeMapping(adaptor: self.adaptor)) >*<
+        tomap.employees             <- .Mapping("employees", employeeMapping) >*<
+        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<

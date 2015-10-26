@@ -17,4 +17,16 @@ class CompanyMappingTests: RealmMappingTest {
         XCTAssertEqual(realm!.objects(Company).count, 1)
         XCTAssertTrue(stub.matches(object))
     }
+    
+    func testWithNilFounder() {
+        
+    }
+    
+    func testWithManyEmployees() {
+        
+    }
+    
+    func testWith0Employees() {
+        
+    }
 }

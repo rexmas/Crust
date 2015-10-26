@@ -44,7 +44,6 @@ public enum JSONValue : CustomStringConvertible {
     // NOTE: Would be nice to figure out a generic recursive way of solving this.
     // Array<Dictionary<String, Any>> doesn't seem to work. Maybe case eval on generic param too?
     public init(object: Any) throws {
-        print(object)
         switch object {
         case let array as Array<Any>:
             let jsonValues = try array.map {
