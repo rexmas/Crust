@@ -74,7 +74,6 @@ public class EmployeeMapping : RealmMapping {
         tomap.joinDate              <- "joinDate"  >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<
-        tomap.joinDate              <- "joinDate"  >*<
         tomap.salary                <- "data.salary"  >*<
         tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
         tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
