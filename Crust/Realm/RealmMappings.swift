@@ -108,61 +108,11 @@ public class CompanyMapping : RealmMapping {
 }
 
 public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(field: List<T>, map:(key: KeyExtensions<U>, context: C)) -> C {
-    return mapField(field, map: map)
-}
-
-public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(field: List<T>, map:(key: KeyExtensions<U>, context: C)) -> C {
     
-    guard map.context.error == nil else {
-        return map.context
-    }
+    // Realm specifies that List "must be declared with 'let'". Seems to actually work either way in practice, but for safety
+    // we're going to include a List mapper that accepts fields with a 'let' declaration and forward to our
+    // `RangeReplaceableCollectionType` mapper.
     
-    guard case .Mapping(let key, let mapping) = map.key else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
-        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
-        return map.context
-    }
-    
-    do {
-        switch map.context.dir {
-        case .ToJSON:
-            let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
-        case .FromJSON:
-            if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: field, mapping: mapping)
-            } else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
-            }
-        }
-    } catch let error as NSError {
-        map.context.error = error
-    }
-    
-    return map.context
-}
-
-private func mapToJson<T: Mappable, U: Mapping where U.MappedObject == T>(var json: JSONValue, fromField field: List<T>, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue {
-    
-    let results = try field.map {
-        try CRMapper<T, U>().mapFromObjectToJSON($0, mapping: mapping)
-    }
-    json[key] = .JSONArray(results)
-    
-    return json
-}
-
-private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, toField field: List<T>, mapping: U) throws {
-    
-    if case .JSONArray(let xs) = json {
-        let mapper = CRMapper<T, U>()
-        let results = try xs.map {
-            try mapper.mapFromJSONToNewObject($0, mapping: mapping)
-        }
-        field.appendContentsOf(results)
-    } else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(json.dynamicType) to List<\(T.self)>" ]
-        throw NSError(domain: "RealmMappingDomain", code: -1, userInfo: userInfo)
-    }
+    var variableList = field
+    return mapField(&variableList, map: map)
 }
