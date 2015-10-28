@@ -38,6 +38,8 @@ class CompanyStub {
         matches &&= pendingLawsuits == object.pendingLawsuits
         if let founder = founder {
             matches &&= founder.matches(object.founder!)
+        } else if object.founder != nil {
+            return false
         }
         for (i, employeeStub) in employees.enumerate() {
             matches &&= employeeStub.matches(object.employees[i])

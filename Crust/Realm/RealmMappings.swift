@@ -70,7 +70,9 @@ public class EmployeeMapping : RealmMapping {
     }
     
     public func mapping(tomap: Employee, context: MappingContext) {
+        let companyMapping = CompanyMapping(adaptor: self.adaptor)
         
+        tomap.employer              <- .Mapping("company", companyMapping) >*<
         tomap.joinDate              <- "joinDate"  >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<
