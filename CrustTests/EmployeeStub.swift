@@ -40,6 +40,8 @@ class EmployeeStub {
         matches &&= percentYearlyRaise == object.percentYearlyRaise
         if let employer = employer {
             matches &&= (employer.matches(object.employer!))
+        } else if object.employer != nil {
+            return false
         }
         
         return matches
