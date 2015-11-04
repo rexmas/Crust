@@ -109,7 +109,9 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         
         mapping.mapping(object, context: context)
         if let error = context.error {
-            mapping.adaptor.mappingErrored(error)
+            if (!nested) {
+                mapping.adaptor.mappingErrored(error)
+            }
             throw error
         }
         
