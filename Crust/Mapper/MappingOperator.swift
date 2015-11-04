@@ -55,7 +55,7 @@ public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
             } else {
-                throw NSError(domain: "", code: 0, userInfo: nil)
+                throw NSError(domain: "CRMappingDomain", code: 0, userInfo: nil)
             }
         } catch let error as NSError {
             map.context.error = error
@@ -81,7 +81,7 @@ public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
             } else {
-                throw NSError(domain: "", code: 0, userInfo: nil)
+                throw NSError(domain: "CRMappingDomain", code: 0, userInfo: nil)
             }
         } catch let error as NSError {
             map.context.error = error
@@ -100,7 +100,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
     
     guard case .Mapping(let key, let mapping) = map.key else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
-        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
+        map.context.error = NSError(domain: "CRMappingDomain", code: -1000, userInfo: userInfo)
         return map.context
     }
     
@@ -114,7 +114,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
+                throw NSError(domain: "CRMappingDomain", code: 0, userInfo: userInfo)
             }
         }
     } catch let error as NSError {
@@ -132,8 +132,8 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
     }
     
     guard case .Mapping(let key, let mapping) = map.key else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
-        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.Mapping to map type \(T.self)" ]
+        map.context.error = NSError(domain: "CRMappingDomain", code: -1000, userInfo: userInfo)
         return map.context
     }
     
@@ -147,7 +147,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
+                throw NSError(domain: "CRMappingDomain", code: 0, userInfo: userInfo)
             }
         }
     } catch let error as NSError {
@@ -209,7 +209,7 @@ private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toFi
 private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T, mapping: U) throws {
     
     let mapper = CRMapper<T, U>()
-    field = try mapper.mapFromJSONToNewObject(json, mapping: mapping)
+    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, nested: true)
 }
 
 private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T?, mapping: U) throws {
@@ -220,7 +220,7 @@ private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json
     }
     
     let mapper = CRMapper<T, U>()
-    field = try mapper.mapFromJSONToNewObject(json, mapping: mapping)
+    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, nested: true)
 }
 
 // MARK: - RangeReplaceableCollectionType (Array and List follow this protocol)
@@ -237,8 +237,8 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
     }
     
     guard case .Mapping(let key, let mapping) = map.key else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a List" ]
-        map.context.error = NSError(domain: "RealmMappingDomain", code: -1000, userInfo: userInfo)
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a \(V.self)" ]
+        map.context.error = NSError(domain: "CRMappingDomain", code: -1000, userInfo: userInfo)
         return map.context
     }
     
@@ -252,7 +252,7 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: "RealmMappingDomain", code: 0, userInfo: userInfo)
+                throw NSError(domain: "CRMappingDomain", code: 0, userInfo: userInfo)
             }
         }
     } catch let error as NSError {
@@ -277,12 +277,12 @@ private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionT
     if case .JSONArray(let xs) = json {
         let mapper = CRMapper<T, U>()
         let results = try xs.map {
-            try mapper.mapFromJSONToNewObject($0, mapping: mapping)
+            try mapper.mapFromJSONToExistingObject($0, mapping: mapping, nested: true)
         }
         field.appendContentsOf(results)
     } else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(json.dynamicType) to List<\(T.self)>" ]
-        throw NSError(domain: "RealmMappingDomain", code: -1, userInfo: userInfo)
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(json.dynamicType) to \(V.self)<\(T.self)>" ]
+        throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
     }
 }
 

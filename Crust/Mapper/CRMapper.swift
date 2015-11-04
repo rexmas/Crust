@@ -28,6 +28,9 @@ public enum KeyExtensions<T: Mapping> : CRMappingKey {
     }
 }
 
+// Do we need this in the end?
+public protocol Mappable { }
+
 public protocol Mapping {
     typealias MappedObject: Mappable
     typealias AdaptorKind: Adaptor
@@ -38,12 +41,13 @@ public protocol Mapping {
     func mapping(tomap: MappedObject, context: MappingContext)
 }
 
-// Do we need this in the end?
-public protocol Mappable { }
-
 public protocol Adaptor {
     typealias BaseType
     typealias ResultsType: CollectionType
+    
+    func mappingBegins()
+    func mappingEnded()
+    func mappingErrored(error: ErrorType)
     
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
@@ -73,33 +77,85 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
     public init() { }
     
     public func mapFromJSONToNewObject(json: JSONValue, mapping: U) throws -> T {
-        let object = getInstance(mapping)
+        let object = try getNewInstance(mapping)
         return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
+    public func mapFromJSONToExistingObject(json: JSONValue, mapping: U, nested: Bool = false) throws -> T {
+        var object = try getInstance(mapping, fromJSON: json)
+        if object == nil {
+            object = try getNewInstance(mapping)
+        }
+        return try mapFromJSON(json, toObject: object!, mapping: mapping, nested: nested)
+    }
+    
+    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U, nested: Bool = false) throws -> T {
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context, nested: nested)
         return object
     }
     
     public func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
         let context = MappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context, nested: false)
         return context.json
     }
     
-    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext) throws {
+    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext, nested: Bool) throws {
+        
+        if (!nested) {
+            mapping.adaptor.mappingBegins()
+        }
+        
         mapping.mapping(object, context: context)
         if let error = context.error {
+            if (!nested) {
+                mapping.adaptor.mappingErrored(error)
+            }
             throw error
         }
+        
+        if (!nested) {
+            mapping.adaptor.mappingEnded()
+        }
+        
         context.object = object
     }
     
-    internal func getInstance(mapping: U) -> T {
-        // NOTE: This sux but `T: U.AdaptorKind.BaseType` throws a compiler error as of 7.1 Xcode
+    internal func getInstance(mapping: U, fromJSON json: JSONValue) throws -> T? {
+        
+        // NOTE: This sux but `T: U.AdaptorKind.BaseType` as a type constraint throws a compiler error as of 7.1 Xcode
         // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
+        guard T.self is U.AdaptorKind.BaseType.Type else {
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(T.self) is not a subtype of \(U.AdaptorKind.BaseType.self)" ]
+            throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+        }
+        
+        let primaryKeys = mapping.primaryKeys
+        var keyValues = [ String : CVarArgType ]()
+        try primaryKeys.forEach {
+            let keyPath = $0.keyPath
+            if let val = json[keyPath] {
+                keyValues[keyPath] = val.valuesAsNSObjects()
+            } else {
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(U.self)" ]
+                throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+            }
+        }
+        
+        // TODO: Use case analysis and throw error.
+        return mapping.adaptor.fetchObjectWithType(T.self as! U.AdaptorKind.BaseType.Type, keyValues: keyValues) as! T?
+    }
+    
+    internal func getNewInstance(mapping: U) throws -> T {
+        
+        // NOTE: This sux but `T: U.AdaptorKind.BaseType` as a type constraint throws a compiler error as of 7.1 Xcode
+        // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
+        guard T.self is U.AdaptorKind.BaseType.Type else {
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(T.self) is not a subtype of \(U.AdaptorKind.BaseType.self)" ]
+            throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+        }
+        
         return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
     }
 }
