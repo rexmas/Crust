@@ -8,7 +8,24 @@ public enum JSONValue : CustomStringConvertible {
     case JSONBool(Bool)
     case JSONNull()
     
-    public func values() -> NSObject {
+    public func values() -> AnyObject {
+        switch self {
+        case let .JSONArray(xs):
+            return xs.map { $0.values() }
+        case let .JSONObject(xs):
+            return xs.mapValues { $0.values() }
+        case let .JSONNumber(n):
+            return n
+        case let .JSONString(s):
+            return s
+        case let .JSONBool(b):
+            return b
+        case .JSONNull():
+            return NSNull()
+        }
+    }
+    
+    public func valuesAsNSObjects() -> NSObject {
         switch self {
         case let .JSONArray(xs):
             return xs.map { $0.values() }

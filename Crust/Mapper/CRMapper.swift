@@ -45,6 +45,10 @@ public protocol Adaptor {
     typealias BaseType
     typealias ResultsType: CollectionType
     
+    func mappingBegins()
+    func mappingEnded()
+    func mappingErrored(error: ErrorType)
+    
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
     func createObject(objType: BaseType.Type) -> BaseType
@@ -77,31 +81,42 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    public func mapFromJSONToExistingObject(json: JSONValue, mapping: U) throws -> T {
+    public func mapFromJSONToExistingObject(json: JSONValue, mapping: U, nested: Bool = false) throws -> T {
         var object = try getInstance(mapping, fromJSON: json)
         if object == nil {
             object = try getNewInstance(mapping)
         }
-        return try mapFromJSON(json, toObject: object!, mapping: mapping)
+        return try mapFromJSON(json, toObject: object!, mapping: mapping, nested: nested)
     }
     
-    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U) throws -> T {
+    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U, nested: Bool = false) throws -> T {
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context, nested: nested)
         return object
     }
     
     public func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
         let context = MappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context)
+        try performMappingWithObject(&object, mapping: mapping, context: context, nested: false)
         return context.json
     }
     
-    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext) throws {
+    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext, nested: Bool) throws {
+        
+        if (!nested) {
+            mapping.adaptor.mappingBegins()
+        }
+        
         mapping.mapping(object, context: context)
         if let error = context.error {
+            mapping.adaptor.mappingErrored(error)
             throw error
         }
+        
+        if (!nested) {
+            mapping.adaptor.mappingEnded()
+        }
+        
         context.object = object
     }
     
@@ -119,7 +134,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         try primaryKeys.forEach {
             let keyPath = $0.keyPath
             if let val = json[keyPath] {
-                keyValues[keyPath] = val.values()
+                keyValues[keyPath] = val.valuesAsNSObjects()
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(U.self)" ]
                 throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)

@@ -16,6 +16,18 @@ public class RealmAdaptor : Adaptor {
         self.init(realm: try Realm())
     }
     
+    public func mappingBegins() {
+        self.realm.beginWrite()
+    }
+    
+    public func mappingEnded() {
+        self.realm.commitWrite()
+    }
+    
+    public func mappingErrored(error: ErrorType) {
+        self.realm.cancelWrite()
+    }
+    
     public func createObject(objType: BaseType.Type) -> BaseType {
         return objType.init()
     }
@@ -36,7 +48,7 @@ public class RealmAdaptor : Adaptor {
         
         var predicates = Array<NSPredicate>()
         for (key, value) in keyValues {
-            let predicate = NSPredicate(format: "%@ = %@", key, value)
+            let predicate = NSPredicate(format: "%K == %@", key, value)
             predicates.append(predicate)
         }
         
