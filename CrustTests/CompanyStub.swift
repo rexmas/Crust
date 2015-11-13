@@ -10,8 +10,18 @@ class CompanyStub {
     var founder: EmployeeStub? = EmployeeStub()
     var pendingLawsuits: Int = 5
     
-    init() {
+    init() { }
+    
+    func copy() -> CompanyStub {
+        let copy = CompanyStub()
+        copy.employees = employees.map { $0.copy() }
+        copy.uuid = uuid
+        copy.name = name
+        copy.foundingDate = foundingDate.copy() as! NSDate
+        copy.founder = founder?.copy()
+        copy.pendingLawsuits = pendingLawsuits
         
+        return copy
     }
     
     func generateJsonObject() -> Dictionary<String, AnyObject> {

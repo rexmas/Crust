@@ -39,6 +39,24 @@ class CompanyMappingTests: RealmMappingTest {
     }
     
     func testDuplicateObjectsAreNotCreatedTwice() {
+        
+        XCTAssertEqual(realm!.objects(Company).count, 0)
+        let stub = CompanyStub()
+        let employeeStub = EmployeeStub()
+        stub.employees = [ employeeStub, employeeStub, employeeStub.copy() ]
+        stub.founder = employeeStub.copy()
+        let json = try! JSONValue(object: stub.generateJsonObject())
+        let mapper = CRMapper<Company, CompanyMapping>()
+        let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
+        
+        self.adaptor!.saveObjects([ object ])
+        
+        XCTAssertEqual(realm!.objects(Company).count, 1)
+        XCTAssertEqual(realm!.objects(Employee).count, 1)
+        XCTAssertTrue(stub.matches(object))
+    }
+    
+    func testFailureToMapReturnsError() {
         // TODO: Caching scheme added to adaptor.
     }
     
