@@ -6,6 +6,8 @@ public enum MappingDirection {
     case ToJSON
 }
 
+internal let CRMappingDomain = "CRMappingDomain"
+
 public protocol CRMappingKey : JSONKeypath { }
 
 extension String : CRMappingKey { }
@@ -45,15 +47,15 @@ public protocol Adaptor {
     typealias BaseType
     typealias ResultsType: CollectionType
     
-    func mappingBegins()
-    func mappingEnded()
+    func mappingBegins() throws
+    func mappingEnded() throws
     func mappingErrored(error: ErrorType)
     
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
     func createObject(objType: BaseType.Type) -> BaseType
-    func deleteObject(obj: BaseType)
-    func saveObjects(objects: [ BaseType ])
+    func deleteObject(obj: BaseType) throws
+    func saveObjects(objects: [ BaseType ]) throws
     
     // TODO: Add threading model here or in separate protocol.
 }
@@ -104,7 +106,17 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
     internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext, nested: Bool) throws {
         
         if (!nested) {
-            mapping.adaptor.mappingBegins()
+            var underlyingError: NSError?
+            do {
+                try mapping.adaptor.mappingBegins()
+            } catch let err as NSError {    // We can handle NSErrors higher up.
+                underlyingError = err
+            } catch {
+                var userInfo = Dictionary<NSObject, AnyObject>()
+                userInfo[NSLocalizedFailureReasonErrorKey] = "Errored during mappingBegins for adaptor \(mapping.adaptor)"
+                userInfo[NSUnderlyingErrorKey] = underlyingError
+                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+            }
         }
         
         mapping.mapping(object, context: context)
@@ -116,7 +128,17 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         }
         
         if (!nested) {
-            mapping.adaptor.mappingEnded()
+            var underlyingError: NSError?
+            do {
+                try mapping.adaptor.mappingEnded()
+            } catch let err as NSError {
+                underlyingError = err
+            } catch {
+                var userInfo = Dictionary<NSObject, AnyObject>()
+                userInfo[NSLocalizedFailureReasonErrorKey] = "Errored during mappingEnded for adaptor \(mapping.adaptor)"
+                userInfo[NSUnderlyingErrorKey] = underlyingError
+                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+            }
         }
         
         context.object = object
@@ -128,7 +150,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
         guard T.self is U.AdaptorKind.BaseType.Type else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(T.self) is not a subtype of \(U.AdaptorKind.BaseType.self)" ]
-            throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
         
         let primaryKeys = mapping.primaryKeys
@@ -139,7 +161,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
                 keyValues[keyPath] = val.valuesAsNSObjects()
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(U.self)" ]
-                throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
             }
         }
         
@@ -153,7 +175,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         // and `T == U.AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects T to be that exact type)
         guard T.self is U.AdaptorKind.BaseType.Type else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(T.self) is not a subtype of \(U.AdaptorKind.BaseType.self)" ]
-            throw NSError(domain: "CRMappingDomain", code: -1, userInfo: userInfo)
+            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
         
         return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T

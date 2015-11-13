@@ -12,7 +12,7 @@ class CompanyMappingTests: RealmMappingTest {
         let mapper = CRMapper<Company, CompanyMapping>()
         let object = try! mapper.mapFromJSONToNewObject(json, mapping: CompanyMapping(adaptor: adaptor!))
         
-        self.adaptor!.saveObjects([ object ])
+        try! self.adaptor!.saveObjects([ object ])
         
         XCTAssertEqual(realm!.objects(Company).count, 1)
         XCTAssertTrue(stub.matches(object))
@@ -24,7 +24,7 @@ class CompanyMappingTests: RealmMappingTest {
         
         let original = Company()
         original.uuid = uuid;
-        self.adaptor!.saveObjects([ original ])
+        try! self.adaptor!.saveObjects([ original ])
         XCTAssertEqual(realm!.objects(Company).count, 1)
         
         let stub = CompanyStub()
@@ -49,7 +49,7 @@ class CompanyMappingTests: RealmMappingTest {
         let mapper = CRMapper<Company, CompanyMapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
         
-        self.adaptor!.saveObjects([ object ])
+        try! self.adaptor!.saveObjects([ object ])
         
         XCTAssertEqual(realm!.objects(Company).count, 1)
         XCTAssertEqual(realm!.objects(Employee).count, 1)

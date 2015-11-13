@@ -12,7 +12,7 @@ class EmployeeMappingTests: RealmMappingTest {
         let mapper = CRMapper<Employee, EmployeeMapping>()
         let object = try! mapper.mapFromJSONToNewObject(json, mapping: EmployeeMapping(adaptor: adaptor!))
         
-        self.adaptor!.saveObjects([ object ])
+        try! self.adaptor!.saveObjects([ object ])
         
         XCTAssertEqual(realm!.objects(Employee).count, 1)
         XCTAssertTrue(stub.matches(object))
