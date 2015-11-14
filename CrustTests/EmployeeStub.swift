@@ -11,8 +11,19 @@ class EmployeeStub {
     var isEmployeeOfMonth: NSNumber = false     // Bool
     var percentYearlyRaise: NSNumber = 0.5      // Double
     
-    init() {
+    init() { }
+    
+    func copy() -> EmployeeStub {
+        let copy = EmployeeStub()
+        copy.employer = employer?.copy()
+        copy.uuid = uuid
+        copy.name = name
+        copy.joinDate = joinDate.copy() as! NSDate
+        copy.salary = salary.copy() as! NSNumber
+        copy.isEmployeeOfMonth = isEmployeeOfMonth.copy() as! NSNumber
+        copy.percentYearlyRaise = percentYearlyRaise.copy() as! NSNumber
         
+        return copy
     }
     
     func generateJsonObject() -> Dictionary<String, AnyObject> {

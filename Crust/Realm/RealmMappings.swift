@@ -16,31 +16,43 @@ public class RealmAdaptor : Adaptor {
         self.init(realm: try Realm())
     }
     
-    public func mappingBegins() {
+    public func mappingBegins() throws {
         self.realm.beginWrite()
     }
     
-    public func mappingEnded() {
-        self.realm.commitWrite()
+    public func mappingEnded() throws {
+        try self.realm.commitWrite()
     }
     
     public func mappingErrored(error: ErrorType) {
-        self.realm.cancelWrite()
+        if self.realm.inWriteTransaction {
+            self.realm.cancelWrite()
+        }
     }
     
     public func createObject(objType: BaseType.Type) -> BaseType {
         return objType.init()
     }
     
-    public func saveObjects(objects: [BaseType]) {
-        self.realm.write {
+    public func saveObjects(objects: [BaseType]) throws {
+        let saveBlock = {
             self.realm.add(objects)
+        }
+        if self.realm.inWriteTransaction {
+            saveBlock()
+        } else {
+            try self.realm.write(saveBlock)
         }
     }
     
-    public func deleteObject(obj: BaseType) {
-        realm.write {
+    public func deleteObject(obj: BaseType) throws {
+        let deleteBlock = {
             self.realm.delete(obj)
+        }
+        if self.realm.inWriteTransaction {
+            deleteBlock()
+        } else {
+            try realm.write(deleteBlock)
         }
     }
     
