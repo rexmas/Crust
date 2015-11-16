@@ -111,7 +111,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
         case .FromJSON:
             if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping)
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
@@ -144,7 +144,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
         case .FromJSON:
             if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping)
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
@@ -206,13 +206,13 @@ private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toFi
     }
 }
 
-private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T, mapping: U) throws {
+private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T, mapping: U, context: MappingContext) throws {
     
     let mapper = CRMapper<T, U>()
-    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, nested: true)
+    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, parentContext: context)
 }
 
-private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T?, mapping: U) throws {
+private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T?, mapping: U, context: MappingContext) throws {
     
     if case .JSONNull = json {
         field = nil
@@ -220,7 +220,7 @@ private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json
     }
     
     let mapper = CRMapper<T, U>()
-    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, nested: true)
+    field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, parentContext: context)
 }
 
 // MARK: - RangeReplaceableCollectionType (Array and List follow this protocol)
@@ -249,7 +249,7 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
         case .FromJSON:
             if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping)
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
@@ -272,12 +272,12 @@ private func mapToJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionTyp
     return json
 }
 
-private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(json: JSONValue, inout toField field: V, mapping: U) throws {
+private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext) throws {
     
     if case .JSONArray(let xs) = json {
         let mapper = CRMapper<T, U>()
         let results = try xs.map {
-            try mapper.mapFromJSONToExistingObject($0, mapping: mapping, nested: true)
+            try mapper.mapFromJSONToExistingObject($0, mapping: mapping, parentContext: context)
         }
         field.appendContentsOf(results)
     } else {
