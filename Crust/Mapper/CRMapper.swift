@@ -167,7 +167,6 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
             }
         }
         
-        // TODO: Use case analysis and throw error.
         return mapping.adaptor.fetchObjectWithType(T.self as! U.AdaptorKind.BaseType.Type, keyValues: keyValues) as! T?
     }
     
