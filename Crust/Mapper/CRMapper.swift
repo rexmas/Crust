@@ -65,6 +65,7 @@ public class MappingContext {
     public var object: Mappable
     public private(set) var dir: MappingDirection
     public internal(set) var error: ErrorType?
+    public internal(set) var parent: MappingContext? = nil
     
     init(withObject object:Mappable, json: JSONValue, direction: MappingDirection) {
         self.dir = direction
@@ -83,29 +84,30 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         return try mapFromJSON(json, toObject: object, mapping: mapping)
     }
     
-    public func mapFromJSONToExistingObject(json: JSONValue, mapping: U, nested: Bool = false) throws -> T {
+    public func mapFromJSONToExistingObject(json: JSONValue, mapping: U, parentContext: MappingContext? = nil) throws -> T {
         var object = try getInstance(mapping, fromJSON: json)
         if object == nil {
             object = try getNewInstance(mapping)
         }
-        return try mapFromJSON(json, toObject: object!, mapping: mapping, nested: nested)
+        return try mapFromJSON(json, toObject: object!, mapping: mapping, parentContext: parentContext)
     }
     
-    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U, nested: Bool = false) throws -> T {
+    public func mapFromJSON(json: JSONValue, var toObject object: T, mapping: U, parentContext: MappingContext? = nil) throws -> T {
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.FromJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context, nested: nested)
+        context.parent = parentContext
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return object
     }
     
     public func mapFromObjectToJSON(var object: T, mapping: U) throws -> JSONValue {
         let context = MappingContext(withObject: object, json: JSONValue.JSONObject([:]), direction: MappingDirection.ToJSON)
-        try performMappingWithObject(&object, mapping: mapping, context: context, nested: false)
+        try performMappingWithObject(&object, mapping: mapping, context: context)
         return context.json
     }
     
-    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext, nested: Bool) throws {
+    internal func performMappingWithObject(inout object: T, mapping: U, context: MappingContext) throws {
         
-        if (!nested) {
+        if context.parent == nil {
             var underlyingError: NSError?
             do {
                 try mapping.adaptor.mappingBegins()
@@ -121,13 +123,13 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
         
         mapping.mapping(object, context: context)
         if let error = context.error {
-            if (!nested) {
+            if context.parent == nil {
                 mapping.adaptor.mappingErrored(error)
             }
             throw error
         }
         
-        if (!nested) {
+        if context.parent == nil {
             var underlyingError: NSError?
             do {
                 try mapping.adaptor.mappingEnded()
@@ -165,7 +167,6 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
             }
         }
         
-        // TODO: Use case analysis and throw error.
         return mapping.adaptor.fetchObjectWithType(T.self as! U.AdaptorKind.BaseType.Type, keyValues: keyValues) as! T?
     }
     
