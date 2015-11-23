@@ -14,14 +14,11 @@ extension String : CRMappingKey { }
 extension Int : CRMappingKey { }
 
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
-    case ForeignKey(CRMappingKey)
     case Transform(CRMappingKey, String) // TODO: Second element should be Transform type to define later
     case Mapping(CRMappingKey, T)
     
     public var keyPath: String {
         switch self {
-        case .ForeignKey(let keyPath):
-            return keyPath.keyPath
         case .Transform(let keyPath, _):
             return keyPath.keyPath
         case .Mapping(let keyPath, _):
