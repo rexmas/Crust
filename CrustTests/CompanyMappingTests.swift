@@ -38,7 +38,26 @@ class CompanyMappingTests: RealmMappingTest {
         XCTAssertTrue(stub.matches(object))
     }
     
-    func testDuplicateObjectsAreNotCreatedTwice() {
+    func testDuplicateJsonObjectsAreNotCreatedTwice() {
+        
+        XCTAssertEqual(realm!.objects(Company).count, 0)
+        let stub = CompanyStub()
+        let employeeStub = EmployeeStub()
+        stub.employees = [ employeeStub ]
+        stub.founder = employeeStub.copy()
+        let json = try! JSONValue(object: stub.generateJsonObject())
+        let mapper = CRMapper<Company, CompanyMapping>()
+        let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
+        
+        try! self.adaptor!.saveObjects([ object ])
+                
+        XCTAssertEqual(realm!.objects(Company).count, 1)
+        XCTAssertEqual(realm!.objects(Employee).count, 1)
+        XCTAssertEqual(object.employees.first!, object.founder!)
+        XCTAssertTrue(stub.matches(object))
+    }
+    
+    func testDuplicateJsonObjectsInArrayMergeToSingleObject() {
         
         XCTAssertEqual(realm!.objects(Company).count, 0)
         let stub = CompanyStub()
@@ -51,13 +70,15 @@ class CompanyMappingTests: RealmMappingTest {
         
         try! self.adaptor!.saveObjects([ object ])
         
-        XCTAssertEqual(realm!.objects(Company).count, 1)
-        XCTAssertEqual(realm!.objects(Employee).count, 1)
-        XCTAssertTrue(stub.matches(object))
+        XCTAssertEqual(object.employees.count, 1)
     }
     
     func testFailureToMapReturnsError() {
         // TODO: Caching scheme added to adaptor.
+    }
+    
+    func testMappingArrayOfValues() {
+        // TODO: Make a new test file that's all structs, test struct mappings.
     }
     
     func testWithNilFounder() {

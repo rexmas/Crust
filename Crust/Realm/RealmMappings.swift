@@ -30,8 +30,10 @@ public class RealmAdaptor : Adaptor {
         }
     }
     
-    public func createObject(objType: BaseType.Type) -> BaseType {
-        return objType.init()
+    public func createObject(objType: BaseType.Type) throws -> BaseType {
+        let obj = objType.init()
+        try self.saveObjects([ obj ])
+        return obj
     }
     
     public func saveObjects(objects: [BaseType]) throws {

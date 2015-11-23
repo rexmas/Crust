@@ -53,7 +53,7 @@ public protocol Adaptor {
     
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
-    func createObject(objType: BaseType.Type) -> BaseType
+    func createObject(objType: BaseType.Type) throws -> BaseType
     func deleteObject(obj: BaseType) throws
     func saveObjects(objects: [ BaseType ]) throws
     
@@ -179,7 +179,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
             throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
         
-        return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
+        return try mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
     }
 }
 
