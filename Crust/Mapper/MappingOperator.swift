@@ -276,7 +276,8 @@ private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionT
     
     if case .JSONArray(let xs) = json {
         let mapper = CRMapper<T, U>()
-        let results = try xs.map {
+        let xsSet = Set(xs)     // De-duping. May want to make this conformance an option in the future.
+        let results = try xsSet.map {
             try mapper.mapFromJSONToExistingObject($0, mapping: mapping, parentContext: context)
         }
         field.appendContentsOf(results)
