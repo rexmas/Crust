@@ -133,6 +133,21 @@ public class CompanyMapping : RealmMapping {
     }
 }
 
+public class CompanyMappingWithDupes : CompanyMapping {
+    
+    public override func mapping(tomap: Company, context: MappingContext) {
+        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+        
+        tomap.employees             <- .MappingOptions(.Mapping("employees", employeeMapping), [ .AllowDuplicatesInCollection ]) >*<
+        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.uuid                  <- "uuid" >*<
+        tomap.name                  <- "name" >*<
+        tomap.foundingDate          <- "data.founding_date"  >*<
+        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        context
+    }
+}
+
 public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(field: List<T>, map:(key: KeyExtensions<U>, context: C)) -> C {
     
     // Realm specifies that List "must be declared with 'let'". Seems to actually work either way in practice, but for safety

@@ -13,21 +13,55 @@ public protocol CRMappingKey : JSONKeypath { }
 extension String : CRMappingKey { }
 extension Int : CRMappingKey { }
 
+public struct CRMappingOptions : OptionSetType {
+    public let rawValue: UInt
+    public init(rawValue: UInt) {
+        self.rawValue = rawValue
+    }
+    static let None = CRMappingOptions(rawValue: 0)
+    static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
+    static let AllowDotsInKeyPath = CRMappingOptions(rawValue: 1 << 1)
+}
+
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
-    case Transform(CRMappingKey, String) // TODO: Second element should be Transform type to define later
+    // TODO:
+    // case Transform(CRMappingKey, U throws -> V)
     case Mapping(CRMappingKey, T)
+    indirect case MappingOptions(KeyExtensions, CRMappingOptions)
     
     public var keyPath: String {
         switch self {
-        case .Transform(let keyPath, _):
-            return keyPath.keyPath
+//        case .Transform(let keyPath, _):
+//            return keyPath.keyPath
         case .Mapping(let keyPath, _):
             return keyPath.keyPath
+        case .MappingOptions(let keyPath, _):
+            return keyPath.keyPath
+        }
+    }
+    
+    public var options: CRMappingOptions {
+        switch self {
+        case .MappingOptions(_, let options):
+            return options
+        default:
+            return [ .None ]
+        }
+    }
+    
+    // TODO: Will consruct function as if Transform will fail for now to future proof.
+    // Possible option: Have Transform construct a base Mapping and convert Mapping to ObjectMapping : Mapping.
+    // Then this func won't have to throw...
+    public func getMapping() throws -> T {
+        switch self {
+        case .Mapping(_, let mapping):
+            return mapping
+        case .MappingOptions(let mapping, _):
+            return try mapping.getMapping()
         }
     }
 }
 
-// Do we need this in the end?
 public protocol Mappable { }
 
 public protocol Mapping {
