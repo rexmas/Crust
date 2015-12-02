@@ -30,8 +30,10 @@ public class RealmAdaptor : Adaptor {
         }
     }
     
-    public func createObject(objType: BaseType.Type) -> BaseType {
-        return objType.init()
+    public func createObject(objType: BaseType.Type) throws -> BaseType {
+        let obj = objType.init()
+        try self.saveObjects([ obj ])
+        return obj
     }
     
     public func saveObjects(objects: [BaseType]) throws {
@@ -122,6 +124,21 @@ public class CompanyMapping : RealmMapping {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
         tomap.employees             <- .Mapping("employees", employeeMapping) >*<
+        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.uuid                  <- "uuid" >*<
+        tomap.name                  <- "name" >*<
+        tomap.foundingDate          <- "data.founding_date"  >*<
+        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        context
+    }
+}
+
+public class CompanyMappingWithDupes : CompanyMapping {
+    
+    public override func mapping(tomap: Company, context: MappingContext) {
+        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+        
+        tomap.employees             <- .MappingOptions(.Mapping("employees", employeeMapping), [ .AllowDuplicatesInCollection ]) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<

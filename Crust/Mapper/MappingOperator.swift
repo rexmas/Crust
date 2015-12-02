@@ -236,7 +236,7 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
         return map.context
     }
     
-    guard case .Mapping(let key, let mapping) = map.key else {
+    guard let mapping = try? map.key.getMapping() else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a \(V.self)" ]
         map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
         return map.context
@@ -246,10 +246,11 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
         switch map.context.dir {
         case .ToJSON:
             let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+            try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: mapping)
         case .FromJSON:
             if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
+                let allowDupes = map.key.options.contains(.AllowDuplicatesInCollection)
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context, allowDuplicates: allowDupes)
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
@@ -272,10 +273,13 @@ private func mapToJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionTyp
     return json
 }
 
-private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext) throws {
+private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws {
     
-    if case .JSONArray(let xs) = json {
+    if case .JSONArray(var xs) = json {
         let mapper = CRMapper<T, U>()
+        if !allowDuplicates {
+            xs = Array(Set(xs))
+        }
         let results = try xs.map {
             try mapper.mapFromJSONToExistingObject($0, mapping: mapping, parentContext: context)
         }

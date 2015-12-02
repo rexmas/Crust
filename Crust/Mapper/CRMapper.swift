@@ -13,24 +13,55 @@ public protocol CRMappingKey : JSONKeypath { }
 extension String : CRMappingKey { }
 extension Int : CRMappingKey { }
 
+public struct CRMappingOptions : OptionSetType {
+    public let rawValue: UInt
+    public init(rawValue: UInt) {
+        self.rawValue = rawValue
+    }
+    static let None = CRMappingOptions(rawValue: 0)
+    static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
+    static let AllowDotsInKeyPath = CRMappingOptions(rawValue: 1 << 1)
+}
+
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
-    case ForeignKey(CRMappingKey)
-    case Transform(CRMappingKey, String) // TODO: Second element should be Transform type to define later
+    // TODO:
+    // case Transform(CRMappingKey, U throws -> V)
     case Mapping(CRMappingKey, T)
+    indirect case MappingOptions(KeyExtensions, CRMappingOptions)
     
     public var keyPath: String {
         switch self {
-        case .ForeignKey(let keyPath):
-            return keyPath.keyPath
-        case .Transform(let keyPath, _):
-            return keyPath.keyPath
+//        case .Transform(let keyPath, _):
+//            return keyPath.keyPath
         case .Mapping(let keyPath, _):
             return keyPath.keyPath
+        case .MappingOptions(let keyPath, _):
+            return keyPath.keyPath
+        }
+    }
+    
+    public var options: CRMappingOptions {
+        switch self {
+        case .MappingOptions(_, let options):
+            return options
+        default:
+            return [ .None ]
+        }
+    }
+    
+    // TODO: Will consruct function as if Transform will fail for now to future proof.
+    // Possible option: Have Transform construct a base Mapping and convert Mapping to ObjectMapping : Mapping.
+    // Then this func won't have to throw...
+    public func getMapping() throws -> T {
+        switch self {
+        case .Mapping(_, let mapping):
+            return mapping
+        case .MappingOptions(let mapping, _):
+            return try mapping.getMapping()
         }
     }
 }
 
-// Do we need this in the end?
 public protocol Mappable { }
 
 public protocol Mapping {
@@ -53,7 +84,7 @@ public protocol Adaptor {
     
     func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
     func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
-    func createObject(objType: BaseType.Type) -> BaseType
+    func createObject(objType: BaseType.Type) throws -> BaseType
     func deleteObject(obj: BaseType) throws
     func saveObjects(objects: [ BaseType ]) throws
     
@@ -179,7 +210,7 @@ public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
             throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
         
-        return mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
+        return try mapping.adaptor.createObject(T.self as! U.AdaptorKind.BaseType.Type) as! T
     }
 }
 

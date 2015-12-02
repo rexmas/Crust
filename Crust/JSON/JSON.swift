@@ -1,6 +1,6 @@
 import Foundation
 
-public enum JSONValue : CustomStringConvertible {
+public enum JSONValue : CustomStringConvertible, Hashable {
     case JSONArray([JSONValue])
     case JSONObject([String : JSONValue])   // TODO: Maybe elevate this to [Hashable : JSONValue]?
     case JSONNumber(Double)
@@ -193,6 +193,27 @@ public enum JSONValue : CustomStringConvertible {
             default:
                 return
             }
+        }
+    }
+    
+    public var hashValue: Int {
+        switch self {
+        case .JSONNull():
+            return 0
+        case let .JSONBool(b):
+            return b.hashValue
+        case let .JSONString(s):
+            return s.hashValue
+        case let .JSONNumber(n):
+            return n.hashValue
+        case let .JSONObject(obj):
+            return obj.reduce(0, combine: { (accum: Int, pair: (key: String, val: JSONValue)) -> Int in
+                return accum ^ pair.key.hashValue ^ pair.val.hashValue
+            })
+        case let .JSONArray(xs):
+            return xs.reduce(0, combine: { (accum: Int, val: JSONValue) -> Int in
+                return accum.hashValue ^ val.hashValue
+            })
         }
     }
     
