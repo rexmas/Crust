@@ -225,12 +225,12 @@ private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json
 
 // MARK: - RangeReplaceableCollectionType (Array and List follow this protocol)
 
-public func <- <T: Mappable, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func <- <T: Mappable, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
     
     return mapField(&field, map: map)
 }
 
-public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
@@ -273,15 +273,22 @@ private func mapToJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionTyp
     return json
 }
 
-private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws {
+private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws {
     
-    if case .JSONArray(var xs) = json {
+    if case .JSONArray(let xs) = json {
         let mapper = CRMapper<T, U>()
-        if !allowDuplicates {
-            xs = Array(Set(xs))
-        }
-        let results = try xs.map {
-            try mapper.mapFromJSONToExistingObject($0, mapping: mapping, parentContext: context)
+        var results = Array<T>()
+        for x in xs {
+            if !allowDuplicates {
+                if let obj = try mapping.getExistingInstanceFromJSON(x) {
+                    if results.contains(obj) {
+                        continue
+                    }
+                }
+            }
+            
+            let obj = try mapper.mapFromJSONToExistingObject(x, mapping: mapping, parentContext: context)
+            results.append(obj)
         }
         field.appendContentsOf(results)
     } else {
