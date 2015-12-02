@@ -1,6 +1,6 @@
 import Foundation
 
-public enum JSONValue : CustomStringConvertible, Hashable {
+public enum JSONValue : CustomStringConvertible {
     case JSONArray([JSONValue])
     case JSONObject([String : JSONValue])   // TODO: Maybe elevate this to [Hashable : JSONValue]?
     case JSONNumber(Double)
@@ -123,7 +123,7 @@ public enum JSONValue : CustomStringConvertible, Hashable {
         return try JSONValue.decode(string.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
     }
     
-    subscript(index: JSONKeypath) -> JSONValue? {
+    public subscript(index: JSONKeypath) -> JSONValue? {
         get {
             return self[index.keyPath]
         }
@@ -143,7 +143,7 @@ public enum JSONValue : CustomStringConvertible, Hashable {
         }
     }
     
-    subscript(index: [String]) -> JSONValue? {
+    public subscript(index: [String]) -> JSONValue? {
         get {
             guard let key = index.first else {
                 return self
@@ -196,27 +196,6 @@ public enum JSONValue : CustomStringConvertible, Hashable {
         }
     }
     
-    public var hashValue: Int {
-        switch self {
-        case .JSONNull():
-            return 0
-        case let .JSONBool(b):
-            return b.hashValue
-        case let .JSONString(s):
-            return s.hashValue
-        case let .JSONNumber(n):
-            return n.hashValue
-        case let .JSONObject(obj):
-            return obj.reduce(0, combine: { (accum: Int, pair: (key: String, val: JSONValue)) -> Int in
-                return accum ^ pair.key.hashValue ^ pair.val.hashValue
-            })
-        case let .JSONArray(xs):
-            return xs.reduce(0, combine: { (accum: Int, val: JSONValue) -> Int in
-                return accum.hashValue ^ val.hashValue
-            })
-        }
-    }
-    
     public var description : String {
         switch self {
         case .JSONNull():
@@ -235,8 +214,36 @@ public enum JSONValue : CustomStringConvertible, Hashable {
     }
 }
 
-// You'll have more fun if you match tuples.
-// Equatable
+// MARK: - Hashable, Equatable
+
+extension JSONValue : Hashable {
+    
+    static let prime = 31
+    static let truePrime = 1231;
+    static let falsePrime = 1237;
+    
+    public var hashValue: Int {
+        switch self {
+        case .JSONNull():
+            return JSONValue.prime
+        case let .JSONBool(b):
+            return b ? JSONValue.truePrime : JSONValue.falsePrime
+        case let .JSONString(s):
+            return s.hashValue
+        case let .JSONNumber(n):
+            return n.hashValue
+        case let .JSONObject(obj):
+            return obj.reduce(1, combine: { (accum: Int, pair: (key: String, val: JSONValue)) -> Int in
+                return accum.hashValue ^ pair.key.hashValue ^ pair.val.hashValue.byteSwapped
+            })
+        case let .JSONArray(xs):
+            return xs.reduce(3, combine: { (accum: Int, val: JSONValue) -> Int in
+                return (accum.hashValue &* JSONValue.prime) ^ val.hashValue
+            })
+        }
+    }
+}
+
 public func ==(lhs : JSONValue, rhs : JSONValue) -> Bool {
     switch (lhs, rhs) {
     case (.JSONNull(), .JSONNull()):
