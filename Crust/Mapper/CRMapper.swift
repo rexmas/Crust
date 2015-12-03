@@ -20,7 +20,6 @@ public struct CRMappingOptions : OptionSetType {
     }
     static let None = CRMappingOptions(rawValue: 0)
     static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
-    static let AllowDotsInKeyPath = CRMappingOptions(rawValue: 1 << 1)
 }
 
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
