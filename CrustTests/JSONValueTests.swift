@@ -3,6 +3,31 @@ import Crust
 
 class JSONValueTests: XCTestCase {
     
+    // MARK: - Subscripting
+    
+    func testSubscriptingWithDotsUsesComponentsForTraversal() {
+        let dict = [ "derp" : [ "blerp" : [ "a", "b" ] ] ]
+        let jObj = try! JSONValue(dict: dict)
+        
+        XCTAssertEqual(jObj["derp.blerp"], try! JSONValue(array: ["a", "b"]))
+    }
+    
+    func testSubscriptingWithDotsUsesWholeStringIfComponentsFail() {
+        let dict = [ "derp.blerp" : [ "a", "b" ] ]
+        let jObj = try! JSONValue(dict: dict)
+        
+        XCTAssertEqual(jObj["derp.blerp"], try! JSONValue(array: ["a", "b"]))
+    }
+    
+    func testSubscriptingReturnsNilIfAttributeIsNonExistent() {
+        let dict = [ "derp" : [ "blerp" : [ "a", "b" ] ] ]
+        let jObj = try! JSONValue(dict: dict)
+        
+        XCTAssertNil(jObj["herp"])
+    }
+    
+    // MARK: - Hashable
+    
     func testFalseAndTrueHashesAreNotEqual() {
         let jFalse = JSONValue.JSONBool(false)
         let jTrue = JSONValue.JSONBool(true)

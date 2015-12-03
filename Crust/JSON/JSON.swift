@@ -135,7 +135,11 @@ public enum JSONValue : CustomStringConvertible {
     subscript(index: String) -> JSONValue? {
         get {
             let components = index.componentsSeparatedByString(".")
-            return self[components]
+            if let result = self[components] {
+                return result
+            } else {
+                return self[[index]]
+            }
         }
         set(newValue) {
             let components = index.componentsSeparatedByString(".")

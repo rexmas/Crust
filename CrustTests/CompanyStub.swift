@@ -34,9 +34,9 @@ class CompanyStub {
             "data" : [
                 "lawsuits" : [
                     "pending" : pendingLawsuits
-                ],
-                "founding_date" : foundingDate.toISOString(),
-            ]
+                ]
+            ],
+            "data.founding_date" : foundingDate.toISOString(),
         ]
     }
     
