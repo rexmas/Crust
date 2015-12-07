@@ -18,6 +18,10 @@ public extension AnyMapping {
     var adaptor: AnyAdaptorImp<MappedObject> {
         return AnyAdaptorImp<MappedObject>()
     }
+    
+    var primaryKeys: Array<CRMappingKey> {
+        return []
+    }
 }
 
 public protocol AnyAdaptor : Adaptor {

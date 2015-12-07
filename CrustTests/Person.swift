@@ -11,10 +11,6 @@ class PersonMapping : AnyMapping {
     
     typealias MappedObject = Person
     
-    var primaryKeys: Array<CRMappingKey> {
-        return []
-    }
-    
     func mapping(var tomap: Person, context: MappingContext) {
         tomap.attitude <- "traits.attitude" >*<
         context
