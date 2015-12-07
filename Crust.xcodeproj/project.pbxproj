@@ -13,6 +13,7 @@
 		172FBC8A1C0EC4A700CF2C71 /* JSONValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */; };
 		172FBC8C1C15140300CF2C71 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8B1C15140300CF2C71 /* Person.swift */; };
 		172FBC901C15279C00CF2C71 /* AnyAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */; };
+		172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC911C152DA500CF2C71 /* StructMappingTests.swift */; };
 		176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */; };
 		17B983CC1BDC465D006BD35C /* RealmMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CB1BDC465D006BD35C /* RealmMappings.swift */; };
 		17B983CE1BDC8B6A006BD35C /* EmployeeStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */; };
@@ -52,6 +53,7 @@
 		172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONValueTests.swift; sourceTree = "<group>"; };
 		172FBC8B1C15140300CF2C71 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyAdaptor.swift; sourceTree = "<group>"; };
+		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructMappingTests.swift; sourceTree = "<group>"; };
 		176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeMappingTests.swift; sourceTree = "<group>"; };
 		17B983CB1BDC465D006BD35C /* RealmMappings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmMappings.swift; sourceTree = "<group>"; };
 		17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeStub.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				17B983CF1BDC8B95006BD35C /* Operators.swift */,
 				172FBC8B1C15140300CF2C71 /* Person.swift */,
 				17B983D11BDC8C2F006BD35C /* RealmMappingTest.swift */,
+				172FBC911C152DA500CF2C71 /* StructMappingTests.swift */,
 			);
 			path = CrustTests;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */,
+				172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */,
 				172FBC8A1C0EC4A700CF2C71 /* JSONValueTests.swift in Sources */,
 				17C7A7651BF9665500B0D5F5 /* CRMapperTests.swift in Sources */,
 				17B983D61BDC8DB1006BD35C /* CompanyStub.swift in Sources */,

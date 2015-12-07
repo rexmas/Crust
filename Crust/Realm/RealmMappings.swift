@@ -95,7 +95,7 @@ public class EmployeeMapping : RealmMapping {
         self.adaptor = adaptor
     }
     
-    public func mapping(tomap: Employee, context: MappingContext) {
+    public func mapping(inout tomap: Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adaptor: self.adaptor)
         
         tomap.employer              <- .Mapping("company", companyMapping) >*<
@@ -120,7 +120,7 @@ public class CompanyMapping : RealmMapping {
         self.adaptor = adaptor
     }
     
-    public func mapping(tomap: Company, context: MappingContext) {
+    public func mapping(inout tomap: Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
         tomap.employees             <- .Mapping("employees", employeeMapping) >*<
@@ -135,7 +135,7 @@ public class CompanyMapping : RealmMapping {
 
 public class CompanyMappingWithDupes : CompanyMapping {
     
-    public override func mapping(tomap: Company, context: MappingContext) {
+    public override func mapping(inout tomap: Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
         tomap.employees             <- .MappingOptions(.Mapping("employees", employeeMapping), [ .AllowDuplicatesInCollection ]) >*<

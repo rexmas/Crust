@@ -11,7 +11,7 @@ class PersonMapping : AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(var tomap: Person, context: MappingContext) {
+    func mapping(inout tomap: Person, context: MappingContext) {
         tomap.attitude <- "traits.attitude" >*<
         context
     }
@@ -27,7 +27,7 @@ class PersonStub {
     func generateJsonObject() -> Dictionary<String, AnyObject> {
         return [
             "traits" : [
-                "attitude" : "chill"
+                "attitude" : attitude
             ],
         ]
     }

@@ -70,7 +70,7 @@ public protocol Mapping {
     var adaptor: AdaptorKind { get }
     var primaryKeys: Array<CRMappingKey> { get }
     
-    func mapping(tomap: MappedObject, context: MappingContext)
+    func mapping(inout tomap: MappedObject, context: MappingContext)
 }
 
 public protocol Adaptor {
@@ -171,8 +171,7 @@ public extension Mapping {
         return try self.adaptor.createObject(MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
     }
     
-    internal func performMappingWithObject(inout object: MappedObject, context: MappingContext) throws {
-        
+    internal func startMappingWithContext(context: MappingContext) throws {
         if context.parent == nil {
             var underlyingError: NSError?
             do {
@@ -186,15 +185,9 @@ public extension Mapping {
                 throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
             }
         }
-        
-        self.mapping(object, context: context)
-        if let error = context.error {
-            if context.parent == nil {
-                self.adaptor.mappingErrored(error)
-            }
-            throw error
-        }
-        
+    }
+    
+    internal func endMappingWithContext(context: MappingContext) throws {
         if context.parent == nil {
             var underlyingError: NSError?
             do {
@@ -208,6 +201,26 @@ public extension Mapping {
                 throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
             }
         }
+    }
+    
+    public func executeMappingWithObject(inout object: MappedObject, context: MappingContext) {
+        self.mapping(&object, context: context)
+    }
+    
+    internal func performMappingWithObject(inout object: MappedObject, context: MappingContext) throws {
+        
+        try self.startMappingWithContext(context)
+        
+        self.executeMappingWithObject(&object, context: context)
+        
+        if let error = context.error {
+            if context.parent == nil {
+                self.adaptor.mappingErrored(error)
+            }
+            throw error
+        }
+        
+        try self.endMappingWithContext(context)
         
         context.object = object
     }
