@@ -17,7 +17,7 @@ class MockMap : Mappable, Mapping, Adaptor {
         return [ ]
     }
     
-    func mapping(tomap: MockMap, context: MappingContext) {
+    func mapping(inout tomap: MockMap, context: MappingContext) {
         catchMapping!(tomap: tomap, context: context)
     }
     
