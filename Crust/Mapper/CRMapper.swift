@@ -86,8 +86,6 @@ public protocol Adaptor {
     func createObject(objType: BaseType.Type) throws -> BaseType
     func deleteObject(obj: BaseType) throws
     func saveObjects(objects: [ BaseType ]) throws
-    
-    // TODO: Add threading model here or in separate protocol.
 }
 
 public class MappingContext {
