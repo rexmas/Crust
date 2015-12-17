@@ -22,16 +22,32 @@ public struct CRMappingOptions : OptionSetType {
     static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
 }
 
+protocol Transform : AnyMapping {
+    func fromJSON(json: JSONValue) throws -> MappedObject
+    func toJSON(obj: MappedObject) -> JSONValue
+}
+
+extension Transform {
+    func mapping(inout tomap: MappedObject, context: MappingContext) {
+        switch context.dir {
+        case .FromJSON:
+            do {
+                try tomap = self.fromJSON(context.json)
+            } catch let err as NSError {
+                context.error = err
+            }
+        case .ToJSON:
+            context.json = self.toJSON(tomap)
+        }
+    }
+}
+
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
-    // TODO:
-    // case Transform(CRMappingKey, U throws -> V)
     case Mapping(CRMappingKey, T)
     indirect case MappingOptions(KeyExtensions, CRMappingOptions)
     
     public var keyPath: String {
         switch self {
-//        case .Transform(let keyPath, _):
-//            return keyPath.keyPath
         case .Mapping(let keyPath, _):
             return keyPath.keyPath
         case .MappingOptions(let keyPath, _):
