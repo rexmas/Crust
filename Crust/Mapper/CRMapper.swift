@@ -22,12 +22,12 @@ public struct CRMappingOptions : OptionSetType {
     static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
 }
 
-protocol Transform : AnyMapping {
+public protocol Transform : AnyMapping {
     func fromJSON(json: JSONValue) throws -> MappedObject
     func toJSON(obj: MappedObject) -> JSONValue
 }
 
-extension Transform {
+public extension Transform {
     func mapping(inout tomap: MappedObject, context: MappingContext) {
         switch context.dir {
         case .FromJSON:
