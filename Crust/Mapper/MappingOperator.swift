@@ -236,12 +236,7 @@ public func mapField<T: Mappable, U: Mapping, V: RangeReplaceableCollectionType,
         return map.context
     }
     
-    guard let mapping = try? map.key.getMapping() else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Must provide a KeyExtension.Mapping to map a \(V.self)" ]
-        map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
-        return map.context
-    }
-    
+    let mapping = map.key.mapping
     do {
         switch map.context.dir {
         case .ToJSON:

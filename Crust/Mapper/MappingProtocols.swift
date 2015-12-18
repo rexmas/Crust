@@ -78,12 +78,12 @@ public enum KeyExtensions<T: Mapping> : CRMappingKey {
         }
     }
     
-    public func getMapping() throws -> T {
+    public var mapping: T {
         switch self {
         case .Mapping(_, let mapping):
             return mapping
         case .MappingOptions(let mapping, _):
-            return try mapping.getMapping()
+            return mapping.mapping
         }
     }
 }
