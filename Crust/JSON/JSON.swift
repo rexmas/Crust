@@ -309,6 +309,7 @@ public protocol JSONEncodable {
 public protocol JSONable : JSONDecodable, JSONEncodable { }
 
 extension Dictionary : JSONable {
+    public typealias J = Dictionary<String, Value>
     public static func fromJSON(x: JSONValue) -> Dictionary.J? {
         switch x {
         case .JSONObject:

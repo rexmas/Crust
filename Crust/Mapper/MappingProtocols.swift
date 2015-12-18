@@ -5,8 +5,8 @@ public struct CRMappingOptions : OptionSetType {
     public init(rawValue: UInt) {
         self.rawValue = rawValue
     }
-    static let None = CRMappingOptions(rawValue: 0)
-    static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
+    public static let None = CRMappingOptions(rawValue: 0)
+    public static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
 }
 
 public protocol Mappable { }
