@@ -16,6 +16,7 @@
 		172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC911C152DA500CF2C71 /* StructMappingTests.swift */; };
 		176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */; };
 		17B583511C249E5E005DBFA6 /* TransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583501C249E5E005DBFA6 /* TransformTests.swift */; };
+		17B583531C24B0B7005DBFA6 /* MappingProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */; };
 		17B983CC1BDC465D006BD35C /* RealmMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CB1BDC465D006BD35C /* RealmMappings.swift */; };
 		17B983CE1BDC8B6A006BD35C /* EmployeeStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */; };
 		17B983D01BDC8B95006BD35C /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CF1BDC8B95006BD35C /* Operators.swift */; };
@@ -57,6 +58,7 @@
 		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructMappingTests.swift; sourceTree = "<group>"; };
 		176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeMappingTests.swift; sourceTree = "<group>"; };
 		17B583501C249E5E005DBFA6 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransformTests.swift; sourceTree = "<group>"; };
+		17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingProtocols.swift; sourceTree = "<group>"; };
 		17B983CB1BDC465D006BD35C /* RealmMappings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmMappings.swift; sourceTree = "<group>"; };
 		17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeStub.swift; sourceTree = "<group>"; };
 		17B983CF1BDC8B95006BD35C /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 			children = (
 				17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */,
 				17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */,
+				17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */,
 			);
 			path = Mapper;
 			sourceTree = "<group>";
@@ -441,6 +444,7 @@
 				17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */,
 				1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */,
 				171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */,
+				17B583531C24B0B7005DBFA6 /* MappingProtocols.swift in Sources */,
 				1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */,
 				268134941BC7816C0079F8D3 /* Employee.swift in Sources */,
 				268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */,

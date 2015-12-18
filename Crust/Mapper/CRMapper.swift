@@ -1,5 +1,4 @@
 import Foundation
-import RealmSwift
 
 public enum MappingDirection {
     case FromJSON
@@ -12,97 +11,6 @@ public protocol CRMappingKey : JSONKeypath { }
 
 extension String : CRMappingKey { }
 extension Int : CRMappingKey { }
-
-public struct CRMappingOptions : OptionSetType {
-    public let rawValue: UInt
-    public init(rawValue: UInt) {
-        self.rawValue = rawValue
-    }
-    static let None = CRMappingOptions(rawValue: 0)
-    static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
-}
-
-public protocol Transform : AnyMapping {
-    func fromJSON(json: JSONValue) throws -> MappedObject
-    func toJSON(obj: MappedObject) -> JSONValue
-}
-
-public extension Transform {
-    func mapping(inout tomap: MappedObject, context: MappingContext) {
-        switch context.dir {
-        case .FromJSON:
-            do {
-                try tomap = self.fromJSON(context.json)
-            } catch let err as NSError {
-                context.error = err
-            }
-        case .ToJSON:
-            context.json = self.toJSON(tomap)
-        }
-    }
-}
-
-public enum KeyExtensions<T: Mapping> : CRMappingKey {
-    case Mapping(CRMappingKey, T)
-    indirect case MappingOptions(KeyExtensions, CRMappingOptions)
-    
-    public var keyPath: String {
-        switch self {
-        case .Mapping(let keyPath, _):
-            return keyPath.keyPath
-        case .MappingOptions(let keyPath, _):
-            return keyPath.keyPath
-        }
-    }
-    
-    public var options: CRMappingOptions {
-        switch self {
-        case .MappingOptions(_, let options):
-            return options
-        default:
-            return [ .None ]
-        }
-    }
-    
-    // TODO: Will consruct function as if Transform will fail for now to future proof.
-    // Possible option: Have Transform construct a base Mapping and convert Mapping to ObjectMapping : Mapping.
-    // Then this func won't have to throw...
-    public func getMapping() throws -> T {
-        switch self {
-        case .Mapping(_, let mapping):
-            return mapping
-        case .MappingOptions(let mapping, _):
-            return try mapping.getMapping()
-        }
-    }
-}
-
-public protocol Mappable { }
-
-public protocol Mapping {
-    typealias MappedObject: Mappable
-    typealias AdaptorKind: Adaptor
-    
-    var adaptor: AdaptorKind { get }
-    var primaryKeys: Array<CRMappingKey> { get }
-    
-    func mapping(inout tomap: MappedObject, context: MappingContext)
-}
-
-public protocol Adaptor {
-    typealias BaseType
-    typealias ResultsType: CollectionType
-    
-    func mappingBegins() throws
-    func mappingEnded() throws
-    func mappingErrored(error: ErrorType)
-    
-    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
-    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
-    func createObject(objType: BaseType.Type) throws -> BaseType
-    func deleteObject(obj: BaseType) throws
-    func saveObjects(objects: [ BaseType ]) throws
-}
 
 public class MappingContext {
     public var json: JSONValue
@@ -118,7 +26,7 @@ public class MappingContext {
     }
 }
 
-// Method caller used to perform mappings.
+/// Method caller used to perform mappings.
 public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
     
     public init() { }
