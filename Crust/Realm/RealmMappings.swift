@@ -77,75 +77,8 @@ public class RealmAdaptor : Adaptor {
     }
 }
 
-extension Employee: Mappable { }
-extension Company: Mappable { }
-
 public protocol RealmMapping : Mapping {
     init(adaptor: RealmAdaptor)
-}
-
-public class EmployeeMapping : RealmMapping {
-    
-    public var adaptor: RealmAdaptor
-    public var primaryKeys: Array<CRMappingKey> {
-        return [ "uuid" ]
-    }
-    
-    public required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
-    }
-    
-    public func mapping(inout tomap: Employee, context: MappingContext) {
-        let companyMapping = CompanyMapping(adaptor: self.adaptor)
-        
-        tomap.employer              <- .Mapping("company", companyMapping) >*<
-        tomap.joinDate              <- "joinDate"  >*<
-        tomap.uuid                  <- "uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.salary                <- "data.salary"  >*<
-        tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
-        context
-    }
-}
-
-public class CompanyMapping : RealmMapping {
-    
-    public var adaptor: RealmAdaptor
-    public var primaryKeys: Array<CRMappingKey> {
-        return [ "uuid" ]
-    }
-    
-    public required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
-    }
-    
-    public func mapping(inout tomap: Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-        
-        tomap.employees             <- .Mapping("employees", employeeMapping) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.foundingDate          <- "data.founding_date"  >*<
-        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
-        context
-    }
-}
-
-public class CompanyMappingWithDupes : CompanyMapping {
-    
-    public override func mapping(inout tomap: Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-        
-        tomap.employees             <- .MappingOptions(.Mapping("employees", employeeMapping), [ .AllowDuplicatesInCollection ]) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.foundingDate          <- "data.founding_date"  >*<
-        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
-        context
-    }
 }
 
 public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(field: List<T>, map:(key: KeyExtensions<U>, context: C)) -> C {

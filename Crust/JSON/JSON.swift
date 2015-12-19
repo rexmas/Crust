@@ -275,72 +275,6 @@ public func !=(lhs : JSONValue, rhs : JSONValue) -> Bool {
     return !(lhs == rhs)
 }
 
-// someday someone will ask for this
-//// Comparable
-//func <=(lhs: JSValue, rhs: JSValue) -> Bool {
-//  return false;
-//}
-//
-//func >(lhs: JSValue, rhs: JSValue) -> Bool {
-//  return !(lhs <= rhs)
-//}
-//
-//func >=(lhs: JSValue, rhs: JSValue) -> Bool {
-//  return (lhs > rhs || lhs == rhs)
-//}
-//
-//func <(lhs: JSValue, rhs: JSValue) -> Bool {
-//  return !(lhs >= rhs)
-//}
-
-//public func <? <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> A? {
-//    switch lhs {
-//    case let .JSONObject(d):
-//        return resolveKeypath(d, rhs: rhs).flatMap(A.fromJSON)
-//    default:
-//        return .None
-//    }
-//}
-//
-//public func <? <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> [A]? {
-//    switch lhs {
-//    case let .JSONObject(d):
-//        return resolveKeypath(d, rhs: rhs).flatMap(JArrayFrom<A, A>.fromJSON)
-//    default:
-//        return .None
-//    }
-//}
-//
-//public func <? <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> [String:A]? {
-//    switch lhs {
-//    case let .JSONObject(d):
-//        return resolveKeypath(d, rhs: rhs).flatMap(JDictionaryFrom<A, A>.fromJSON)
-//    default:
-//        return .None
-//    }
-//}
-//
-//public func <! <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> A {
-//    if let r : A = (lhs <? rhs) {
-//        return r
-//    }
-//    return error("Cannot find value at keypath \(rhs) in JSON object \(rhs).")
-//}
-//
-//public func <! <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> [A] {
-//    if let r : [A] = (lhs <? rhs) {
-//        return r
-//    }
-//    return error("Cannot find array at keypath \(rhs) in JSON object \(rhs).")
-//}
-//
-//public func <! <A : JSONDecodable where A == A.J>(lhs : JSONValue, rhs : JSONKeypath) -> [String:A] {
-//    if let r : [String:A] = (lhs <? rhs) {
-//        return r
-//    }
-//    return error("Cannot find object at keypath \(rhs) in JSON object \(rhs).")
-//}
-
 // MARK: - Protocols
 // MARK: - JSONKeypath
 
@@ -362,9 +296,6 @@ extension Int : JSONKeypath {
 
 // MARK: - JSONable
 
-// TODO: May need to remove the typealias and just return Any if
-// Array conversion turns out to be too cumbersome.
-
 public protocol JSONDecodable {
     typealias J = Self
     static func fromJSON(x : JSONValue) -> J?
@@ -378,6 +309,7 @@ public protocol JSONEncodable {
 public protocol JSONable : JSONDecodable, JSONEncodable { }
 
 extension Dictionary : JSONable {
+    public typealias J = Dictionary<String, Value>
     public static func fromJSON(x: JSONValue) -> Dictionary.J? {
         switch x {
         case .JSONObject:
@@ -521,97 +453,5 @@ extension NSNull : JSONable {
     
     public class func toJSON(xs : NSNull) -> JSONValue {
         return JSONValue.JSONNull()
-    }
-}
-
-// MARK: - Specialized Containers
-// Container types should be split.
-
-public struct JArrayFrom<A, B : JSONDecodable where B.J == A> : JSONDecodable {
-    public typealias J = [A]
-    
-    public static func fromJSON(x : JSONValue) -> J? {
-        switch x {
-        case let .JSONArray(xs):
-            let r = xs.map(B.fromJSON)
-            let rp = r.flatMap { $0 }
-            if r.count == rp.count {
-                return rp
-            } else {
-                return nil
-            }
-        default:
-            return nil
-        }
-    }
-}
-
-public struct JArrayTo<A, B : JSONEncodable where B.J == A> : JSONEncodable {
-    public typealias J = [A]
-    
-    public static func toJSON(xs: J) -> JSONValue {
-        return JSONValue.JSONArray(xs.map(B.toJSON))
-    }
-}
-
-public struct JArray<A, B : JSONable where B.J == A> : JSONable {
-    public typealias J = [A]
-    
-    public static func fromJSON(x : JSONValue) -> J? {
-        switch x {
-        case let .JSONArray(xs):
-            let r = xs.map(B.fromJSON)
-            let rp = r.flatMap { $0 }
-            if r.count == rp.count {
-                return rp
-            } else {
-                return nil
-            }
-        default:
-            return nil
-        }
-    }
-    
-    public static func toJSON(xs : J) -> JSONValue {
-        return JSONValue.JSONArray(xs.map(B.toJSON))
-    }
-}
-
-
-public struct JDictionaryFrom<A, B : JSONDecodable where B.J == A> : JSONDecodable {
-    public typealias J = Dictionary<String, A>
-    
-    public static func fromJSON(x : JSONValue) -> J? {
-        switch x {
-        case let .JSONObject(xs):
-            return xs.mapValues { B.fromJSON($0)! }
-        default: 
-            return nil
-        }
-    }
-}
-
-public struct JDictionaryTo<A, B : JSONEncodable where B.J == A> : JSONEncodable {
-    public typealias J = Dictionary<String, A>
-    
-    public static func toJSON(xs : J) -> JSONValue {
-        return JSONValue.JSONObject(xs.mapValues { B.toJSON($0) })
-    }
-}
-
-public struct JDictionary<A, B : JSONable where B.J == A> : JSONable {
-    public typealias J = Dictionary<String, A>
-    
-    public static func fromJSON(x : JSONValue) -> J? {
-        switch x {
-        case let .JSONObject(xs):
-            return xs.mapValues { B.fromJSON($0)! }
-        default: 
-            return nil
-        }
-    }
-    
-    public static func toJSON(xs : J) -> JSONValue {
-        return JSONValue.JSONObject(xs.mapValues { B.toJSON($0) })
     }
 }

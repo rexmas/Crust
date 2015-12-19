@@ -15,6 +15,10 @@
 		172FBC901C15279C00CF2C71 /* AnyAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */; };
 		172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC911C152DA500CF2C71 /* StructMappingTests.swift */; };
 		176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */; };
+		17B583511C249E5E005DBFA6 /* TransformTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583501C249E5E005DBFA6 /* TransformTests.swift */; };
+		17B583531C24B0B7005DBFA6 /* MappingProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */; };
+		17B583561C24B965005DBFA6 /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583541C24B965005DBFA6 /* Company.swift */; };
+		17B583571C24B965005DBFA6 /* Employee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583551C24B965005DBFA6 /* Employee.swift */; };
 		17B983CC1BDC465D006BD35C /* RealmMappings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CB1BDC465D006BD35C /* RealmMappings.swift */; };
 		17B983CE1BDC8B6A006BD35C /* EmployeeStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */; };
 		17B983D01BDC8B95006BD35C /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983CF1BDC8B95006BD35C /* Operators.swift */; };
@@ -25,8 +29,6 @@
 		17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */; };
 		17F960011BCB39C400CC6D4A /* MappingOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */; };
 		268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268068E11B47080C0076C226 /* CRUberProductsRequest.swift */; };
-		268134941BC7816C0079F8D3 /* Employee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268134931BC7816C0079F8D3 /* Employee.swift */; };
-		268134961BC781BC0079F8D3 /* Company.swift in Sources */ = {isa = PBXBuildFile; fileRef = 268134951BC781BC0079F8D3 /* Company.swift */; };
 		26951C251AFB401A007B0E07 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26951C241AFB401A007B0E07 /* AppDelegate.swift */; };
 		26951C271AFB401A007B0E07 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26951C261AFB401A007B0E07 /* ViewController.swift */; };
 		26951C2A1AFB401B007B0E07 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 26951C281AFB401B007B0E07 /* Main.storyboard */; };
@@ -55,6 +57,10 @@
 		172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyAdaptor.swift; sourceTree = "<group>"; };
 		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructMappingTests.swift; sourceTree = "<group>"; };
 		176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeMappingTests.swift; sourceTree = "<group>"; };
+		17B583501C249E5E005DBFA6 /* TransformTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransformTests.swift; sourceTree = "<group>"; };
+		17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingProtocols.swift; sourceTree = "<group>"; };
+		17B583541C24B965005DBFA6 /* Company.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
+		17B583551C24B965005DBFA6 /* Employee.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Employee.swift; sourceTree = "<group>"; };
 		17B983CB1BDC465D006BD35C /* RealmMappings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RealmMappings.swift; sourceTree = "<group>"; };
 		17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmployeeStub.swift; sourceTree = "<group>"; };
 		17B983CF1BDC8B95006BD35C /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
@@ -65,8 +71,6 @@
 		17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRMapper.swift; sourceTree = "<group>"; };
 		17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingOperator.swift; sourceTree = "<group>"; };
 		268068E11B47080C0076C226 /* CRUberProductsRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRUberProductsRequest.swift; sourceTree = "<group>"; };
-		268134931BC7816C0079F8D3 /* Employee.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Employee.swift; sourceTree = "<group>"; };
-		268134951BC781BC0079F8D3 /* Company.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Company.swift; sourceTree = "<group>"; };
 		26951C1F1AFB401A007B0E07 /* Crust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Crust.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		26951C231AFB401A007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26951C241AFB401A007B0E07 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -123,6 +127,7 @@
 			children = (
 				17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */,
 				17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */,
+				17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */,
 			);
 			path = Mapper;
 			sourceTree = "<group>";
@@ -139,8 +144,6 @@
 		268134921BC780C30079F8D3 /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				268134931BC7816C0079F8D3 /* Employee.swift */,
-				268134951BC781BC0079F8D3 /* Company.swift */,
 				17B983CB1BDC465D006BD35C /* RealmMappings.swift */,
 			);
 			path = Realm;
@@ -196,9 +199,11 @@
 			isa = PBXGroup;
 			children = (
 				26951C381AFB401B007B0E07 /* Supporting Files */,
+				17B583541C24B965005DBFA6 /* Company.swift */,
 				17B983D31BDC8D7E006BD35C /* CompanyMappingTests.swift */,
 				17B983D51BDC8DB1006BD35C /* CompanyStub.swift */,
 				17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */,
+				17B583551C24B965005DBFA6 /* Employee.swift */,
 				176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */,
 				17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */,
 				172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */,
@@ -206,6 +211,7 @@
 				172FBC8B1C15140300CF2C71 /* Person.swift */,
 				17B983D11BDC8C2F006BD35C /* RealmMappingTest.swift */,
 				172FBC911C152DA500CF2C71 /* StructMappingTests.swift */,
+				17B583501C249E5E005DBFA6 /* TransformTests.swift */,
 			);
 			path = CrustTests;
 			sourceTree = "<group>";
@@ -438,15 +444,14 @@
 				17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */,
 				1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */,
 				171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */,
+				17B583531C24B0B7005DBFA6 /* MappingProtocols.swift in Sources */,
 				1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */,
-				268134941BC7816C0079F8D3 /* Employee.swift in Sources */,
 				268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */,
 				172FBC901C15279C00CF2C71 /* AnyAdaptor.swift in Sources */,
 				17B983CC1BDC465D006BD35C /* RealmMappings.swift in Sources */,
 				26951C271AFB401A007B0E07 /* ViewController.swift in Sources */,
 				26951C251AFB401A007B0E07 /* AppDelegate.swift in Sources */,
 				17F960011BCB39C400CC6D4A /* MappingOperator.swift in Sources */,
-				268134961BC781BC0079F8D3 /* Company.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,6 +459,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17B583511C249E5E005DBFA6 /* TransformTests.swift in Sources */,
 				176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */,
 				172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */,
 				172FBC8A1C0EC4A700CF2C71 /* JSONValueTests.swift in Sources */,
@@ -462,8 +468,10 @@
 				17B983CE1BDC8B6A006BD35C /* EmployeeStub.swift in Sources */,
 				17B983D21BDC8C2F006BD35C /* RealmMappingTest.swift in Sources */,
 				172FBC8C1C15140300CF2C71 /* Person.swift in Sources */,
+				17B583571C24B965005DBFA6 /* Employee.swift in Sources */,
 				17B983D01BDC8B95006BD35C /* Operators.swift in Sources */,
 				17B983D41BDC8D7E006BD35C /* CompanyMappingTests.swift in Sources */,
+				17B583561C24B965005DBFA6 /* Company.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
