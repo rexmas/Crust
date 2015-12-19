@@ -17,7 +17,7 @@ public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
 infix operator <- { associativity right }
 
 // Map arbitrary object.
-public func <- <T: JSONable, C: MappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     return mapField(&field, map: map)
 }
 
@@ -29,7 +29,7 @@ public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject 
 // NOTE: Must supply two separate versions for optional and non-optional types or we'll have to continuously
 // guard against unsafe nil assignments.
 
-public func <- <T: JSONable, C: MappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
     return mapField(&field, map: map)
 }
 
@@ -40,7 +40,7 @@ public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject 
 // MARK: - Map funcs
 
 // Arbitrary object.
-public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
@@ -66,7 +66,7 @@ public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field:
 }
 
 // Arbitrary Optional.
-public func mapField<T: JSONable, C: MappingContext where T == T.J>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
@@ -159,7 +159,7 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
 
 // MARK: - To JSON
 
-private func mapToJson<T: JSONable where T == T.J>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
+private func mapToJson<T: JSONable where T == T.ConversionType>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
     
     if let field = field {
         json[key] = T.toJSON(field)
@@ -183,7 +183,7 @@ private func mapToJson<T: Mappable, U: Mapping where U.MappedObject == T>(var js
 
 // MARK: - From JSON
 
-private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T) throws {
+private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValue, inout toField field: T) throws {
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson
@@ -192,7 +192,7 @@ private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toFi
     }
 }
 
-private func mapFromJson<T: JSONable where T.J == T>(json: JSONValue, inout toField field: T?) throws {
+private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValue, inout toField field: T?) throws {
     
     if case .JSONNull = json {
         field = nil

@@ -2,7 +2,7 @@ import Foundation
 
 public enum JSONValue : CustomStringConvertible {
     case JSONArray([JSONValue])
-    case JSONObject([String : JSONValue])   // TODO: Maybe elevate this to [Hashable : JSONValue]?
+    case JSONObject([String : JSONValue])
     case JSONNumber(Double)
     case JSONString(String)
     case JSONBool(Bool)
@@ -297,20 +297,20 @@ extension Int : JSONKeypath {
 // MARK: - JSONable
 
 public protocol JSONDecodable {
-    typealias J = Self
-    static func fromJSON(x : JSONValue) -> J?
+    typealias ConversionType = Self
+    static func fromJSON(x : JSONValue) -> ConversionType?
 }
 
 public protocol JSONEncodable {
-    typealias J
-    static func toJSON(x : J) -> JSONValue
+    typealias ConversionType
+    static func toJSON(x : ConversionType) -> JSONValue
 }
 
 public protocol JSONable : JSONDecodable, JSONEncodable { }
 
 extension Dictionary : JSONable {
-    public typealias J = Dictionary<String, Value>
-    public static func fromJSON(x: JSONValue) -> Dictionary.J? {
+    public typealias ConversionType = Dictionary<String, Value>
+    public static func fromJSON(x: JSONValue) -> Dictionary.ConversionType? {
         switch x {
         case .JSONObject:
             return x.values() as? Dictionary<String, Value>
@@ -319,7 +319,7 @@ extension Dictionary : JSONable {
         }
     }
     
-    public static func toJSON(x: Dictionary.J) -> JSONValue {
+    public static func toJSON(x: Dictionary.ConversionType) -> JSONValue {
         do {
             return try JSONValue(dict: x)
         } catch {
