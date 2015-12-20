@@ -3,6 +3,7 @@ platform :ios, '8.0'
 use_frameworks!
 
 pod 'Alamofire'
+pod 'JSONValueRX'
 pod 'RealmSwift'
 
 link_with 'Crust', 'CrustTests'
