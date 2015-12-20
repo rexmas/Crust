@@ -1,5 +1,6 @@
 import XCTest
 import Crust
+import JSONValueRX
 
 struct Transformable : AnyMappable {
     var value: String = "awesome"

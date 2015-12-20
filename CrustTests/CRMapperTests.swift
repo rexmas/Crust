@@ -1,5 +1,6 @@
 import XCTest
 @testable import Crust
+import JSONValueRX
 
 
 class MockMap : Mappable, Mapping, Adaptor {

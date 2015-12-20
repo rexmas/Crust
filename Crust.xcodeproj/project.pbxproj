@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF3F1BC38BE600D4EAD8 /* JSON.swift */; };
-		1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1710BF421BC38C4A00D4EAD8 /* Utilities.swift */; };
 		171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */; };
-		172FBC8A1C0EC4A700CF2C71 /* JSONValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */; };
 		172FBC8C1C15140300CF2C71 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8B1C15140300CF2C71 /* Person.swift */; };
 		172FBC901C15279C00CF2C71 /* AnyAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */; };
 		172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC911C152DA500CF2C71 /* StructMappingTests.swift */; };
@@ -49,10 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1710BF3F1BC38BE600D4EAD8 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
-		1710BF421BC38C4A00D4EAD8 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		171D4A6D1B6D55C700CFCF25 /* CRRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CRRequest.swift; sourceTree = "<group>"; };
-		172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONValueTests.swift; sourceTree = "<group>"; };
 		172FBC8B1C15140300CF2C71 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyAdaptor.swift; sourceTree = "<group>"; };
 		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructMappingTests.swift; sourceTree = "<group>"; };
@@ -105,19 +99,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1710BF3E1BC38BCF00D4EAD8 /* JSON */ = {
-			isa = PBXGroup;
-			children = (
-				1710BF3F1BC38BE600D4EAD8 /* JSON.swift */,
-			);
-			path = JSON;
-			sourceTree = "<group>";
-		};
 		1710BF411BC38C3B00D4EAD8 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
 				172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */,
-				1710BF421BC38C4A00D4EAD8 /* Utilities.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -173,7 +158,6 @@
 			isa = PBXGroup;
 			children = (
 				268068E01B4702A80076C226 /* API */,
-				1710BF3E1BC38BCF00D4EAD8 /* JSON */,
 				17F95FFC1BCB39C400CC6D4A /* Mapper */,
 				268134921BC780C30079F8D3 /* Realm */,
 				1710BF411BC38C3B00D4EAD8 /* Utilities */,
@@ -206,7 +190,6 @@
 				17B583551C24B965005DBFA6 /* Employee.swift */,
 				176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */,
 				17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */,
-				172FBC891C0EC4A700CF2C71 /* JSONValueTests.swift */,
 				17B983CF1BDC8B95006BD35C /* Operators.swift */,
 				172FBC8B1C15140300CF2C71 /* Person.swift */,
 				17B983D11BDC8C2F006BD35C /* RealmMappingTest.swift */,
@@ -442,10 +425,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				17F960001BCB39C400CC6D4A /* CRMapper.swift in Sources */,
-				1710BF431BC38C4A00D4EAD8 /* Utilities.swift in Sources */,
 				171D4A6E1B6D55C700CFCF25 /* CRRequest.swift in Sources */,
 				17B583531C24B0B7005DBFA6 /* MappingProtocols.swift in Sources */,
-				1710BF401BC38BE600D4EAD8 /* JSON.swift in Sources */,
 				268068E21B47080D0076C226 /* CRUberProductsRequest.swift in Sources */,
 				172FBC901C15279C00CF2C71 /* AnyAdaptor.swift in Sources */,
 				17B983CC1BDC465D006BD35C /* RealmMappings.swift in Sources */,
@@ -462,7 +443,6 @@
 				17B583511C249E5E005DBFA6 /* TransformTests.swift in Sources */,
 				176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */,
 				172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */,
-				172FBC8A1C0EC4A700CF2C71 /* JSONValueTests.swift in Sources */,
 				17C7A7651BF9665500B0D5F5 /* CRMapperTests.swift in Sources */,
 				17B983D61BDC8DB1006BD35C /* CompanyStub.swift in Sources */,
 				17B983CE1BDC8B6A006BD35C /* EmployeeStub.swift in Sources */,

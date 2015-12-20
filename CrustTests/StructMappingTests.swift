@@ -1,5 +1,6 @@
 import XCTest
 import Crust
+import JSONValueRX
 
 class StructMappingTests: XCTestCase {
 

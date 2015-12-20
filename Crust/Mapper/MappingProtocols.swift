@@ -1,4 +1,5 @@
 import Foundation
+import JSONValueRX
 
 public struct CRMappingOptions : OptionSetType {
     public let rawValue: UInt

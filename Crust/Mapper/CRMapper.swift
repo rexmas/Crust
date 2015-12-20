@@ -1,4 +1,5 @@
 import Foundation
+import JSONValueRX
 
 public enum MappingDirection {
     case FromJSON
