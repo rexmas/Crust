@@ -1,5 +1,6 @@
 import XCTest
 import Crust
+import JSONValueRX
 import RealmSwift
 
 class EmployeeMappingTests: RealmMappingTest {

@@ -1,5 +1,6 @@
 import Foundation
 import Crust
+import JSONValueRX
 
 enum HairColor : String, AnyMappable {
     case Blue

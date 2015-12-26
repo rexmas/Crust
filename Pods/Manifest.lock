@@ -1,5 +1,6 @@
 PODS:
   - Alamofire (3.1.2)
+  - JSONValueRX (1.0)
   - Realm (0.96.2):
     - Realm/Headers (= 0.96.2)
   - Realm/Headers (0.96.2)
@@ -8,10 +9,12 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire
+  - JSONValueRX
   - RealmSwift
 
 SPEC CHECKSUMS:
   Alamofire: 7c16ca65f3c7e681fd925fd7f2dec7747ff96855
+  JSONValueRX: c2b1af3035e6b2f66b6c2426e2973bdda0e9689e
   Realm: 3ce8448151c571e90b85002d984d7f93f54fc8a3
   RealmSwift: 485599fe54e35461c4a0daa7d01d8fbf11424873
 
