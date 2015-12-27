@@ -1,11 +1,11 @@
 PODS:
-  - Alamofire (3.1.2)
-  - JSONValueRX (1.0)
-  - Realm (0.96.2):
-    - Realm/Headers (= 0.96.2)
-  - Realm/Headers (0.96.2)
-  - RealmSwift (0.96.2):
-    - Realm (= 0.96.2)
+  - Alamofire (3.1.4)
+  - JSONValueRX (1.0.1)
+  - Realm (0.97.0):
+    - Realm/Headers (= 0.97.0)
+  - Realm/Headers (0.97.0)
+  - RealmSwift (0.97.0):
+    - Realm (= 0.97.0)
 
 DEPENDENCIES:
   - Alamofire
@@ -13,9 +13,9 @@ DEPENDENCIES:
   - RealmSwift
 
 SPEC CHECKSUMS:
-  Alamofire: 7c16ca65f3c7e681fd925fd7f2dec7747ff96855
-  JSONValueRX: c2b1af3035e6b2f66b6c2426e2973bdda0e9689e
-  Realm: 3ce8448151c571e90b85002d984d7f93f54fc8a3
-  RealmSwift: 485599fe54e35461c4a0daa7d01d8fbf11424873
+  Alamofire: fbc829692f351fa1d8a31dd75fd7f7f56fea31fb
+  JSONValueRX: 9cb170c7507e46a1384ee0d680dfdb850020e748
+  Realm: b498a6fb9d288b171ff98d0e2d4384c295be8990
+  RealmSwift: d014810dec75c9a3f1a33926d2dabfed855c582c
 
 COCOAPODS: 0.39.0
