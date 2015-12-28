@@ -1,3 +1,6 @@
+[![Cocoapods Compatible](https://img.shields.io/cocoapods/v/JSONValueRX.svg)](https://img.shields.io/cocoapods/v/JSONValueRX.svg)
+[![Build Status](https://travis-ci.org/rexmas/JSONValue.svg)](https://travis-ci.org/rexmas/JSONValue)
+
 # JSONValue
 Simple JSON representation supporting subscripting and pattern matching.
 JSONValue uses an algebraic datatype representation of JSON for type safety and pattern matching.
@@ -11,6 +14,19 @@ enum JSONValue : CustomStringConvertible {
     case JSONNull()
 }
 ```
+#Requirements
+iOS 8.0+
+Swift 2.1+
+
+#Installation
+### CocoaPods
+```
+platform :ios, '8.0'
+use_frameworks!
+
+pod 'JSONValueRX'
+```
+
 #Subscripting
 Supports `.` indexing
 ```swift

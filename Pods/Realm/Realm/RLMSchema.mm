@@ -26,10 +26,13 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#include <mutex>
 #import "object_store.hpp"
-#import <objc/runtime.h>
+#import "schema.hpp"
+
 #import <realm/group.hpp>
+
+#import <objc/runtime.h>
+#include <mutex>
 
 using namespace realm;
 
@@ -177,8 +180,13 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 
 // schema based on runtime objects
 + (instancetype)sharedSchema {
+    static mach_port_t threadID;
+    if (pthread_mach_thread_np(pthread_self()) == threadID) {
+        @throw RLMException(@"Illegal recursive call of +[%@ %@]. Note: Properties of Swift `Object` classes must not be prepopulated with queried results from a Realm.", self, NSStringFromSelector(_cmd));
+    }
     static std::once_flag onceFlag;
     std::call_once(onceFlag, [&](){
+        threadID = pthread_mach_thread_np(pthread_self());
         RLMSchema *schema = [[RLMSchema alloc] init];
 
         unsigned int numClasses;
@@ -190,6 +198,8 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 
         // set shared schema
         s_sharedSchema = schema;
+
+        threadID = 0;
     });
     return s_sharedSchema;
 }
@@ -197,12 +207,17 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
 // schema based on tables in a realm
 + (instancetype)dynamicSchemaFromRealm:(RLMRealm *)realm {
     // generate object schema and class mapping for all tables in the realm
-    ObjectStore::Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    Schema objectStoreSchema = ObjectStore::schema_from_group(realm.group);
+    return [self dynamicSchemaFromObjectStoreSchema:objectStoreSchema];
+}
 
+// schema based on tables in a realm
++ (instancetype)dynamicSchemaFromObjectStoreSchema:(Schema &)objectStoreSchema {
     // cache descriptors for all subclasses of RLMObject
     NSMutableArray *schemaArray = [NSMutableArray arrayWithCapacity:objectStoreSchema.size()];
-    for (unsigned long i = 0; i < objectStoreSchema.size(); i++) {
-        [schemaArray addObject:[RLMObjectSchema objectSchemaForObjectStoreSchema:objectStoreSchema[i]]];
+    for (auto &objectSchema : objectStoreSchema) {
+        RLMObjectSchema *schema = [RLMObjectSchema objectSchemaForObjectStoreSchema:objectSchema];
+        [schemaArray addObject:schema];
     }
 
     // set class array and mapping
@@ -252,6 +267,15 @@ static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] in
         [objectSchemaString appendFormat:@"\t%@\n", [objectSchema.description stringByReplacingOccurrencesOfString:@"\n" withString:@"\n\t"]];
     }
     return [NSString stringWithFormat:@"Schema {\n%@}", objectSchemaString];
+}
+
+- (std::unique_ptr<Schema>)objectStoreCopy {
+    std::vector<realm::ObjectSchema> schema;
+    schema.reserve(_objectSchema.count);
+    for (RLMObjectSchema *objectSchema in _objectSchema) {
+        schema.push_back(objectSchema.objectStoreCopy);
+    }
+    return std::make_unique<realm::Schema>(std::move(schema));
 }
 
 @end
