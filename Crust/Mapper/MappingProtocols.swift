@@ -38,8 +38,8 @@ public protocol Adaptor {
 }
 
 public protocol Transform : AnyMapping {
-    func fromJSON(json: JSONValueRX.JSONValue) throws -> MappedObject
-    func toJSON(obj: MappedObject) -> JSONValueRX.JSONValue
+    func fromJSON(json: JSONValue) throws -> MappedObject
+    func toJSON(obj: MappedObject) -> JSONValue
 }
 
 public extension Transform {
