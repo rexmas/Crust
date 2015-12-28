@@ -90,23 +90,24 @@ class CompanyMappingTests: RealmMappingTest {
         XCTAssertEqual(object.employees.count, 1)
     }
     
-    func testFailureToMapReturnsError() {
-        // TODO: Caching scheme added to adaptor.
-    }
-    
-    func testMappingArrayOfValues() {
-        // TODO: Make a new test file that's all structs, test struct mappings.
-    }
-    
-    func testWithNilFounder() {
+    func testNilFounderNilsRelationship() {
+        let uuid = NSUUID().UUIDString;
         
-    }
-    
-    func testWithManyEmployees() {
+        let original = Company()
+        original.uuid = uuid
+        original.founder = Employee()
+        try! self.adaptor!.saveObjects([ original ])
+        XCTAssertEqual(realm!.objects(Company).count, 1)
+        XCTAssertEqual(realm!.objects(Employee).count, 1)
         
-    }
-    
-    func testWith0Employees() {
+        let stub = CompanyStub()
+        stub.uuid = uuid;
+        stub.founder = nil;
+        let json = try! JSONValue(object: stub.generateJsonObject())
+        let mapper = CRMapper<Company, CompanyMapping>()
+        let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
         
+        XCTAssertTrue(stub.matches(object))
+        XCTAssertNil(object.founder)
     }
 }

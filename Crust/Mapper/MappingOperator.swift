@@ -224,7 +224,7 @@ private func mapFromJson<T: Mappable, U: Mapping where U.MappedObject == T>(json
     field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, parentContext: context)
 }
 
-// MARK: - RangeReplaceableCollectionType (Array and List follow this protocol)
+// MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol)
 
 public func <- <T: Mappable, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
     

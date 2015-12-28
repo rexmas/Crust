@@ -15,7 +15,7 @@ enum HairColor : String, AnyMappable {
 
 struct Person : AnyMappable {
     
-    var bankAccounts: NSArray = [ 1234, 5678 ]
+    var bankAccounts: Array<Int> = [ 1234, 5678 ]
     var attitude: String = "awesome"
     var hairColor: HairColor = .Unknown
 }
@@ -51,15 +51,16 @@ class PersonMapping : AnyMapping {
     typealias MappedObject = Person
     
     func mapping(inout tomap: Person, context: MappingContext) {
-        tomap.attitude  <- "traits.attitude" >*<
-        tomap.hairColor <- .Mapping("traits.bodily.hair_color", HairColorMapping()) >*<
+        tomap.bankAccounts  <- "bank_accounts" >*<
+        tomap.attitude      <- "traits.attitude" >*<
+        tomap.hairColor     <- .Mapping("traits.bodily.hair_color", HairColorMapping()) >*<
         context
     }
 }
 
 class PersonStub {
     
-    var bankAccounts: NSArray = [ 0987, 6543 ]
+    var bankAccounts: Array<Int> = [ 0987, 6543 ]
     var attitude: String = "whoaaaa"
     var hairColor: HairColor = .Blue
     
@@ -67,6 +68,7 @@ class PersonStub {
     
     func generateJsonObject() -> Dictionary<String, AnyObject> {
         return [
+            "bank_accounts" : bankAccounts,
             "traits" : [
                 "attitude" : attitude,
                 "bodily" : [
@@ -80,6 +82,7 @@ class PersonStub {
         var matches = true
         matches &&= attitude == object.attitude
         matches &&= hairColor == object.hairColor
+        matches &&= bankAccounts == object.bankAccounts
         
         return matches
     }
