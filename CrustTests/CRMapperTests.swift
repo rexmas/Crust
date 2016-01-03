@@ -25,8 +25,7 @@ class MockMap : Mappable, Mapping, Adaptor {
     func mappingEnded() throws { }
     func mappingErrored(error: ErrorType) { }
     
-    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType? { return nil }
-    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType { return [ ] }
+    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType { return [ ] }
     func createObject(objType: BaseType.Type) -> BaseType { return self }
     func deleteObject(obj: BaseType) throws { }
     func saveObjects(objects: [ BaseType ]) throws { }

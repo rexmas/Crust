@@ -1,40 +1,41 @@
-import RealmSwift
 import Crust
 
-public class Employee: Object {
+class Employee {
     
-    public dynamic var employer: Company?
-    public dynamic var uuid: String = ""
-    public dynamic var name: String = ""
-    public dynamic var joinDate: NSDate = NSDate()
-    public dynamic var salary: Int = 0
-    public dynamic var isEmployeeOfMonth: Bool = false
-    public dynamic var percentYearlyRaise: Double = 0.0
+    required init() { }
+    
+    var employer: Company?
+    var uuid: String = ""
+    var name: String = ""
+    var joinDate: NSDate = NSDate()
+    var salary: Int = 0
+    var isEmployeeOfMonth: Bool = false
+    var percentYearlyRaise: Double = 0.0
 }
 
-extension Employee: Mappable { }
+extension Employee: AnyMappable { }
 
-public class EmployeeMapping : RealmMapping {
+class EmployeeMapping : MockMapping {
     
-    public var adaptor: RealmAdaptor
-    public var primaryKeys: Array<CRMappingKey> {
+    var adaptor: MockAdaptor<Employee>
+    var primaryKeys: Array<CRMappingKey> {
         return [ "uuid" ]
     }
     
-    public required init(adaptor: RealmAdaptor) {
+    required init(adaptor: MockAdaptor<Employee>) {
         self.adaptor = adaptor
     }
     
-    public func mapping(inout tomap: Employee, context: MappingContext) {
-        let companyMapping = CompanyMapping(adaptor: self.adaptor)
+    func mapping(inout tomap: Employee, context: MappingContext) {
+        let companyMapping = CompanyMapping(adaptor: MockAdaptor<Company>())
         
         tomap.employer              <- .Mapping("company", companyMapping) >*<
-            tomap.joinDate              <- "joinDate"  >*<
-            tomap.uuid                  <- "uuid" >*<
-            tomap.name                  <- "name" >*<
-            tomap.salary                <- "data.salary"  >*<
-            tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-            tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
+        tomap.joinDate              <- "joinDate"  >*<
+        tomap.uuid                  <- "uuid" >*<
+        tomap.name                  <- "name" >*<
+        tomap.salary                <- "data.salary"  >*<
+        tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
+        tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
         context
     }
 }

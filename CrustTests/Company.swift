@@ -1,33 +1,34 @@
-import RealmSwift
 import Crust
 
-public class Company: Object {
+class Company {
     
-    public let employees = List<Employee>()
-    public dynamic var uuid: String = ""
-    public dynamic var name: String = ""
-    public dynamic var foundingDate: NSDate = NSDate()
-    public dynamic var founder: Employee?
-    public dynamic var pendingLawsuits: Int = 0
+    required init() { }
+    
+    var employees = Array<Employee>()
+    var uuid: String = ""
+    var name: String = ""
+    var foundingDate: NSDate = NSDate()
+    var founder: Employee?
+    var pendingLawsuits: Int = 0
 }
 
-extension Company: Mappable { }
+extension Company: AnyMappable { }
 
-public class CompanyMapping : RealmMapping {
+class CompanyMapping : Mapping {
     
-    public var adaptor: RealmAdaptor
-    public var primaryKeys: Array<CRMappingKey> {
+    var adaptor: MockAdaptor<Company>
+    var primaryKeys: Array<CRMappingKey> {
         return [ "uuid" ]
     }
     
-    public required init(adaptor: RealmAdaptor) {
+    required init(adaptor: MockAdaptor<Company>) {
         self.adaptor = adaptor
     }
     
-    public func mapping(inout tomap: Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+    func mapping(inout tomap: Company, context: MappingContext) {
+        let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
-        tomap.employees             <- .Mapping("employees", employeeMapping) >*<
+        tomap.employees             <- KeyExtensions.Mapping("employees", employeeMapping) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<
@@ -37,13 +38,13 @@ public class CompanyMapping : RealmMapping {
     }
 }
 
-public class CompanyMappingWithDupes : CompanyMapping {
+class CompanyMappingWithDupes : CompanyMapping {
     
-    public override func mapping(inout tomap: Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+    override func mapping(inout tomap: Company, context: MappingContext) {
+        let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         let mappingExtension = KeyExtensions.Mapping("employees", employeeMapping)
         
-        tomap.employees             <- .MappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.employees             <- KeyExtensions.MappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<

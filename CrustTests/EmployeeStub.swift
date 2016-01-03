@@ -45,7 +45,7 @@ class EmployeeStub {
         var matches = true
         matches &&= uuid == object.uuid
         matches &&= name == object.name
-        matches &&= floor(joinDate.timeIntervalSinceReferenceDate) == object.joinDate.timeIntervalSinceReferenceDate
+        matches &&= floor(joinDate.timeIntervalSinceReferenceDate) == floor(object.joinDate.timeIntervalSinceReferenceDate)
         matches &&= salary == object.salary
         matches &&= isEmployeeOfMonth == object.isEmployeeOfMonth
         matches &&= percentYearlyRaise == object.percentYearlyRaise

@@ -1,5 +1,3 @@
-import Foundation
-
 public struct AnyAdaptorImp<T: AnyMappable> : AnyAdaptor {
     public typealias BaseType = T
     public init() { }
@@ -35,11 +33,7 @@ public extension AnyAdaptor {
     func mappingEnded() throws { }
     func mappingErrored(error: ErrorType) { }
     
-    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType? {
-        return nil
-    }
-    
-    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> Array<BaseType> {
+    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> Array<BaseType> {
         return Array<BaseType>()
     }
     
