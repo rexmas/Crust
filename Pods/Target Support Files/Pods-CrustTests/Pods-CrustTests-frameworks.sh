@@ -84,10 +84,8 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "Pods-CrustTests/Alamofire.framework"
   install_framework "Pods-CrustTests/JSONValueRX.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "Pods-CrustTests/Alamofire.framework"
   install_framework "Pods-CrustTests/JSONValueRX.framework"
 fi
