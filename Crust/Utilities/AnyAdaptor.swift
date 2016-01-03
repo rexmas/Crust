@@ -1,12 +1,10 @@
-public struct AnyAdaptorImp<T: AnyMappable> : AnyAdaptor {
-    public typealias BaseType = T
-    public init() { }
-}
-
+/// `MappedObject` type constraint required in `AnyMapping`.
 public protocol AnyMappable : Mappable {
     init()
 }
 
+/// A `Mapping` that does not require an adaptor of `typealias AdaptorKind`.
+/// Use for structs or classes that require no storage when mapping.
 public protocol AnyMapping : Mapping {
     typealias AdaptorKind: AnyAdaptor = AnyAdaptorImp<MappedObject>
     typealias MappedObject: AnyMappable
@@ -22,6 +20,17 @@ public extension AnyMapping {
     }
 }
 
+/// Used internally to remove the need for structures conforming to `AnyMapping`
+/// to specify a `typealias AdaptorKind`.
+public struct AnyAdaptorImp<T: AnyMappable> : AnyAdaptor {
+    public typealias BaseType = T
+    public init() { }
+}
+
+/// A bare-bones `Adaptor`.
+///
+/// Conforming to `AnyAdaptor` automatically implements the requirements for `Adaptor`
+/// outside of specifying the `BaseType`.
 public protocol AnyAdaptor : Adaptor {
     typealias BaseType: AnyMappable
     typealias ResultsType = Array<BaseType>
