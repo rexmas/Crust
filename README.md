@@ -1,6 +1,4 @@
 #Crust
-What sits between the cloud and the core of an app.
-
 A flexible Swift framework for converting classes and structs to and from JSON with support for storage solutions such as Realm.
 
 #Features
