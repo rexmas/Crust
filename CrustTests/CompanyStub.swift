@@ -44,7 +44,7 @@ class CompanyStub {
         var matches = true
         matches &&= uuid == object.uuid
         matches &&= name == object.name
-        matches &&= floor(foundingDate.timeIntervalSinceReferenceDate) == object.foundingDate.timeIntervalSinceReferenceDate
+        matches &&= floor(foundingDate.timeIntervalSinceReferenceDate) == floor(object.foundingDate.timeIntervalSinceReferenceDate)
         matches &&= pendingLawsuits == object.pendingLawsuits
         if let founder = founder {
             matches &&= founder.matches(object.founder!)

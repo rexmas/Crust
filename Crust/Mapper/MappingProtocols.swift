@@ -30,8 +30,7 @@ public protocol Adaptor {
     func mappingEnded() throws
     func mappingErrored(error: ErrorType)
     
-    func fetchObjectWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> BaseType?
-    func fetchObjectsWithType(type: BaseType.Type, predicate: NSPredicate) -> ResultsType
+    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType
     func createObject(objType: BaseType.Type) throws -> BaseType
     func deleteObject(obj: BaseType) throws
     func saveObjects(objects: [ BaseType ]) throws

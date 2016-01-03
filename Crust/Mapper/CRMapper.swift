@@ -81,7 +81,8 @@ public extension Mapping {
             }
         }
         
-        return self.adaptor.fetchObjectWithType(MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues) as! MappedObject?
+        let obj = self.adaptor.fetchObjectsWithType(MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues).first
+        return obj as! MappedObject?
     }
     
     func getNewInstance() throws -> MappedObject {
