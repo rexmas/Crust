@@ -227,7 +227,7 @@ The object conforming to `Adaptor` must include two `typealias`s:
 The `Mapping` must then set it's `typealias AdaptorKind = <Your Adaptor>` to use it during mapping.
 
 #Realm
-Realm support is coming shortly.
+https://github.com/rexmas/RealmCrust
 
 #Contributing
 
