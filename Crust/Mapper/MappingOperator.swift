@@ -292,5 +292,3 @@ private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionT
         throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
     }
 }
-
-

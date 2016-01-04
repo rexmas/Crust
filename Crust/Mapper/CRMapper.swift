@@ -151,6 +151,3 @@ public extension Mapping {
         context.object = object
     }
 }
-
-// For Network lib have something along the lines of. Will need to properly handle the typing constraints.
-// func registerMapping(mapping: Mapping, forPath path: URLPath)
