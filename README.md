@@ -1,3 +1,6 @@
+[![Cocoapods Compatible](https://img.shields.io/cocoapods/v/Crust.svg)](https://img.shields.io/cocoapods/v/Crust.svg)
+[![Build Status](https://travis-ci.org/rexmas/Crust.svg)](https://travis-ci.org/rexmas/Crust)
+
 #Crust
 A flexible Swift framework for converting classes and structs to and from JSON with support for storage solutions such as Realm.
 
