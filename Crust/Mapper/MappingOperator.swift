@@ -18,6 +18,11 @@ public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
 infix operator <- { associativity right }
 
 // Map arbitrary object.
+
+public func <- <T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType, T: AnyMappable>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+    return mapField(&field, map: map)
+}
+
 public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
     return mapField(&field, map: map)
 }
@@ -29,6 +34,10 @@ public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject 
 
 // NOTE: Must supply two separate versions for optional and non-optional types or we'll have to continuously
 // guard against unsafe nil assignments.
+
+public func <- <T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType, T: AnyMappable>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+    return mapField(&field, map: map)
+}
 
 public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
     return mapField(&field, map: map)
@@ -125,8 +134,72 @@ public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedOb
     return map.context
 }
 
+public func mapField<T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType, T: AnyMappable>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    guard case .Mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.Mapping to map type \(T.self)" ]
+        map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
+        return map.context
+    }
+    
+    do {
+        switch map.context.dir {
+        case .ToJSON:
+            let json = map.context.json
+            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+        case .FromJSON:
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
+            } else {
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+                throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
+            }
+        }
+    } catch let error as NSError {
+        map.context.error = error
+    }
+    
+    return map.context
+}
+
 // TODO: Maybe we can just make Optional: Mappable and then this redudancy can safely go away...
 public func mapField<T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+    
+    guard map.context.error == nil else {
+        return map.context
+    }
+    
+    guard case .Mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.Mapping to map type \(T.self)" ]
+        map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
+        return map.context
+    }
+    
+    do {
+        switch map.context.dir {
+        case .ToJSON:
+            let json = map.context.json
+            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+        case .FromJSON:
+            if let baseJSON = map.context.json[map.key] {
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
+            } else {
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+                throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
+            }
+        }
+    } catch let error as NSError {
+        map.context.error = error
+    }
+    
+    return map.context
+}
+
+public func mapField<T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType, T: AnyMappable>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
