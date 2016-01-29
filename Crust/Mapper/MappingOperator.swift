@@ -39,16 +39,13 @@ public func <- <T: JSONable, U: Transform, C: MappingContext where U.MappedObjec
     return mapField(&field, map: map)
 }
 
-public func <- <T: JSONable, C: MappingContext where T == T.ConversionType >(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
     return mapField(&field, map: map)
 }
 
 public func <- <T: Mappable, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
     return mapField(&field, map: map)
 }
-
-public typealias MappableAndJSONable = protocol<JSONable, Mappable>
-
 
 // MARK: - Map funcs
 
@@ -80,31 +77,6 @@ public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>
 
 // Arbitrary Optional.
 public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
-    
-    guard map.context.error == nil else {
-        return map.context
-    }
-    
-    switch map.context.dir {
-    case .ToJSON:
-        let json = map.context.json
-        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
-    case .FromJSON:
-        do {
-            if let baseJSON = map.context.json[map.key] {
-                try mapFromJson(baseJSON, toField: &field)
-            } else {
-                throw NSError(domain: CRMappingDomain, code: 0, userInfo: nil)
-            }
-        } catch let error as NSError {
-            map.context.error = error
-        }
-    }
-    
-    return map.context
-}
-
-public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType, T == T.ConversionType, T: AnyMappable>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
     
     guard map.context.error == nil else {
         return map.context
@@ -393,5 +365,3 @@ private func mapFromJson<T: Mappable, U: Mapping, V: RangeReplaceableCollectionT
         throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
     }
 }
-
-
