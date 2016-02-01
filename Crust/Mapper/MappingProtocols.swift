@@ -65,7 +65,8 @@ public class JSONableMapping<T: JSONable where T.ConversionType: AnyMappable> : 
         if let obj = T.fromJSON(json) {
             return obj
         } else {
-            throw NSError(domain: CRMappingDomain, code: -1, userInfo: nil)
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of \(T.self) could not convert JSON \(json)" ]
+            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
     }
     
