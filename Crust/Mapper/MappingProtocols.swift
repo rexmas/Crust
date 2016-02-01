@@ -58,6 +58,22 @@ public extension Transform {
     }
 }
 
+public class JSONableMapping<T: JSONable where T.ConversionType: AnyMappable> : Transform {
+    public typealias MappedObject = T.ConversionType
+    
+    public func fromJSON(json: JSONValue) throws -> MappedObject {
+        if let obj = T.fromJSON(json) {
+            return obj
+        } else {
+            throw NSError(domain: CRMappingDomain, code: -1, userInfo: nil)
+        }
+    }
+    
+    public func toJSON(obj: MappedObject) -> JSONValue {
+        return T.toJSON(obj)
+    }
+}
+
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
     case Mapping(CRMappingKey, T)
     indirect case MappingOptions(KeyExtensions, CRMappingOptions)
