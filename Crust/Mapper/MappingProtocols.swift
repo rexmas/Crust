@@ -10,6 +10,8 @@ public struct CRMappingOptions : OptionSetType {
     public static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
 }
 
+public typealias MappableJSONable = protocol<Mappable, JSONable>
+
 public protocol Mappable { }
 
 public protocol Mapping {
