@@ -2,7 +2,7 @@ import XCTest
 @testable import Crust
 import JSONValueRX
 
-class MockMap : Mappable, Mapping, Adaptor {
+class MockMap : Mapping, Adaptor {
     typealias BaseType = MockMap
     typealias ResultsType = Array<MockMap>
     

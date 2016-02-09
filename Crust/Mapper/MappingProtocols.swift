@@ -10,12 +10,8 @@ public struct CRMappingOptions : OptionSetType {
     public static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
 }
 
-public typealias MappableJSONable = protocol<Mappable, JSONable>
-
-public protocol Mappable { }
-
 public protocol Mapping {
-    typealias MappedObject: Mappable
+    typealias MappedObject
     typealias AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
@@ -55,23 +51,6 @@ public extension Transform {
         case .ToJSON:
             context.json = self.toJSON(tomap)
         }
-    }
-}
-
-public class JSONableMapping<T: JSONable where T.ConversionType: AnyMappable> : Transform {
-    public typealias MappedObject = T.ConversionType
-    
-    public func fromJSON(json: JSONValue) throws -> MappedObject {
-        if let obj = T.fromJSON(json) {
-            return obj
-        } else {
-            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of \(T.self) could not convert JSON \(json)" ]
-            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
-        }
-    }
-    
-    public func toJSON(obj: MappedObject) -> JSONValue {
-        return T.toJSON(obj)
     }
 }
 

@@ -15,12 +15,12 @@ extension Int : CRMappingKey { }
 
 public class MappingContext {
     public var json: JSONValue
-    public var object: Mappable
+    public var object: Any
     public private(set) var dir: MappingDirection
     public internal(set) var error: ErrorType?
     public internal(set) var parent: MappingContext? = nil
     
-    init(withObject object:Mappable, json: JSONValue, direction: MappingDirection) {
+    init(withObject object: Any, json: JSONValue, direction: MappingDirection) {
         self.dir = direction
         self.object = object
         self.json = json
@@ -28,7 +28,7 @@ public class MappingContext {
 }
 
 /// Method caller used to perform mappings.
-public struct CRMapper<T: Mappable, U: Mapping where U.MappedObject == T> {
+public struct CRMapper<T, U: Mapping where U.MappedObject == T> {
     
     public init() { }
     

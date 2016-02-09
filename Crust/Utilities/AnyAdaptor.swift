@@ -1,5 +1,5 @@
 /// `MappedObject` type constraint required in `AnyMapping`.
-public protocol AnyMappable : Mappable {
+public protocol AnyMappable {
     init()
 }
 
