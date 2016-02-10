@@ -65,7 +65,8 @@ public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
             } else {
-                throw NSError(domain: CRMappingDomain, code: 0, userInfo: nil)
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Could not find value in JSON \(map.context.json) from keyPath \(map.key)" ]
+                throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
             }
         } catch let error as NSError {
             map.context.error = error
@@ -91,7 +92,8 @@ public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
             } else {
-                throw NSError(domain: CRMappingDomain, code: 0, userInfo: nil)
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Value not present in JSON \(map.context.json) from keyPath \(map.key)" ]
+                throw NSError(domain: CRMappingDomain, code: 0, userInfo: userInfo)
             }
         } catch let error as NSError {
             map.context.error = error
@@ -198,7 +200,8 @@ private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValu
     if let fromJson = T.fromJSON(json) {
         field = fromJson
     } else {
-        throw NSError(domain: CRMappingDomain, code: -1, userInfo: nil)
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Conversion of JSON \(json) to type \(T.self) failed" ]
+        throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
     }
 }
 
@@ -212,7 +215,8 @@ private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValu
     if let fromJson = T.fromJSON(json) {
         field = fromJson
     } else {
-        throw NSError(domain: CRMappingDomain, code: -1, userInfo: nil)
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Conversion of JSON \(json) to type \(T.self) failed" ]
+        throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
     }
 }
 
