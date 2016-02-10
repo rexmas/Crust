@@ -64,12 +64,15 @@ public extension Mapping {
         
         try self.checkForAdaptorBaseTypeConformance()
         
-        let primaryKeys = self.primaryKeys
+        guard let primaryKeys = self.primaryKeys else {
+            return nil
+        }
+        
         var keyValues = [ String : CVarArgType ]()
-        try primaryKeys.forEach {
-            let keyPath = $0.keyPath
+        try primaryKeys.forEach { primaryKey, jsonKey in
+            let keyPath = jsonKey.keyPath
             if let val = json[keyPath] {
-                keyValues[keyPath] = val.valuesAsNSObjects()
+                keyValues[primaryKey] = val.valuesAsNSObjects()
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(Self.self)" ]
                 throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)

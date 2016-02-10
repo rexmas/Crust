@@ -15,7 +15,7 @@ public protocol Mapping {
     typealias AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
-    var primaryKeys: Array<CRMappingKey> { get }
+    var primaryKeys: Dictionary<String, CRMappingKey>? { get }
     
     func mapping(inout tomap: MappedObject, context: MappingContext)
 }

@@ -70,7 +70,6 @@ class User {
     var name: String? = nil
     var surname: String? = nil
     var birthDate: NSDate? = nil
-    
 }
 
 extension User: AnyMappable { }
@@ -78,8 +77,8 @@ extension User: AnyMappable { }
 class UserMapping: Mapping {
     
     var adaptor: MockAdaptor<User>
-    var primaryKeys: Array<CRMappingKey> {
-        return [ "data.id_hash" ]
+    var primaryKeys: Dictionary<String, CRMappingKey>? {
+        return [ "identifier" : "data.id_hash" ]
     }
     
     required init(adaptor: MockAdaptor<User>) {

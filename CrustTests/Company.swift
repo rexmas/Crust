@@ -17,8 +17,8 @@ extension Company: AnyMappable { }
 class CompanyMapping : Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: Array<CRMappingKey> {
-        return [ "uuid" ]
+    var primaryKeys: Dictionary<String, CRMappingKey>? {
+        return [ "uuid" : "data.uuid" ]
     }
     
     required init(adaptor: MockAdaptor<Company>) {
@@ -30,7 +30,7 @@ class CompanyMapping : Mapping {
         
         tomap.employees             <- KeyExtensions.Mapping("employees", employeeMapping) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "uuid" >*<
+        tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<
         tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
@@ -46,7 +46,7 @@ class CompanyMappingWithDupes : CompanyMapping {
         
         tomap.employees             <- KeyExtensions.MappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "uuid" >*<
+        tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<
         tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
