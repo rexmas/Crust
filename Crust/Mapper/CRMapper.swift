@@ -62,12 +62,7 @@ public struct CRMapper<T, U: Mapping where U.MappedObject == T> {
 public extension Mapping {
     func getExistingInstanceFromJSON(json: JSONValue) throws -> MappedObject? {
         
-        // NOTE: This sux but `MappedObject: AdaptorKind.BaseType` as a type constraint throws a compiler error as of 7.1 Xcode
-        // and `MappedObject == AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects MappedObject to be that exact type)
-        guard MappedObject.self is AdaptorKind.BaseType.Type else {
-            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(MappedObject.self) is not a subtype of \(AdaptorKind.BaseType.self)" ]
-            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
-        }
+        try self.checkForAdaptorBaseTypeConformance()
         
         let primaryKeys = self.primaryKeys
         var keyValues = [ String : CVarArgType ]()
@@ -81,20 +76,25 @@ public extension Mapping {
             }
         }
         
-        let obj = self.adaptor.fetchObjectsWithType(MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues).first
+        let obj = self.adaptor.fetchObjectsWithType(MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues)?.first
         return obj as! MappedObject?
     }
     
     func getNewInstance() throws -> MappedObject {
         
+        try self.checkForAdaptorBaseTypeConformance()
+        
+        return try self.adaptor.createObject(MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
+    }
+    
+    internal func checkForAdaptorBaseTypeConformance() throws {
         // NOTE: This sux but `MappedObject: AdaptorKind.BaseType` as a type constraint throws a compiler error as of 7.1 Xcode
         // and `MappedObject == AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects MappedObject to be that exact type)
+        
         guard MappedObject.self is AdaptorKind.BaseType.Type else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(MappedObject.self) is not a subtype of \(AdaptorKind.BaseType.self)" ]
             throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
         }
-        
-        return try self.adaptor.createObject(MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
     }
     
     internal func startMappingWithContext(context: MappingContext) throws {
@@ -138,6 +138,15 @@ public extension Mapping {
         try self.startMappingWithContext(context)
         
         self.executeMappingWithObject(&object, context: context)
+        
+        if context.error == nil {
+            do {
+                try self.checkForAdaptorBaseTypeConformance()
+                try self.adaptor.saveObjects([ object as! AdaptorKind.BaseType ])
+            } catch let error as NSError {
+                context.error = error
+            }
+        }
         
         if let error = context.error {
             if context.parent == nil {

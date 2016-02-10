@@ -42,7 +42,7 @@ public extension AnyAdaptor {
     func mappingEnded() throws { }
     func mappingErrored(error: ErrorType) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> Array<BaseType> {
+    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> Array<BaseType>? {
         return Array<BaseType>()
     }
     
