@@ -18,8 +18,8 @@ extension Employee: AnyMappable { }
 class EmployeeMapping : MockMapping {
     
     var adaptor: MockAdaptor<Employee>
-    var primaryKeys: Array<CRMappingKey> {
-        return [ "uuid" ]
+    var primaryKeys: Dictionary<String, CRMappingKey>? {
+        return [ "uuid" : "uuid" ]
     }
     
     required init(adaptor: MockAdaptor<Employee>) {

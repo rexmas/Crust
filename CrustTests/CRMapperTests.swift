@@ -2,7 +2,7 @@ import XCTest
 @testable import Crust
 import JSONValueRX
 
-class MockMap : Mappable, Mapping, Adaptor {
+class MockMap : Mapping, Adaptor {
     typealias BaseType = MockMap
     typealias ResultsType = Array<MockMap>
     
@@ -13,8 +13,8 @@ class MockMap : Mappable, Mapping, Adaptor {
     var adaptor: MockMap {
         return self
     }
-    var primaryKeys: Array<CRMappingKey> {
-        return [ ]
+    var primaryKeys: Dictionary<String, CRMappingKey>? {
+        return nil
     }
     
     func mapping(inout tomap: MockMap, context: MappingContext) {
@@ -25,7 +25,7 @@ class MockMap : Mappable, Mapping, Adaptor {
     func mappingEnded() throws { }
     func mappingErrored(error: ErrorType) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType { return [ ] }
+    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType? { return nil }
     func createObject(objType: BaseType.Type) -> BaseType { return self }
     func deleteObject(obj: BaseType) throws { }
     func saveObjects(objects: [ BaseType ]) throws { }
