@@ -67,7 +67,7 @@ Crust has 2 basic protocols:
 
 And 2 additional protocols when no storage `Adaptor` is required:
 - `AnyMappable`
-	- Inherited from the model (class or struct) to be mapped to and from JSON.
+	- Inherited by the model (class or struct) to be mapped to and from JSON.
 - `AnyMapping`
 	- A `Mapping` that does not require an `Adaptor`.
 
