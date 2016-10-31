@@ -1,7 +1,7 @@
 import Foundation
 import JSONValueRX
 
-public struct CRMappingOptions : OptionSetType {
+public struct CRMappingOptions : OptionSet {
     public let rawValue: UInt
     public init(rawValue: UInt) {
         self.rawValue = rawValue
@@ -11,44 +11,44 @@ public struct CRMappingOptions : OptionSetType {
 }
 
 public protocol Mapping {
-    typealias MappedObject
-    typealias AdaptorKind: Adaptor
+    associatedtype MappedObject
+    associatedtype AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
     var primaryKeys: Dictionary<String, CRMappingKey>? { get }
     
-    func mapping(inout tomap: MappedObject, context: MappingContext)
+    func mapping(_ tomap: inout MappedObject, context: MappingContext)
 }
 
 public protocol Adaptor {
-    typealias BaseType
-    typealias ResultsType: CollectionType
+    associatedtype BaseType
+    associatedtype ResultsType: Collection
     
     func mappingBegins() throws
     func mappingEnded() throws
-    func mappingErrored(error: ErrorType)
+    func mappingErrored(_ error: Error)
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType?
-    func createObject(objType: BaseType.Type) throws -> BaseType
-    func deleteObject(obj: BaseType) throws
-    func saveObjects(objects: [ BaseType ]) throws
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType?
+    func createObject(_ objType: BaseType.Type) throws -> BaseType
+    func deleteObject(_ obj: BaseType) throws
+    func saveObjects(_ objects: [ BaseType ]) throws
 }
 
 public protocol Transform : AnyMapping {
-    func fromJSON(json: JSONValue) throws -> MappedObject
-    func toJSON(obj: MappedObject) -> JSONValue
+    func fromJSON(_ json: JSONValue) throws -> MappedObject
+    func toJSON(_ obj: MappedObject) -> JSONValue
 }
 
 public extension Transform {
-    func mapping(inout tomap: MappedObject, context: MappingContext) {
+    func mapping(_ tomap: inout MappedObject, context: MappingContext) {
         switch context.dir {
-        case .FromJSON:
+        case .fromJSON:
             do {
                 try tomap = self.fromJSON(context.json)
             } catch let err as NSError {
                 context.error = err
             }
-        case .ToJSON:
+        case .toJSON:
             context.json = self.toJSON(tomap)
         }
     }
@@ -56,20 +56,20 @@ public extension Transform {
 
 public enum KeyExtensions<T: Mapping> : CRMappingKey {
     case Mapping(CRMappingKey, T)
-    indirect case MappingOptions(KeyExtensions, CRMappingOptions)
+    indirect case mappingOptions(KeyExtensions, CRMappingOptions)
     
     public var keyPath: String {
         switch self {
         case .Mapping(let keyPath, _):
             return keyPath.keyPath
-        case .MappingOptions(let keyPath, _):
+        case .mappingOptions(let keyPath, _):
             return keyPath.keyPath
         }
     }
     
     public var options: CRMappingOptions {
         switch self {
-        case .MappingOptions(_, let options):
+        case .mappingOptions(_, let options):
             return options
         default:
             return [ .None ]
@@ -80,7 +80,7 @@ public enum KeyExtensions<T: Mapping> : CRMappingKey {
         switch self {
         case .Mapping(_, let mapping):
             return mapping
-        case .MappingOptions(let mapping, _):
+        case .mappingOptions(let mapping, _):
             return mapping.mapping
         }
     }

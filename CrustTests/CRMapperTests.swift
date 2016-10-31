@@ -8,7 +8,7 @@ class MockMap : Mapping, Adaptor {
     
     init() { }
     
-    var catchMapping: ((tomap: MockMap, context: MappingContext) -> ())? = nil
+    var catchMapping: ((_ tomap: MockMap, _ context: MappingContext) -> ())? = nil
     
     var adaptor: MockMap {
         return self
@@ -17,18 +17,18 @@ class MockMap : Mapping, Adaptor {
         return nil
     }
     
-    func mapping(inout tomap: MockMap, context: MappingContext) {
-        catchMapping!(tomap: tomap, context: context)
+    func mapping(_ tomap: inout MockMap, context: MappingContext) {
+        catchMapping!(tomap, context)
     }
     
     func mappingBegins() throws { }
     func mappingEnded() throws { }
-    func mappingErrored(error: ErrorType) { }
+    func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType? { return nil }
-    func createObject(objType: BaseType.Type) -> BaseType { return self }
-    func deleteObject(obj: BaseType) throws { }
-    func saveObjects(objects: [ BaseType ]) throws { }
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType? { return nil }
+    func createObject(_ objType: BaseType.Type) -> BaseType { return self }
+    func deleteObject(_ obj: BaseType) throws { }
+    func saveObjects(_ objects: [ BaseType ]) throws { }
 }
 
 class CRMapperTests: XCTestCase {
@@ -37,7 +37,7 @@ class CRMapperTests: XCTestCase {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [:])
-        let parent = MappingContext(withObject: mockMap, json: json, direction: Crust.MappingDirection.FromJSON)
+        let parent = MappingContext(withObject: mockMap, json: json, direction: Crust.MappingDirection.fromJSON)
         let mapper = CRMapper<MockMap, MockMap>()
         
         var tested = false

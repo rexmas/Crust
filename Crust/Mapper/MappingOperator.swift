@@ -3,7 +3,7 @@ import JSONValueRX
 
 // MARK: - Merge right into tuple operator definition
 
-infix operator >*< { associativity right }
+infix operator >*< : AssignmentPrecedence
 
 public func >*< <T, U>(left: T, right: U) -> (T, U) {
     return (left, right)
@@ -15,52 +15,59 @@ public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
 
 // MARK: - Map value operator definition
 
-infix operator <- { associativity right }
+infix operator <- : AssignmentPrecedence
 
 // Map arbitrary object.
 
-public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+@discardableResult
+public func <- <T: JSONable, C: MappingContext>(field: inout T, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     return mapField(&field, map: map)
 }
 
 // Map a Mappable.
-public func <- <T, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+
+@discardableResult
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
-public func <- <T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+@discardableResult
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
 // NOTE: Must supply two separate versions for optional and non-optional types or we'll have to continuously
 // guard against unsafe nil assignments.
 
-public func <- <T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+@discardableResult
+public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     return mapField(&field, map: map)
 }
 
-public func <- <T, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+@discardableResult
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
-public func <- <T: JSONable, U: Transform, C: MappingContext where U.MappedObject == T, T == T.ConversionType>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+@discardableResult
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
 // MARK: - Map funcs
 
 // Arbitrary object.
-public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T, map:(key: JSONKeypath, context: C)) -> C {
+public func mapField<T: JSONable, C: MappingContext>(_ field: inout T, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     
     guard map.context.error == nil else {
         return map.context
     }
     
     switch map.context.dir {
-    case .ToJSON:
+    case .toJSON:
         let json = map.context.json
         map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
-    case .FromJSON:
+    case .fromJSON:
         do {
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
@@ -77,17 +84,17 @@ public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>
 }
 
 // Arbitrary Optional.
-public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>(inout field: T?, map:(key: JSONKeypath, context: C)) -> C {
+public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     
     guard map.context.error == nil else {
         return map.context
     }
     
     switch map.context.dir {
-    case .ToJSON:
+    case .toJSON:
         let json = map.context.json
         map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
-    case .FromJSON:
+    case .fromJSON:
         do {
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
@@ -104,7 +111,7 @@ public func mapField<T: JSONable, C: MappingContext where T == T.ConversionType>
 }
 
 // Mappable.
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
@@ -118,10 +125,10 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedO
     
     do {
         switch map.context.dir {
-        case .ToJSON:
+        case .toJSON:
             let json = map.context.json
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
-        case .FromJSON:
+        case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             } else {
@@ -137,7 +144,7 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedO
 }
 
 // TODO: Maybe we can just make Optional: Mappable and then this redudancy can safely go away...
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedObject == T>(inout field: T?, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
@@ -151,10 +158,10 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedO
     
     do {
         switch map.context.dir {
-        case .ToJSON:
+        case .toJSON:
             let json = map.context.json
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
-        case .FromJSON:
+        case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             } else {
@@ -171,21 +178,23 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext where U.MappedO
 
 // MARK: - To JSON
 
-private func mapToJson<T: JSONable where T == T.ConversionType>(var json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue {
+private func mapToJson<T: JSONable>(_ json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue where T == T.ConversionType {
+    var json = json
     
     if let field = field {
         json[key] = T.toJSON(field)
     } else {
-        json[key] = .JSONNull()
+        json[key] = .jsonNull()
     }
     
     return json
 }
 
-private func mapToJson<T, U: Mapping where U.MappedObject == T>(var json: JSONValue, fromField field: T?, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue {
+private func mapToJson<T, U: Mapping>(_ json: JSONValue, fromField field: T?, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue where U.MappedObject == T {
+    var json = json
     
     guard let field = field else {
-        json[key] = .JSONNull()
+        json[key] = .jsonNull()
         return json
     }
     
@@ -195,7 +204,7 @@ private func mapToJson<T, U: Mapping where U.MappedObject == T>(var json: JSONVa
 
 // MARK: - From JSON
 
-private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValue, inout toField field: T) throws {
+private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T) throws where T.ConversionType == T {
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson
@@ -205,9 +214,9 @@ private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValu
     }
 }
 
-private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValue, inout toField field: T?) throws {
+private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T?) throws where T.ConversionType == T {
     
-    if case .JSONNull = json {
+    if case .jsonNull = json {
         field = nil
         return
     }
@@ -220,15 +229,15 @@ private func mapFromJson<T: JSONable where T.ConversionType == T>(json: JSONValu
     }
 }
 
-private func mapFromJson<T, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T, mapping: U, context: MappingContext) throws {
+private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout T, mapping: U, context: MappingContext) throws where U.MappedObject == T {
     
     let mapper = CRMapper<T, U>()
     field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, parentContext: context)
 }
 
-private func mapFromJson<T, U: Mapping where U.MappedObject == T>(json: JSONValue, inout toField field: T?, mapping: U, context: MappingContext) throws {
+private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout T?, mapping: U, context: MappingContext) throws where U.MappedObject == T {
     
-    if case .JSONNull = json {
+    if case .jsonNull = json {
         field = nil
         return
     }
@@ -239,12 +248,12 @@ private func mapFromJson<T, U: Mapping where U.MappedObject == T>(json: JSONValu
 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol)
 
-public func <- <T, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
     return mapField(&field, map: map)
 }
 
-public func mapField<T, U: Mapping, V: RangeReplaceableCollectionType, C: MappingContext where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(inout field: V, map:(key: KeyExtensions<U>, context: C)) -> C {
+public func mapField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
     guard map.context.error == nil else {
         return map.context
@@ -253,10 +262,10 @@ public func mapField<T, U: Mapping, V: RangeReplaceableCollectionType, C: Mappin
     let mapping = map.key.mapping
     do {
         switch map.context.dir {
-        case .ToJSON:
+        case .toJSON:
             let json = map.context.json
             try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: mapping)
-        case .FromJSON:
+        case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 let allowDupes = map.key.options.contains(.AllowDuplicatesInCollection)
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context, allowDuplicates: allowDupes)
@@ -272,19 +281,20 @@ public func mapField<T, U: Mapping, V: RangeReplaceableCollectionType, C: Mappin
     return map.context
 }
 
-private func mapToJson<T, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T>(var json: JSONValue, fromField field: V, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue {
+private func mapToJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, fromField field: V, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue where U.MappedObject == T, V.Iterator.Element == T {
+    var json = json
     
     let results = try field.map {
         try CRMapper<T, U>().mapFromObjectToJSON($0, mapping: mapping)
     }
-    json[key] = .JSONArray(results)
+    json[key] = .jsonArray(results)
     
     return json
 }
 
-private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollectionType where U.MappedObject == T, V.Generator.Element == T, T: Equatable>(json: JSONValue, inout toField field: V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws {
+private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, toField field: inout V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
-    if case .JSONArray(let xs) = json {
+    if case .jsonArray(let xs) = json {
         let mapper = CRMapper<T, U>()
         var results = Array<T>()
         for x in xs {
@@ -299,9 +309,9 @@ private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollectionType where 
             let obj = try mapper.mapFromJSONToExistingObject(x, mapping: mapping, parentContext: context)
             results.append(obj)
         }
-        field.appendContentsOf(results)
+        field.append(contentsOf: results)
     } else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(json.dynamicType) to \(V.self)<\(T.self)>" ]
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(V.self)<\(T.self)>" ]
         throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
     }
 }

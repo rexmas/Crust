@@ -6,15 +6,15 @@ class MockAdaptor<T: AnyMappable> : Adaptor {
     
     func mappingBegins() throws { }
     func mappingEnded() throws { }
-    func mappingErrored(error: ErrorType) { }
+    func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType? { return [] }
-    func createObject(objType: BaseType.Type) throws -> BaseType { return objType.init() }
-    func deleteObject(obj: BaseType) throws { }
-    func saveObjects(objects: [ BaseType ]) throws { }
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType? { return [] }
+    func createObject(_ objType: BaseType.Type) throws -> BaseType { return objType.init() }
+    func deleteObject(_ obj: BaseType) throws { }
+    func saveObjects(_ objects: [ BaseType ]) throws { }
 }
 
 protocol MockMapping : Mapping {
-    typealias BaseType: AnyMappable
+    associatedtype BaseType: AnyMappable
     init(adaptor: MockAdaptor<BaseType>)
 }

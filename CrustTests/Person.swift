@@ -24,9 +24,9 @@ struct Person : AnyMappable {
 class HairColorMapping : Transform {
     typealias MappedObject = HairColor
     
-    func fromJSON(json: JSONValue) throws -> HairColor {
+    func fromJSON(_ json: JSONValue) throws -> HairColor {
         switch json {
-        case .JSONString(let str):
+        case .jsonString(let str):
             switch str {
             case "Gold":
                 return .Gold
@@ -42,8 +42,8 @@ class HairColorMapping : Transform {
         }
     }
     
-    func toJSON(obj: HairColor) -> JSONValue {
-        return .JSONString(obj.rawValue)
+    func toJSON(_ obj: HairColor) -> JSONValue {
+        return .jsonString(obj.rawValue)
     }
 }
 
@@ -51,7 +51,7 @@ class PersonMapping : AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(inout tomap: Person, context: MappingContext) {
+    func mapping(_ tomap: inout Person, context: MappingContext) {
         tomap.bankAccounts  <- "bank_accounts" >*<
         tomap.attitude      <- "traits.attitude" >*<
         tomap.hairColor     <- .Mapping("traits.bodily.hair_color", HairColorMapping()) >*<
@@ -69,17 +69,17 @@ class PersonStub {
     
     init() { }
     
-    func generateJsonObject() -> Dictionary<String, AnyObject> {
+    func generateJsonObject() -> [AnyHashable : Any] {
         var ownsCatVal: AnyObject
         if let cat = self.ownsCat {
-            ownsCatVal = cat
+            ownsCatVal = cat as AnyObject
         } else {
             ownsCatVal = NSNull()
         }
         
         return [
             "owns_cat" : ownsCatVal,
-            "bank_accounts" : bankAccounts,
+            "bank_accounts" : bankAccounts as AnyObject,
             "traits" : [
                 "attitude" : attitude,
                 "bodily" : [
@@ -89,7 +89,7 @@ class PersonStub {
         ]
     }
     
-    func matches(object: Person) -> Bool {
+    func matches(_ object: Person) -> Bool {
         var matches = true
         matches &&= attitude == object.attitude
         matches &&= hairColor == object.hairColor

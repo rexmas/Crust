@@ -7,7 +7,7 @@ class Employee {
     var employer: Company?
     var uuid: String = ""
     var name: String = ""
-    var joinDate: NSDate = NSDate()
+    var joinDate: Date = Date()
     var salary: Int = 0
     var isEmployeeOfMonth: Bool = false
     var percentYearlyRaise: Double = 0.0
@@ -26,7 +26,7 @@ class EmployeeMapping : MockMapping {
         self.adaptor = adaptor
     }
     
-    func mapping(inout tomap: Employee, context: MappingContext) {
+    func mapping(_ tomap: inout Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adaptor: MockAdaptor<Company>())
         
         tomap.employer              <- .Mapping("company", companyMapping) >*<

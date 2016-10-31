@@ -4,9 +4,9 @@ import Crust
 class CompanyStub {
     
     var employees = [ EmployeeStub ]()
-    var uuid: String = NSUUID().UUIDString
+    var uuid: String = UUID().uuidString
     var name: String = "Derp International"
-    var foundingDate: NSDate = NSDate()
+    var foundingDate: Date = Date()
     var founder: EmployeeStub? = EmployeeStub()
     var pendingLawsuits: Int = 5
     
@@ -17,17 +17,17 @@ class CompanyStub {
         copy.employees = employees.map { $0.copy() }
         copy.uuid = uuid
         copy.name = name
-        copy.foundingDate = foundingDate.copy() as! NSDate
+        copy.foundingDate = foundingDate
         copy.founder = founder?.copy()
         copy.pendingLawsuits = pendingLawsuits
         
         return copy
     }
     
-    func generateJsonObject() -> Dictionary<String, AnyObject> {
+    func generateJsonObject() -> [AnyHashable : Any] {
         let founder = self.founder?.generateJsonObject()
         return [
-            "name" : name,
+            "name" : name as AnyObject,
             "employees" : employees.map { $0.generateJsonObject() } as NSArray,
             "founder" : founder == nil ? NSNull() : founder! as NSDictionary,
             "data" : [
@@ -36,11 +36,11 @@ class CompanyStub {
                     "pending" : pendingLawsuits
                 ]
             ],
-            "data.founding_date" : foundingDate.toISOString(),
+            "data.founding_date" : foundingDate.isoString,
         ]
     }
     
-    func matches(object: Company) -> Bool {
+    func matches(_ object: Company) -> Bool {
         var matches = true
         matches &&= uuid == object.uuid
         matches &&= name == object.name
@@ -51,7 +51,7 @@ class CompanyStub {
         } else if object.founder != nil {
             return false
         }
-        for (i, employeeStub) in employees.enumerate() {
+        for (i, employeeStub) in employees.enumerated() {
             matches &&= employeeStub.matches(object.employees[i])
         }
         

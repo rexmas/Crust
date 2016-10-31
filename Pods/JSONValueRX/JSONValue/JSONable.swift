@@ -3,161 +3,161 @@ import Foundation
 // MARK: - JSONable
 
 public protocol JSONDecodable {
-    typealias ConversionType = Self
-    static func fromJSON(x : JSONValue) -> ConversionType?
+    associatedtype ConversionType = Self
+    static func fromJSON(_ x: JSONValue) -> ConversionType?
 }
 
 public protocol JSONEncodable {
-    typealias ConversionType
-    static func toJSON(x : ConversionType) -> JSONValue
+    associatedtype ConversionType
+    static func toJSON(_ x: ConversionType) -> JSONValue
 }
 
-public protocol JSONable : JSONDecodable, JSONEncodable { }
+public protocol JSONable: JSONDecodable, JSONEncodable { }
 
-extension Dictionary : JSONable {
+extension Dictionary: JSONable {
     public typealias ConversionType = Dictionary<String, Value>
-    public static func fromJSON(x: JSONValue) -> Dictionary.ConversionType? {
+    public static func fromJSON(_ x: JSONValue) -> Dictionary.ConversionType? {
         switch x {
-        case .JSONObject:
+        case .jsonObject:
             return x.values() as? Dictionary<String, Value>
         default:
             return nil
         }
     }
     
-    public static func toJSON(x: Dictionary.ConversionType) -> JSONValue {
+    public static func toJSON(_ x: Dictionary.ConversionType) -> JSONValue {
         do {
             return try JSONValue(dict: x)
         } catch {
-            return JSONValue.JSONNull()
+            return JSONValue.jsonNull()
         }
     }
 }
 
-extension Array : JSONable {
-    public static func fromJSON(x: JSONValue) -> Array? {
+extension Array: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> Array? {
         switch x {
-        case .JSONArray:
+        case .jsonArray:
             return x.values() as? Array
         default:
             return nil
         }
     }
     
-    public static func toJSON(x: Array) -> JSONValue {
+    public static func toJSON(_ x: Array) -> JSONValue {
         do {
             return try JSONValue(array: x)
         } catch {
-            return JSONValue.JSONNull()
+            return JSONValue.jsonNull()
         }
     }
 }
 
-extension Bool : JSONable {
-    public static func fromJSON(x : JSONValue) -> Bool? {
+extension Bool: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> Bool? {
         switch x {
-        case let .JSONBool(n):
+        case let .jsonBool(n):
             return n
-        case .JSONNumber(0):
+        case .jsonNumber(0):
             return false
-        case .JSONNumber(1):
+        case .jsonNumber(1):
             return true
         default:
             return nil
         }
     }
     
-    public static func toJSON(xs : Bool) -> JSONValue {
-        return JSONValue.JSONNumber(Double(xs))
+    public static func toJSON(_ xs: Bool) -> JSONValue {
+        return JSONValue.jsonBool(xs)
     }
 }
 
-extension Int : JSONable {
-    public static func fromJSON(x : JSONValue) -> Int? {
+extension Int: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> Int? {
         switch x {
-        case let .JSONNumber(n):
+        case let .jsonNumber(n):
             return Int(n)
         default:
             return nil
         }
     }
     
-    public static func toJSON(xs : Int) -> JSONValue {
-        return JSONValue.JSONNumber(Double(xs))
+    public static func toJSON(_ xs: Int) -> JSONValue {
+        return JSONValue.jsonNumber(Double(xs))
     }
 }
 
-extension Double : JSONable {
-    public static func fromJSON(x : JSONValue) -> Double? {
+extension Double: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> Double? {
         switch x {
-        case let .JSONNumber(n):
+        case let .jsonNumber(n):
             return n
         default:
             return nil
         }
     }
     
-    public static func toJSON(xs : Double) -> JSONValue {
-        return JSONValue.JSONNumber(xs)
+    public static func toJSON(_ xs: Double) -> JSONValue {
+        return JSONValue.jsonNumber(xs)
     }
 }
 
-extension NSNumber : JSONable {
-    public class func fromJSON(x : JSONValue) -> NSNumber? {
+extension NSNumber: JSONable {
+    public class func fromJSON(_ x: JSONValue) -> NSNumber? {
         switch x {
-        case let .JSONNumber(n):
-            return NSNumber(double: n)
+        case let .jsonNumber(n):
+            return NSNumber(value: n as Double)
         default:
             return nil
         }
     }
     
-    public class func toJSON(x : NSNumber) -> JSONValue {
-        return JSONValue.JSONNumber(Double(x))
+    public class func toJSON(_ x: NSNumber) -> JSONValue {
+        return JSONValue.jsonNumber(Double(x))
     }
 }
 
-extension String : JSONable {
-    public static func fromJSON(x : JSONValue) -> String? {
+extension String: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> String? {
         switch x {
-        case let .JSONString(n):
+        case let .jsonString(n):
             return n
         default:
             return nil
         }
     }
     
-    public static func toJSON(x : String) -> JSONValue {
-        return JSONValue.JSONString(x)
+    public static func toJSON(_ x: String) -> JSONValue {
+        return JSONValue.jsonString(x)
     }
 }
 
-extension NSDate : JSONable {
-    public static func fromJSON(x: JSONValue) -> NSDate? {
+extension Date: JSONable {
+    public static func fromJSON(_ x: JSONValue) -> Date? {
         switch x {
-        case let .JSONString(string):
-            return NSDate.fromISOString(string)
+        case let .jsonString(string):
+            return Date(isoString: string)
         default:
             return nil
         }
     }
     
-    public static func toJSON(x: NSDate) -> JSONValue {
-        return .JSONString(x.toISOString())
+    public static func toJSON(_ x: Date) -> JSONValue {
+        return .jsonString(x.isoString)
     }
 }
 
-extension NSNull : JSONable {
-    public class func fromJSON(x : JSONValue) -> NSNull? {
+extension NSNull: JSONable {
+    public class func fromJSON(_ x: JSONValue) -> NSNull? {
         switch x {
-        case .JSONNull():
+        case .jsonNull():
             return NSNull()
         default:
             return nil
         }
     }
     
-    public class func toJSON(xs : NSNull) -> JSONValue {
-        return JSONValue.JSONNull()
+    public class func toJSON(_ xs: NSNull) -> JSONValue {
+        return JSONValue.jsonNull()
     }
 }

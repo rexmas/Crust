@@ -1,43 +1,43 @@
 import Foundation
 
-public enum JSONValue : CustomStringConvertible {
-    case JSONArray([JSONValue])
-    case JSONObject([String : JSONValue])
-    case JSONNumber(Double)
-    case JSONString(String)
-    case JSONBool(Bool)
-    case JSONNull()
+public enum JSONValue: CustomStringConvertible {
+    case jsonArray([JSONValue])
+    case jsonObject([String : JSONValue])
+    case jsonNumber(Double)
+    case jsonString(String)
+    case jsonBool(Bool)
+    case jsonNull()
     
     public func values() -> AnyObject {
         switch self {
-        case let .JSONArray(xs):
-            return xs.map { $0.values() }
-        case let .JSONObject(xs):
-            return xs.mapValues { $0.values() }
-        case let .JSONNumber(n):
-            return n
-        case let .JSONString(s):
-            return s
-        case let .JSONBool(b):
-            return b
-        case .JSONNull():
+        case let .jsonArray(xs):
+            return xs.map { $0.values() } as AnyObject
+        case let .jsonObject(xs):
+            return xs.mapValues { $0.values() } as AnyObject
+        case let .jsonNumber(n):
+            return n as AnyObject
+        case let .jsonString(s):
+            return s as AnyObject
+        case let .jsonBool(b):
+            return b as AnyObject
+        case .jsonNull():
             return NSNull()
         }
     }
     
     public func valuesAsNSObjects() -> NSObject {
         switch self {
-        case let .JSONArray(xs):
-            return xs.map { $0.values() }
-        case let .JSONObject(xs):
-            return xs.mapValues { $0.values() }
-        case let .JSONNumber(n):
-            return NSNumber(double: n)
-        case let .JSONString(s):
+        case let .jsonArray(xs):
+            return xs.map { $0.values() } as NSObject
+        case let .jsonObject(xs):
+            return xs.mapValues { $0.values() } as NSObject
+        case let .jsonNumber(n):
+            return NSNumber(value: n as Double)
+        case let .jsonString(s):
             return NSString(string: s)
-        case let .JSONBool(b):
-            return NSNumber(bool: b)
-        case .JSONNull():
+        case let .jsonBool(b):
+            return NSNumber(value: b as Bool)
+        case .jsonNull():
             return NSNull()
         }
     }
@@ -46,7 +46,7 @@ public enum JSONValue : CustomStringConvertible {
         let jsonValues = try array.map {
             return try JSONValue(object: $0)
         }
-        self = .JSONArray(jsonValues)
+        self = .jsonArray(jsonValues)
     }
     
     public init<V>(dict: Dictionary<String, V>) throws {
@@ -55,7 +55,7 @@ public enum JSONValue : CustomStringConvertible {
             let x = try JSONValue(object: val)
             jsonValues[key] = x
         }
-        self = .JSONObject(jsonValues)
+        self = .jsonObject(jsonValues)
     }
     
     // NOTE: Would be nice to figure out a generic recursive way of solving this.
@@ -66,13 +66,13 @@ public enum JSONValue : CustomStringConvertible {
             let jsonValues = try array.map {
                 return try JSONValue(object: $0)
             }
-            self = .JSONArray(jsonValues)
+            self = .jsonArray(jsonValues)
             
         case let array as NSArray:
             let jsonValues = try array.map {
                 return try JSONValue(object: $0)
             }
-            self = .JSONArray(jsonValues)
+            self = .jsonArray(jsonValues)
             
         case let dict as Dictionary<String, Any>:
             var jsonValues = [String : JSONValue]()
@@ -80,7 +80,7 @@ public enum JSONValue : CustomStringConvertible {
                 let x = try JSONValue(object: val)
                 jsonValues[key] = x
             }
-            self = .JSONObject(jsonValues)
+            self = .jsonObject(jsonValues)
             
         case let dict as NSDictionary:
             var jsonValues = [String : JSONValue]()
@@ -88,39 +88,39 @@ public enum JSONValue : CustomStringConvertible {
                 let x = try JSONValue(object: val)
                 jsonValues[key as! String] = x
             }
-            self = .JSONObject(jsonValues)
+            self = .jsonObject(jsonValues)
         
         case let val as NSNumber:
             if val.isBool {
-                self = .JSONBool(val.boolValue)
+                self = .jsonBool(val.boolValue)
             } else {
-                self = .JSONNumber(val.doubleValue)
+                self = .jsonNumber(val.doubleValue)
             }
             
         case let val as NSString:
-            self = .JSONString(String(val))
+            self = .jsonString(String(val))
             
         case is NSNull:
-            self = .JSONNull()
+            self = .jsonNull()
             
         default:
             // TODO: Generate an enum of standard errors.
-            let userInfo = [ NSLocalizedFailureReasonErrorKey : "\(object.dynamicType) cannot be converted to JSON" ]
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "\(type(of: (object))) cannot be converted to JSON" ]
             throw NSError(domain: "CRJSONErrorDomain", code: -1000, userInfo: userInfo)
         }
     }
     
-    public func encode() throws -> NSData {
-        return try NSJSONSerialization.dataWithJSONObject(self.values(), options: NSJSONWritingOptions(rawValue: 0))
+    public func encode() throws -> Data {
+        return try JSONSerialization.data(withJSONObject: self.values(), options: JSONSerialization.WritingOptions(rawValue: 0))
     }
     
-    public static func decode(data: NSData) throws -> JSONValue {
-        let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions(rawValue: 0))
+    public static func decode(_ data: Data) throws -> JSONValue {
+        let json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions(rawValue: 0))
         return try JSONValue(object: json)
     }
     
-    public static func decode(string: String) throws -> JSONValue {
-        return try JSONValue.decode(string.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!)
+    public static func decode(_ string: String) throws -> JSONValue {
+        return try JSONValue.decode(string.data(using: String.Encoding.utf8, allowLossyConversion: false)!)
     }
     
     public subscript(index: JSONKeypath) -> JSONValue? {
@@ -134,7 +134,7 @@ public enum JSONValue : CustomStringConvertible {
     
     subscript(index: String) -> JSONValue? {
         get {
-            let components = index.componentsSeparatedByString(".")
+            let components = index.components(separatedBy: ".")
             if let result = self[components] {
                 return result
             } else {
@@ -142,7 +142,7 @@ public enum JSONValue : CustomStringConvertible {
             }
         }
         set(newValue) {
-            let components = index.componentsSeparatedByString(".")
+            let components = index.components(separatedBy: ".")
             self[components] = newValue
         }
     }
@@ -155,14 +155,14 @@ public enum JSONValue : CustomStringConvertible {
             
             let keys = index.dropFirst()
             switch self {
-            case .JSONObject(let obj):
+            case .jsonObject(let obj):
                 if let next = obj[key] {
                     return next[Array(keys)]
                 } else {
                     return nil
                 }
-            case .JSONArray(let arr):
-                return .JSONArray(arr.flatMap { $0[index] })
+            case .jsonArray(let arr):
+                return .jsonArray(arr.flatMap { $0[index] })
             default:
                 return nil
             }
@@ -174,13 +174,13 @@ public enum JSONValue : CustomStringConvertible {
             
             if index.count == 1 {
                 switch self {
-                case .JSONObject(var obj):
+                case .jsonObject(var obj):
                     if (newValue != nil) {
                         obj.updateValue(newValue!, forKey: key)
                     } else {
-                        obj.removeValueForKey(key)
+                        obj.removeValue(forKey: key)
                     }
-                    self = .JSONObject(obj)
+                    self = .jsonObject(obj)
                 default:
                     return
                 }
@@ -188,11 +188,11 @@ public enum JSONValue : CustomStringConvertible {
             
             let keys = index.dropFirst()
             switch self {
-            case .JSONObject(var obj):
+            case .jsonObject(var obj):
                 if var next = obj[key] {
                     next[Array(keys)] = newValue
                     obj.updateValue(next, forKey: key)
-                    self = .JSONObject(obj)
+                    self = .jsonObject(obj)
                 }
             default:
                 return
@@ -200,19 +200,19 @@ public enum JSONValue : CustomStringConvertible {
         }
     }
     
-    public var description : String {
+    public var description: String {
         switch self {
-        case .JSONNull():
+        case .jsonNull():
             return "JSONNull()"
-        case let .JSONBool(b):
+        case let .jsonBool(b):
             return "JSONBool(\(b))"
-        case let .JSONString(s):
+        case let .jsonString(s):
             return "JSONString(\(s))"
-        case let .JSONNumber(n):
+        case let .jsonNumber(n):
             return "JSONNumber(\(n))"
-        case let .JSONObject(o):
+        case let .jsonObject(o):
             return "JSONObject(\(o))"
-        case let .JSONArray(a):
+        case let .jsonArray(a):
             return "JSONArray(\(a))"
         }
     }
@@ -221,7 +221,7 @@ public enum JSONValue : CustomStringConvertible {
 // MARK: - Protocols
 // MARK: - Hashable, Equatable
 
-extension JSONValue : Hashable {
+extension JSONValue: Hashable {
     
     static let prime = 31
     static let truePrime = 1231;
@@ -229,50 +229,50 @@ extension JSONValue : Hashable {
     
     public var hashValue: Int {
         switch self {
-        case .JSONNull():
+        case .jsonNull():
             return JSONValue.prime
-        case let .JSONBool(b):
-            return b ? JSONValue.truePrime : JSONValue.falsePrime
-        case let .JSONString(s):
+        case let .jsonBool(b):
+            return b ? JSONValue.truePrime: JSONValue.falsePrime
+        case let .jsonString(s):
             return s.hashValue
-        case let .JSONNumber(n):
+        case let .jsonNumber(n):
             return n.hashValue
-        case let .JSONObject(obj):
-            return obj.reduce(1, combine: { (accum: Int, pair: (key: String, val: JSONValue)) -> Int in
+        case let .jsonObject(obj):
+            return obj.reduce(1, { (accum: Int, pair: (key: String, val: JSONValue)) -> Int in
                 return accum.hashValue ^ pair.key.hashValue ^ pair.val.hashValue.byteSwapped
             })
-        case let .JSONArray(xs):
-            return xs.reduce(3, combine: { (accum: Int, val: JSONValue) -> Int in
+        case let .jsonArray(xs):
+            return xs.reduce(3, { (accum: Int, val: JSONValue) -> Int in
                 return (accum.hashValue &* JSONValue.prime) ^ val.hashValue
             })
         }
     }
 }
 
-public func ==(lhs : JSONValue, rhs : JSONValue) -> Bool {
+public func ==(lhs: JSONValue, rhs: JSONValue) -> Bool {
     switch (lhs, rhs) {
-    case (.JSONNull(), .JSONNull()):
+    case (.jsonNull(), .jsonNull()):
         return true
-    case let (.JSONBool(l), .JSONBool(r)) where l == r:
+    case let (.jsonBool(l), .jsonBool(r)) where l == r:
         return true
-    case let (.JSONString(l), .JSONString(r)) where l == r:
+    case let (.jsonString(l), .jsonString(r)) where l == r:
         return true
-    case let (.JSONNumber(l), .JSONNumber(r)) where l == r:
+    case let (.jsonNumber(l), .jsonNumber(r)) where l == r:
         return true
-    case let (.JSONObject(l), .JSONObject(r))
-        where l.elementsEqual(r, isEquivalent: {
+    case let (.jsonObject(l), .jsonObject(r))
+        where l.elementsEqual(r, by: {
             (v1: (String, JSONValue), v2: (String, JSONValue)) in
             v1.0 == v2.0 && v1.1 == v2.1
         }):
         return true
-    case let (.JSONArray(l), .JSONArray(r)) where l.elementsEqual(r, isEquivalent: { $0 == $1 }):
+    case let (.jsonArray(l), .jsonArray(r)) where l.elementsEqual(r, by: { $0 == $1 }):
         return true
     default:
         return false
     }
 }
 
-public func !=(lhs : JSONValue, rhs : JSONValue) -> Bool {
+public func !=(lhs: JSONValue, rhs: JSONValue) -> Bool {
     return !(lhs == rhs)
 }
 
@@ -282,13 +282,13 @@ public protocol JSONKeypath {
     var keyPath: String { get }
 }
 
-extension String : JSONKeypath {
+extension String: JSONKeypath {
     public var keyPath: String {
         return self
     }
 }
 
-extension Int : JSONKeypath {
+extension Int: JSONKeypath {
     public var keyPath: String {
         return String(self)
     }

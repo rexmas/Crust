@@ -6,8 +6,8 @@ public protocol AnyMappable {
 /// A `Mapping` that does not require an adaptor of `typealias AdaptorKind`.
 /// Use for structs or classes that require no storage when mapping.
 public protocol AnyMapping : Mapping {
-    typealias AdaptorKind: AnyAdaptor = AnyAdaptorImp<MappedObject>
-    typealias MappedObject: AnyMappable
+    associatedtype AdaptorKind: AnyAdaptor = AnyAdaptorImp<MappedObject>
+    associatedtype MappedObject: AnyMappable
 }
 
 public extension AnyMapping {
@@ -32,24 +32,24 @@ public struct AnyAdaptorImp<T: AnyMappable> : AnyAdaptor {
 /// Conforming to `AnyAdaptor` automatically implements the requirements for `Adaptor`
 /// outside of specifying the `BaseType`.
 public protocol AnyAdaptor : Adaptor {
-    typealias BaseType: AnyMappable
-    typealias ResultsType = Array<BaseType>
+    associatedtype BaseType: AnyMappable
+    associatedtype ResultsType = Array<BaseType>
 }
 
 public extension AnyAdaptor {
     
     func mappingBegins() throws { }
     func mappingEnded() throws { }
-    func mappingErrored(error: ErrorType) { }
+    func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> Array<BaseType>? {
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> Array<BaseType>? {
         return nil
     }
     
-    func createObject(objType: BaseType.Type) throws -> BaseType {
+    func createObject(_ objType: BaseType.Type) throws -> BaseType {
         return objType.init()
     }
     
-    func deleteObject(obj: BaseType) throws { }
-    func saveObjects(objects: [ BaseType ]) throws { }
+    func deleteObject(_ obj: BaseType) throws { }
+    func saveObjects(_ objects: [ BaseType ]) throws { }
 }
