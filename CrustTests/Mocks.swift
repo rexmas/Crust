@@ -1,6 +1,6 @@
 import Crust
 
-class MockAdaptor<T: AnyMappable> : Adaptor {
+class MockAdaptor<T: AnyMappable>: Adaptor {
     typealias BaseType = T
     typealias ResultsType = Array<T>
     
@@ -14,7 +14,7 @@ class MockAdaptor<T: AnyMappable> : Adaptor {
     func saveObjects(_ objects: [ BaseType ]) throws { }
 }
 
-protocol MockMapping : Mapping {
+protocol MockMapping: Mapping {
     associatedtype BaseType: AnyMappable
     init(adaptor: MockAdaptor<BaseType>)
 }

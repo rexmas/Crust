@@ -15,7 +15,7 @@ class Employee {
 
 extension Employee: AnyMappable { }
 
-class EmployeeMapping : MockMapping {
+class EmployeeMapping: MockMapping {
     
     var adaptor: MockAdaptor<Employee>
     var primaryKeys: Dictionary<String, CRMappingKey>? {

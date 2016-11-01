@@ -14,7 +14,7 @@ class Company {
 
 extension Company: AnyMappable { }
 
-class CompanyMapping : Mapping {
+class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
     var primaryKeys: Dictionary<String, CRMappingKey>? {
@@ -38,7 +38,7 @@ class CompanyMapping : Mapping {
     }
 }
 
-class CompanyMappingWithDupes : CompanyMapping {
+class CompanyMappingWithDupes: CompanyMapping {
     
     override func mapping(_ tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())

@@ -1,7 +1,7 @@
 import Foundation
 import JSONValueRX
 
-public struct CRMappingOptions : OptionSet {
+public struct CRMappingOptions: OptionSet {
     public let rawValue: UInt
     public init(rawValue: UInt) {
         self.rawValue = rawValue
@@ -34,7 +34,7 @@ public protocol Adaptor {
     func saveObjects(_ objects: [ BaseType ]) throws
 }
 
-public protocol Transform : AnyMapping {
+public protocol Transform: AnyMapping {
     func fromJSON(_ json: JSONValue) throws -> MappedObject
     func toJSON(_ obj: MappedObject) -> JSONValue
 }
@@ -54,7 +54,7 @@ public extension Transform {
     }
 }
 
-public enum KeyExtensions<T: Mapping> : CRMappingKey {
+public enum KeyExtensions<T: Mapping>: CRMappingKey {
     case Mapping(CRMappingKey, T)
     indirect case mappingOptions(KeyExtensions, CRMappingOptions)
     

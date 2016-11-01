@@ -2,7 +2,7 @@ import Foundation
 import Crust
 import JSONValueRX
 
-enum HairColor : String, AnyMappable {
+enum HairColor: String, AnyMappable {
     case Blue
     case Brown
     case Gold
@@ -13,7 +13,7 @@ enum HairColor : String, AnyMappable {
     }
 }
 
-struct Person : AnyMappable {
+struct Person: AnyMappable {
     
     var bankAccounts: Array<Int> = [ 1234, 5678 ]
     var attitude: String = "awesome"
@@ -21,12 +21,12 @@ struct Person : AnyMappable {
     var ownsCat: Bool? = nil
 }
 
-class HairColorMapping : Transform {
+class HairColorMapping: Transform {
     typealias MappedObject = HairColor
     
     func fromJSON(_ json: JSONValue) throws -> HairColor {
         switch json {
-        case .jsonString(let str):
+        case .string(let str):
             switch str {
             case "Gold":
                 return .Gold
@@ -43,11 +43,11 @@ class HairColorMapping : Transform {
     }
     
     func toJSON(_ obj: HairColor) -> JSONValue {
-        return .jsonString(obj.rawValue)
+        return .string(obj.rawValue)
     }
 }
 
-class PersonMapping : AnyMapping {
+class PersonMapping: AnyMapping {
     
     typealias MappedObject = Person
     

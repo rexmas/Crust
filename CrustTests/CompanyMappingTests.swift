@@ -2,7 +2,7 @@ import XCTest
 import Crust
 import JSONValueRX
 
-class CompanyMappingTests : XCTestCase {
+class CompanyMappingTests: XCTestCase {
     
     func testJsonToCompany() {
         
@@ -14,7 +14,7 @@ class CompanyMappingTests : XCTestCase {
         XCTAssertTrue(stub.matches(object))
     }
     
-    class MockAdaptorExistingCompany : MockAdaptor<Company> {
+    class MockAdaptorExistingCompany: MockAdaptor<Company> {
         var company: Company
         
         required init(withCompany company: Company) {

@@ -8,10 +8,10 @@ public enum MappingDirection {
 
 internal let CRMappingDomain = "CRMappingDomain"
 
-public protocol CRMappingKey : JSONKeypath { }
+public protocol CRMappingKey: JSONKeypath { }
 
-extension String : CRMappingKey { }
-extension Int : CRMappingKey { }
+extension String: CRMappingKey { }
+extension Int: CRMappingKey { }
 
 open class MappingContext {
     open var json: JSONValue
@@ -55,7 +55,7 @@ public struct CRMapper<T, U: Mapping> where U.MappedObject == T {
     
     public func mapFromObjectToJSON(_ object: T, mapping: U) throws -> JSONValue {
         var object = object
-        let context = MappingContext(withObject: object, json: JSONValue.jsonObject([:]), direction: MappingDirection.toJSON)
+        let context = MappingContext(withObject: object, json: JSONValue.object([:]), direction: MappingDirection.toJSON)
         try mapping.performMappingWithObject(&object, context: context)
         return context.json
     }

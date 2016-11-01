@@ -2,17 +2,17 @@ import XCTest
 import Crust
 import JSONValueRX
 
-struct Transformable : AnyMappable {
+struct Transformable: AnyMappable {
     var value: String = "awesome"
 }
 
-class TransformableMapping : Transform {
+class TransformableMapping: Transform {
     
     typealias MappedObject = Transformable
     
     func fromJSON(_ json: JSONValue) throws -> MappedObject {
         switch json {
-        case .jsonNumber(let num):
+        case .number(let num):
             var transformable = Transformable()
             transformable.value = "\(num)"
             return transformable
@@ -22,7 +22,7 @@ class TransformableMapping : Transform {
     }
     
     func toJSON(_ obj: MappedObject) -> JSONValue {
-        return .jsonNumber(Double(obj.value.hash))
+        return .number(Double(obj.value.hash))
     }
 }
 
@@ -50,7 +50,7 @@ class DateMapping: Transform {
     
     func fromJSON(_ json: JSONValue) throws -> MappedObject {
         switch json {
-        case .jsonString(let date):
+        case .string(let date):
             return self.dateFormatter.date(from: date) ?? Date()
         default:
             throw NSError(domain: "", code: 0, userInfo: nil)
@@ -58,7 +58,7 @@ class DateMapping: Transform {
     }
     
     func toJSON(_ obj: MappedObject) -> JSONValue {
-        return .jsonString(self.dateFormatter.string(from: obj))
+        return .string(self.dateFormatter.string(from: obj))
     }
 }
 
@@ -114,7 +114,7 @@ class TransformTests: XCTestCase {
         let mapper = CRMapper<Transformable, TransformableMapping>()
         let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping())
         
-        XCTAssertEqual(json, JSONValue.jsonNumber(Double(object.value.hash)))
+        XCTAssertEqual(json, JSONValue.number(Double(object.value.hash)))
     }
     
     func testCustomTransformOverridesDefaultOne(){
