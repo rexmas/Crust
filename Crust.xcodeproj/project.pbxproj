@@ -25,7 +25,6 @@
 		17B983D61BDC8DB1006BD35C /* CompanyStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983D51BDC8DB1006BD35C /* CompanyStub.swift */; };
 		17C7A7651BF9665500B0D5F5 /* CRMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */; };
 		3C1EAD7F3E1C53F7D78345FD /* Pods_Crust.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */; };
-		746D448215A1320F070BF61F /* Pods_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */; };
 		97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -65,14 +64,11 @@
 		26951C391AFB401B007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		29E3D438C5101C01DFD19520 /* Pods-Crust.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Crust/Pods-Crust.debug.xcconfig"; sourceTree = "<group>"; };
-		2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.debug.xcconfig"; sourceTree = "<group>"; };
 		8C49AD01D91DCA093FAEBE81 /* Pods-Crust.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust/Pods-Crust.release.xcconfig"; sourceTree = "<group>"; };
 		9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_CrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B69217840C166BBAD301629D /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1AE299D5AD9525414FA4511 /* Pods-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
 		CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
-		DF8F17E0120F9080CBB36DAB /* Pods-CrustTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CrustTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,7 +84,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				746D448215A1320F070BF61F /* Pods_CrustTests.framework in Frameworks */,
 				97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -195,8 +190,6 @@
 			children = (
 				29E3D438C5101C01DFD19520 /* Pods-Crust.debug.xcconfig */,
 				8C49AD01D91DCA093FAEBE81 /* Pods-Crust.release.xcconfig */,
-				DF8F17E0120F9080CBB36DAB /* Pods-CrustTests.debug.xcconfig */,
-				C1AE299D5AD9525414FA4511 /* Pods-CrustTests.release.xcconfig */,
 				7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */,
 				CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */,
 			);
@@ -209,7 +202,6 @@
 				175C9A481C311DD000B0D6E7 /* Pods.framework */,
 				B69217840C166BBAD301629D /* Pods.framework */,
 				28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */,
-				2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */,
 				9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */,
 			);
 			name = Frameworks;
