@@ -6,7 +6,7 @@ target 'Crust' do
   pod 'JSONValueRX'
 
   target 'CrustTests' do
-    inherit! :search_paths
+    inherit! :complete
   end
 end
 

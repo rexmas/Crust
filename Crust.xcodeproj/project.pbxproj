@@ -26,6 +26,7 @@
 		17C7A7651BF9665500B0D5F5 /* CRMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */; };
 		3C1EAD7F3E1C53F7D78345FD /* Pods_Crust.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */; };
 		746D448215A1320F070BF61F /* Pods_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */; };
+		97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,9 +66,12 @@
 		28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		29E3D438C5101C01DFD19520 /* Pods-Crust.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Crust/Pods-Crust.debug.xcconfig"; sourceTree = "<group>"; };
 		2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.debug.xcconfig"; sourceTree = "<group>"; };
 		8C49AD01D91DCA093FAEBE81 /* Pods-Crust.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust/Pods-Crust.release.xcconfig"; sourceTree = "<group>"; };
+		9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_CrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B69217840C166BBAD301629D /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1AE299D5AD9525414FA4511 /* Pods-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
+		CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
 		DF8F17E0120F9080CBB36DAB /* Pods-CrustTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CrustTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,6 +89,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				746D448215A1320F070BF61F /* Pods_CrustTests.framework in Frameworks */,
+				97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +197,8 @@
 				8C49AD01D91DCA093FAEBE81 /* Pods-Crust.release.xcconfig */,
 				DF8F17E0120F9080CBB36DAB /* Pods-CrustTests.debug.xcconfig */,
 				C1AE299D5AD9525414FA4511 /* Pods-CrustTests.release.xcconfig */,
+				7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */,
+				CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -203,6 +210,7 @@
 				B69217840C166BBAD301629D /* Pods.framework */,
 				28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */,
 				2DA1C182E17A30FA13F037D8 /* Pods_CrustTests.framework */,
+				9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -331,7 +339,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4FB17661EB2B69D310EB25F9 /* [CP] Check Pods Manifest.lock */ = {
@@ -361,7 +369,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CrustTests/Pods-CrustTests-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		918D5A38AF766D61357EFFA6 /* [CP] Check Pods Manifest.lock */ = {
@@ -577,10 +585,10 @@
 		};
 		26951C421AFB401B007B0E07 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DF8F17E0120F9080CBB36DAB /* Pods-CrustTests.debug.xcconfig */;
+			baseConfigurationReference = 7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -597,10 +605,10 @@
 		};
 		26951C431AFB401B007B0E07 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C1AE299D5AD9525414FA4511 /* Pods-CrustTests.release.xcconfig */;
+			baseConfigurationReference = CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = CrustTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
