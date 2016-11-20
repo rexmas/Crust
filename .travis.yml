@@ -2,7 +2,7 @@ language: objective-c
 osx_image: xcode8.1
 xcode_workspace: Crust.xcworkspace
 xcode_scheme: Crust
-xcode_sdk: iphonesimulator10.0
+xcode_sdk: iphonesimulator10.1
 script:
  - set -o pipefail
  - xcodebuild -version
