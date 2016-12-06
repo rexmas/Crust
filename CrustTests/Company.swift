@@ -4,7 +4,7 @@ class Company {
     
     required init() { }
     
-    var employees = Array<Employee>()
+    var employees = [Employee]()
     var uuid: String = ""
     var name: String = ""
     var foundingDate: Date = Date()
@@ -17,7 +17,7 @@ extension Company: AnyMappable { }
 class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: Dictionary<String, Keypath>? {
+    var primaryKeys: [String : Keypath]? {
         return [ "uuid" : "data.uuid" ]
     }
     

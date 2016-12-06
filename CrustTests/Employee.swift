@@ -18,7 +18,7 @@ extension Employee: AnyMappable { }
 class EmployeeMapping: MockMapping {
     
     var adaptor: MockAdaptor<Employee>
-    var primaryKeys: Dictionary<String, Keypath>? {
+    var primaryKeys: [String : Keypath]? {
         return [ "uuid" : "uuid" ]
     }
     

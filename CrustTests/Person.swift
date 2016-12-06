@@ -15,7 +15,7 @@ enum HairColor: String, AnyMappable {
 
 struct Person: AnyMappable {
     
-    var bankAccounts: Array<Int> = [ 1234, 5678 ]
+    var bankAccounts: [Int] = [ 1234, 5678 ]
     var attitude: String = "awesome"
     var hairColor: HairColor = .Unknown
     var ownsCat: Bool? = nil
@@ -62,7 +62,7 @@ class PersonMapping: AnyMapping {
 
 class PersonStub {
     
-    var bankAccounts: Array<Int> = [ 0987, 6543 ]
+    var bankAccounts: [Int] = [ 0987, 6543 ]
     var attitude: String = "whoaaaa"
     var hairColor: HairColor = .Blue
     var ownsCat: Bool? = true

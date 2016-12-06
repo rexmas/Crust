@@ -4,7 +4,7 @@ import JSONValueRX
 
 class MockMap: Mapping, Adaptor {
     typealias BaseType = MockMap
-    typealias ResultsType = Array<MockMap>
+    typealias ResultsType = [MockMap]
     
     init() { }
     
@@ -13,7 +13,7 @@ class MockMap: Mapping, Adaptor {
     var adaptor: MockMap {
         return self
     }
-    var primaryKeys: Dictionary<String, Keypath>? {
+    var primaryKeys: [String : Keypath]? {
         return nil
     }
     
@@ -25,7 +25,7 @@ class MockMap: Mapping, Adaptor {
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType? { return nil }
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType? { return nil }
     func createObject(_ objType: BaseType.Type) -> BaseType { return self }
     func deleteObject(_ obj: BaseType) throws { }
     func saveObjects(_ objects: [ BaseType ]) throws { }

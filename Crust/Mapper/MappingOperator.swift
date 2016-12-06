@@ -296,7 +296,7 @@ private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: J
     
     if case .array(let xs) = json {
         let mapper = CRMapper<T, U>()
-        var results = Array<T>()
+        var results = [T]()
         for x in xs {
             if !allowDuplicates {
                 if let obj = try mapping.getExistingInstanceFromJSON(x) {

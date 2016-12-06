@@ -15,7 +15,7 @@ public protocol Mapping {
     associatedtype AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
-    var primaryKeys: Dictionary<String, Keypath>? { get }
+    var primaryKeys: [String : Keypath]? { get }
     
     func mapping(_ tomap: inout MappedObject, context: MappingContext)
 }
@@ -28,7 +28,7 @@ public protocol Adaptor {
     func mappingEnded() throws
     func mappingErrored(_ error: Error)
     
-    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType?
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType?
     func createObject(_ objType: BaseType.Type) throws -> BaseType
     func deleteObject(_ obj: BaseType) throws
     func saveObjects(_ objects: [ BaseType ]) throws
