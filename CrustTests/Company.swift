@@ -25,7 +25,7 @@ class CompanyMapping: Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(_ tomap: inout Company, context: MappingContext) {
+    func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
         tomap.employees             <- Spec.mapping("employees", employeeMapping) >*<
@@ -40,7 +40,7 @@ class CompanyMapping: Mapping {
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(_ tomap: inout Company, context: MappingContext) {
+    override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         let mappingExtension = Spec.mapping("employees", employeeMapping)
         

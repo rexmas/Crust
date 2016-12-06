@@ -51,7 +51,7 @@ class PersonMapping: AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(_ tomap: inout Person, context: MappingContext) {
+    func mapping(tomap: inout Person, context: MappingContext) {
         tomap.bankAccounts  <- "bank_accounts" >*<
         tomap.attitude      <- "traits.attitude" >*<
         tomap.hairColor     <- .mapping("traits.bodily.hair_color", HairColorMapping()) >*<

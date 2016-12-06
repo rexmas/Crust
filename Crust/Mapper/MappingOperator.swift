@@ -299,7 +299,7 @@ private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: J
         var results = [T]()
         for x in xs {
             if !allowDuplicates {
-                if let obj = try mapping.getExistingInstanceFromJSON(x) {
+                if let obj = try mapping.getExistingInstance(json: x) {
                     if results.contains(obj) {
                         continue
                     }

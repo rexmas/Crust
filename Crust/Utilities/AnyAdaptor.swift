@@ -42,14 +42,14 @@ public extension AnyAdaptor {
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: [String : CVarArg]) -> [BaseType]? {
+    func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> [BaseType]? {
         return nil
     }
     
-    func createObject(_ objType: BaseType.Type) throws -> BaseType {
-        return objType.init()
+    func createObject(type: BaseType.Type) throws -> BaseType {
+        return type.init()
     }
     
     func deleteObject(_ obj: BaseType) throws { }
-    func saveObjects(_ objects: [ BaseType ]) throws { }
+    func save(objects: [ BaseType ]) throws { }
 }
