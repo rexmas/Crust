@@ -27,12 +27,12 @@ public func <- <T: JSONable, C: MappingContext>(field: inout T, map:(key: JSONKe
 // Map a Mappable.
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
@@ -45,12 +45,12 @@ public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONK
 }
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
@@ -111,14 +111,14 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key
 }
 
 // Mappable.
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
     }
     
-    guard case .Mapping(let key, let mapping) = map.key else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.Mapping to map type \(T.self)" ]
+    guard case .mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.mapping to map type \(T.self)" ]
         map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
         return map.context
     }
@@ -144,14 +144,14 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
 }
 
 // TODO: Maybe we can just make Optional: Mappable and then this redudancy can safely go away...
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
     }
     
-    guard case .Mapping(let key, let mapping) = map.key else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.Mapping to map type \(T.self)" ]
+    guard case .mapping(let key, let mapping) = map.key else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.mapping to map type \(T.self)" ]
         map.context.error = NSError(domain: CRMappingDomain, code: -1000, userInfo: userInfo)
         return map.context
     }
@@ -248,12 +248,12 @@ private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout 
 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol)
 
-public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
     return mapField(&field, map: map)
 }
 
-public func mapField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: KeyExtensions<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+public func mapField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
     guard map.context.error == nil else {
         return map.context

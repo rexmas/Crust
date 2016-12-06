@@ -89,7 +89,7 @@ class UserMapping: Mapping {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
         toMap.identifier        <- "data.id_hash" >*<
-        toMap.birthDate         <- KeyExtensions.Mapping("data.birthdate", userBirthdateMapping) >*<
+        toMap.birthDate         <- Spec.mapping("data.birthdate", userBirthdateMapping) >*<
         toMap.name              <- "data.user_name" >*<
         toMap.surname           <- "data.user_surname" >*<
         context

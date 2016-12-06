@@ -28,8 +28,8 @@ class CompanyMapping: Mapping {
     func mapping(_ tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
-        tomap.employees             <- KeyExtensions.Mapping("employees", employeeMapping) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.employees             <- Spec.mapping("employees", employeeMapping) >*<
+        tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<
@@ -42,10 +42,10 @@ class CompanyMappingWithDupes: CompanyMapping {
     
     override func mapping(_ tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
-        let mappingExtension = KeyExtensions.Mapping("employees", employeeMapping)
+        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- KeyExtensions.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.employees             <- Spec.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<

@@ -29,7 +29,7 @@ class EmployeeMapping: MockMapping {
     func mapping(_ tomap: inout Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adaptor: MockAdaptor<Company>())
         
-        tomap.employer              <- .Mapping("company", companyMapping) >*<
+        tomap.employer              <- .mapping("company", companyMapping) >*<
         tomap.joinDate              <- "joinDate"  >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<

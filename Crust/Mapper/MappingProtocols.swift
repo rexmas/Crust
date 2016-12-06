@@ -54,13 +54,13 @@ public extension Transform {
     }
 }
 
-public enum KeyExtensions<T: Mapping>: CRMappingKey {
-    case Mapping(CRMappingKey, T)
-    indirect case mappingOptions(KeyExtensions, CRMappingOptions)
+public enum Spec<T: Mapping>: CRMappingKey {
+    case mapping(CRMappingKey, T)
+    indirect case mappingOptions(Spec, CRMappingOptions)
     
     public var keyPath: String {
         switch self {
-        case .Mapping(let keyPath, _):
+        case .mapping(let keyPath, _):
             return keyPath.keyPath
         case .mappingOptions(let keyPath, _):
             return keyPath.keyPath
@@ -78,7 +78,7 @@ public enum KeyExtensions<T: Mapping>: CRMappingKey {
     
     public var mapping: T {
         switch self {
-        case .Mapping(_, let mapping):
+        case .mapping(_, let mapping):
             return mapping
         case .mappingOptions(let mapping, _):
             return mapping.mapping
