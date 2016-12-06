@@ -44,7 +44,6 @@
 		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StructMappingTests.swift; sourceTree = "<group>"; };
 		175C9A3A1C311D8400B0D6E7 /* Crust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Crust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		175C9A3C1C311D8400B0D6E7 /* Crust.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crust.h; sourceTree = "<group>"; };
-		175C9A3E1C311D8400B0D6E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		175C9A481C311DD000B0D6E7 /* Pods.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Pods.framework; path = "Pods/../build/Debug-iphoneos/Pods.framework"; sourceTree = "<group>"; };
 		175C9A911C38A0A900B0D6E7 /* Mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Mocks.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = EmployeeMappingTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -99,15 +98,6 @@
 			path = Utilities;
 			sourceTree = "<group>";
 		};
-		175C9A3B1C311D8400B0D6E7 /* Crust */ = {
-			isa = PBXGroup;
-			children = (
-				175C9A3C1C311D8400B0D6E7 /* Crust.h */,
-				175C9A3E1C311D8400B0D6E7 /* Info.plist */,
-			);
-			path = Crust;
-			sourceTree = "<group>";
-		};
 		17F95FFC1BCB39C400CC6D4A /* Mapper */ = {
 			isa = PBXGroup;
 			children = (
@@ -123,7 +113,6 @@
 			children = (
 				26951C211AFB401A007B0E07 /* Crust */,
 				26951C371AFB401B007B0E07 /* CrustTests */,
-				175C9A3B1C311D8400B0D6E7 /* Crust */,
 				26951C201AFB401A007B0E07 /* Products */,
 				D7F1B5D00F7C55EEC05E60B4 /* Frameworks */,
 				38101DC982CB02805B2E52C0 /* Pods */,
@@ -152,6 +141,7 @@
 		26951C221AFB401A007B0E07 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				175C9A3C1C311D8400B0D6E7 /* Crust.h */,
 				26951C231AFB401A007B0E07 /* Info.plist */,
 			);
 			name = "Supporting Files";
