@@ -15,7 +15,7 @@ public extension AnyMapping {
         return AnyAdaptorImp<MappedObject>()
     }
     
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: Dictionary<String, Keypath>? {
         return nil
     }
 }

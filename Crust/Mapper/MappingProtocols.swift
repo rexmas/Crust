@@ -15,7 +15,7 @@ public protocol Mapping {
     associatedtype AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
-    var primaryKeys: Dictionary<String, CRMappingKey>? { get }
+    var primaryKeys: Dictionary<String, Keypath>? { get }
     
     func mapping(_ tomap: inout MappedObject, context: MappingContext)
 }
@@ -54,8 +54,8 @@ public extension Transform {
     }
 }
 
-public enum Spec<T: Mapping>: CRMappingKey {
-    case mapping(CRMappingKey, T)
+public enum Spec<T: Mapping>: Keypath {
+    case mapping(Keypath, T)
     indirect case mappingOptions(Spec, CRMappingOptions)
     
     public var keyPath: String {

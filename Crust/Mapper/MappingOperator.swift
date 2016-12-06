@@ -190,7 +190,7 @@ private func mapToJson<T: JSONable>(_ json: JSONValue, fromField field: T?, viaK
     return json
 }
 
-private func mapToJson<T, U: Mapping>(_ json: JSONValue, fromField field: T?, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue where U.MappedObject == T {
+private func mapToJson<T, U: Mapping>(_ json: JSONValue, fromField field: T?, viaKey key: Keypath, mapping: U) throws -> JSONValue where U.MappedObject == T {
     var json = json
     
     guard let field = field else {
@@ -281,7 +281,7 @@ public func mapField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingCon
     return map.context
 }
 
-private func mapToJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, fromField field: V, viaKey key: CRMappingKey, mapping: U) throws -> JSONValue where U.MappedObject == T, V.Iterator.Element == T {
+private func mapToJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, fromField field: V, viaKey key: Keypath, mapping: U) throws -> JSONValue where U.MappedObject == T, V.Iterator.Element == T {
     var json = json
     
     let results = try field.map {

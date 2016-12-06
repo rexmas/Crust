@@ -13,7 +13,7 @@ class MockMap: Mapping, Adaptor {
     var adaptor: MockMap {
         return self
     }
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: Dictionary<String, Keypath>? {
         return nil
     }
     

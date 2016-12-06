@@ -77,7 +77,7 @@ extension User: AnyMappable { }
 class UserMapping: Mapping {
     
     var adaptor: MockAdaptor<User>
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: Dictionary<String, Keypath>? {
         return [ "identifier" : "data.id_hash" ]
     }
     

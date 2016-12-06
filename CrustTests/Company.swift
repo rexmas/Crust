@@ -17,7 +17,7 @@ extension Company: AnyMappable { }
 class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: Dictionary<String, Keypath>? {
         return [ "uuid" : "data.uuid" ]
     }
     

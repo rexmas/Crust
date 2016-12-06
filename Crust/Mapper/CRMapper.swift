@@ -8,10 +8,10 @@ public enum MappingDirection {
 
 internal let CRMappingDomain = "CRMappingDomain"
 
-public protocol CRMappingKey: JSONKeypath { }
+public protocol Keypath: JSONKeypath { }
 
-extension String: CRMappingKey { }
-extension Int: CRMappingKey { }
+extension String: Keypath { }
+extension Int: Keypath { }
 
 open class MappingContext {
     open var json: JSONValue
