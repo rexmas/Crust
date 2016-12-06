@@ -2,12 +2,11 @@
 platform :ios, '8.0'
 use_frameworks!
 
-pod 'JSONValueRX'
-
-link_with 'Crust', 'CrustTests'
-
 target 'Crust' do
+  pod 'JSONValueRX'
+
+  target 'CrustTests' do
+    inherit! :complete
+  end
 end
 
-target 'CrustTests' do
-end

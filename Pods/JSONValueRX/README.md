@@ -1,17 +1,17 @@
-[![Cocoapods Compatible](https://img.shields.io/cocoapods/v/JSONValueRX.svg)](https://img.shields.io/cocoapods/v/JSONValueRX.svg)
+[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/JSONValueRX.svg)](https://img.shields.io/cocoapods/v/JSONValueRX.svg)
 [![Build Status](https://travis-ci.org/rexmas/JSONValue.svg)](https://travis-ci.org/rexmas/JSONValue)
 
 # JSONValue
 Simple JSON representation supporting subscripting and pattern matching.
 JSONValue uses an algebraic datatype representation of JSON for type safety and pattern matching.
 ```swift
-enum JSONValue : CustomStringConvertible {
-    case JSONArray([JSONValue])
-    case JSONObject([String : JSONValue])
-    case JSONNumber(Double)
-    case JSONString(String)
-    case JSONBool(Bool)
-    case JSONNull()
+enum JSONValue: CustomStringConvertible {
+    case array([JSONValue])
+    case object([String : JSONValue])
+    case number(Double)
+    case string(String)
+    case bool(Bool)
+    case null()
 }
 ```
 #Requirements
@@ -50,17 +50,17 @@ print(jsonVal["blerp.z"])
 
 jsonVal[["blerp.w"]] = try! JSONValue(object: "werp")
 print(jsonVal["blerp.w"])
-// Optional(JSONString(werp))
+// Optional(string(werp))
 ```
 
 #Equatable
 ```swift
-print(JSONValue.JSONNumber(1.0) == JSONValue.JSONNumber(1.0))
+print(JSONValue.number(1.0) == JSONValue.number(1.0))
 // true
 ```
 
 #Hashable
-`extension JSONValue : Hashable`
+`extension JSONValue: Hashable`
 
 Inverted key/value pairs do not collide.
 ```swift
@@ -72,26 +72,26 @@ print(hashable1.hashValue)
 print(hashable2.hashValue)
 // 2895177120076124296
 ```
-#Encoding/Decoding from String, NSData
+#Encoding/Decoding from String, Data
 ```swift
-public func encode() throws -> NSData
-public static func decode(data: NSData) throws -> JSONValue
-public static func decode(string: String) throws -> JSONValue
+public func encode() throws -> Data
+public static func decode(_ data: Data) throws -> JSONValue
+public static func decode(_ string: String) throws -> JSONValue
 ```
 
 #Custom Encoding/Decoding
 ```swift
 public protocol JSONDecodable {
-    typealias ConversionType = Self
-    static func fromJSON(x : JSONValue) -> ConversionType?
+    associatedtype ConversionType = Self
+    static func fromJSON(_ x: JSONValue) -> ConversionType?
 }
 
 public protocol JSONEncodable {
-    typealias ConversionType
-    static func toJSON(x : ConversionType) -> JSONValue
+    associatedtype ConversionType
+    static func toJSON(_ x: ConversionType) -> JSONValue
 }
 
-public protocol JSONable : JSONDecodable, JSONEncodable { }
+public protocol JSONable: JSONDecodable, JSONEncodable { }
 ```
 The following support `JSONable` for out-of-the-box Encoding/Decoding.
 ```swift
@@ -99,12 +99,12 @@ NSNull
 Double
 Bool
 Int
-NSDate
+Date
 Array
 String
 Dictionary
 ```
-`NSDate` uses built in `ISO` encoding/decoding to/from `.JSONString`
+`Date` uses built in `ISO` encoding/decoding to/from `.string`
 
 # Contributing
 

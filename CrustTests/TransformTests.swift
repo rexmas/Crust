@@ -2,17 +2,17 @@ import XCTest
 import Crust
 import JSONValueRX
 
-struct Transformable : AnyMappable {
+struct Transformable: AnyMappable {
     var value: String = "awesome"
 }
 
-class TransformableMapping : Transform {
+class TransformableMapping: Transform {
     
     typealias MappedObject = Transformable
     
-    func fromJSON(json: JSONValue) throws -> MappedObject {
+    func fromJSON(_ json: JSONValue) throws -> MappedObject {
         switch json {
-        case .JSONNumber(let num):
+        case .number(let num):
             var transformable = Transformable()
             transformable.value = "\(num)"
             return transformable
@@ -21,44 +21,44 @@ class TransformableMapping : Transform {
         }
     }
     
-    func toJSON(obj: MappedObject) -> JSONValue {
-        return .JSONNumber(Double(obj.value.hash))
+    func toJSON(_ obj: MappedObject) -> JSONValue {
+        return .number(Double(obj.value.hash))
     }
 }
 
-extension NSDate: AnyMappable { }
+extension Date: AnyMappable { }
 
-extension NSDateFormatter {
+extension DateFormatter {
     
-    class func birthdateFormatter() -> NSDateFormatter {
-        let formatter = NSDateFormatter()
+    class func birthdateFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         return formatter
     }
 }
 
 class DateMapping: Transform {
     
-    typealias MappedObject = NSDate
+    typealias MappedObject = Date
     
-    let dateFormatter: NSDateFormatter
+    let dateFormatter: DateFormatter
     
-    init(dateFormatter: NSDateFormatter){
+    init(dateFormatter: DateFormatter){
         self.dateFormatter = dateFormatter
     }
     
-    func fromJSON(json: JSONValue) throws -> MappedObject {
+    func fromJSON(_ json: JSONValue) throws -> MappedObject {
         switch json {
-        case .JSONString(let date):
-            return self.dateFormatter.dateFromString(date) ?? NSDate()
+        case .string(let date):
+            return self.dateFormatter.date(from: date) ?? Date()
         default:
             throw NSError(domain: "", code: 0, userInfo: nil)
         }
     }
     
-    func toJSON(obj: MappedObject) -> JSONValue {
-        return .JSONString(self.dateFormatter.stringFromDate(obj))
+    func toJSON(_ obj: MappedObject) -> JSONValue {
+        return .string(self.dateFormatter.string(from: obj))
     }
 }
 
@@ -69,7 +69,7 @@ class User {
     var identifier: Int = 0
     var name: String? = nil
     var surname: String? = nil
-    var birthDate: NSDate? = nil
+    var birthDate: Date? = nil
 }
 
 extension User: AnyMappable { }
@@ -85,8 +85,8 @@ class UserMapping: Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(inout toMap: User, context: MappingContext) {
-        let userBirthdateMapping = DateMapping(dateFormatter: NSDateFormatter.birthdateFormatter())
+    func mapping(_ toMap: inout User, context: MappingContext) {
+        let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
         toMap.identifier        <- "data.id_hash" >*<
         toMap.birthDate         <- KeyExtensions.Mapping("data.birthdate", userBirthdateMapping) >*<
@@ -114,16 +114,16 @@ class TransformTests: XCTestCase {
         let mapper = CRMapper<Transformable, TransformableMapping>()
         let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping())
         
-        XCTAssertEqual(json, JSONValue.JSONNumber(Double(object.value.hash)))
+        XCTAssertEqual(json, JSONValue.number(Double(object.value.hash)))
     }
     
     func testCustomTransformOverridesDefaultOne(){
-        let jsonObject: Dictionary<String, AnyObject> = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
+        let jsonObject: [AnyHashable : Any] = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
         let json = try! JSONValue(object: jsonObject)
         let mapper = CRMapper<User, UserMapping>()
         let object = try! mapper.mapFromJSONToNewObject(json, mapping: UserMapping(adaptor: MockAdaptor<User>()))
         
-        let targetDate: NSDate = NSDateFormatter.birthdateFormatter().dateFromString("1991-03-31")!
+        let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         
         XCTAssertEqual(object.birthDate, targetDate)
     }

@@ -1,26 +1,22 @@
 import Foundation
 
 extension NSNumber {
-    
-    var isBool : Bool {
+    public var isBool: Bool {
+        let trueNumber = NSNumber(value: true as Bool)
+        let falseNumber = NSNumber(value: false as Bool)
+        let trueObjCType = String(cString: trueNumber.objCType)
+        let falseObjCType = String(cString: falseNumber.objCType)
         
-        let trueNumber = NSNumber(bool: true)
-        let falseNumber = NSNumber(bool: false)
-        let trueObjCType = String.fromCString(trueNumber.objCType)
-        let falseObjCType = String.fromCString(falseNumber.objCType)
-        
-        let objCType = String.fromCString(self.objCType)
-        let isTrueNumber = (self.compare(trueNumber) == NSComparisonResult.OrderedSame && objCType == trueObjCType)
-        let isFalseNumber = (self.compare(falseNumber) == NSComparisonResult.OrderedSame && objCType == falseObjCType)
+        let objCType = String(cString: self.objCType)
+        let isTrueNumber = (self.compare(trueNumber) == ComparisonResult.orderedSame && objCType == trueObjCType)
+        let isFalseNumber = (self.compare(falseNumber) == ComparisonResult.orderedSame && objCType == falseObjCType)
         
         return isTrueNumber || isFalseNumber
     }
 }
 
 extension Dictionary {
-    
-    func mapValues<OutValue>(@noescape transform: Value throws -> OutValue) rethrows -> [Key : OutValue] {
-        
+    func mapValues<OutValue>(_ transform: (Value) throws -> OutValue) rethrows -> [Key : OutValue] {
         var outDict = [Key : OutValue]()
         try self.forEach { (key, value) in
             outDict[key] = try transform(value)
@@ -30,32 +26,28 @@ extension Dictionary {
 }
 
 // Consider using SwiftDate library if requirements increase.
-public extension NSDateFormatter {
-    
-    class func ISODateFormatter() -> NSDateFormatter {
-        struct Static {
-            static let dateFormatter = NSDateFormatter()
-            static var onceToken: dispatch_once_t = 0
-        }
-        dispatch_once(&Static.onceToken) {
-            Static.dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-            Static.dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
-            Static.dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-        }
-        
-        return Static.dateFormatter
-    }
+public extension DateFormatter {
+    @nonobjc public static let isoFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        return dateFormatter
+    }()
 }
 
-public extension NSDate {
+public extension Date {
     
-    class func fromISOString(ISOString: String) -> NSDate? {
-        let dateFromatter = NSDateFormatter.ISODateFormatter()
-        return dateFromatter.dateFromString(ISOString)
+    public init?(isoString: String) {
+        let dateFormatter = DateFormatter.isoFormatter
+        guard let date = dateFormatter.date(from: isoString) else {
+            return nil
+        }
+        self = date
     }
     
-    func toISOString() -> String {
-        let dateFromatter = NSDateFormatter.ISODateFormatter()
-        return dateFromatter.stringFromDate(self)
+    public var isoString: String {
+        let dateFromatter = DateFormatter.isoFormatter
+        return dateFromatter.string(from: self)
     }
 }

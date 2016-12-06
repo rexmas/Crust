@@ -2,7 +2,7 @@ import XCTest
 import Crust
 import JSONValueRX
 
-class CompanyMappingTests : XCTestCase {
+class CompanyMappingTests: XCTestCase {
     
     func testJsonToCompany() {
         
@@ -14,21 +14,21 @@ class CompanyMappingTests : XCTestCase {
         XCTAssertTrue(stub.matches(object))
     }
     
-    class MockAdaptorExistingCompany : MockAdaptor<Company> {
+    class MockAdaptorExistingCompany: MockAdaptor<Company> {
         var company: Company
         
         required init(withCompany company: Company) {
             self.company = company
         }
         
-        override func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> Array<Company> {
+        override func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> Array<Company> {
             return [ self.company ]
         }
     }
     
     func testUsesExistingObject() {
         
-        let uuid = NSUUID().UUIDString;
+        let uuid = UUID().uuidString;
         
         let original = Company()
         original.uuid = uuid
@@ -45,7 +45,7 @@ class CompanyMappingTests : XCTestCase {
     }
     
     func testNilOptionalNilsRelationship() {
-        let uuid = NSUUID().UUIDString;
+        let uuid = UUID().uuidString;
         
         let original = Company()
         original.uuid = uuid

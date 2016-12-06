@@ -2,7 +2,7 @@ import Foundation
 import Crust
 import JSONValueRX
 
-enum HairColor : String, AnyMappable {
+enum HairColor: String, AnyMappable {
     case Blue
     case Brown
     case Gold
@@ -13,7 +13,7 @@ enum HairColor : String, AnyMappable {
     }
 }
 
-struct Person : AnyMappable {
+struct Person: AnyMappable {
     
     var bankAccounts: Array<Int> = [ 1234, 5678 ]
     var attitude: String = "awesome"
@@ -21,12 +21,12 @@ struct Person : AnyMappable {
     var ownsCat: Bool? = nil
 }
 
-class HairColorMapping : Transform {
+class HairColorMapping: Transform {
     typealias MappedObject = HairColor
     
-    func fromJSON(json: JSONValue) throws -> HairColor {
+    func fromJSON(_ json: JSONValue) throws -> HairColor {
         switch json {
-        case .JSONString(let str):
+        case .string(let str):
             switch str {
             case "Gold":
                 return .Gold
@@ -42,16 +42,16 @@ class HairColorMapping : Transform {
         }
     }
     
-    func toJSON(obj: HairColor) -> JSONValue {
-        return .JSONString(obj.rawValue)
+    func toJSON(_ obj: HairColor) -> JSONValue {
+        return .string(obj.rawValue)
     }
 }
 
-class PersonMapping : AnyMapping {
+class PersonMapping: AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(inout tomap: Person, context: MappingContext) {
+    func mapping(_ tomap: inout Person, context: MappingContext) {
         tomap.bankAccounts  <- "bank_accounts" >*<
         tomap.attitude      <- "traits.attitude" >*<
         tomap.hairColor     <- .Mapping("traits.bodily.hair_color", HairColorMapping()) >*<
@@ -69,17 +69,17 @@ class PersonStub {
     
     init() { }
     
-    func generateJsonObject() -> Dictionary<String, AnyObject> {
+    func generateJsonObject() -> [AnyHashable : Any] {
         var ownsCatVal: AnyObject
         if let cat = self.ownsCat {
-            ownsCatVal = cat
+            ownsCatVal = cat as AnyObject
         } else {
             ownsCatVal = NSNull()
         }
         
         return [
             "owns_cat" : ownsCatVal,
-            "bank_accounts" : bankAccounts,
+            "bank_accounts" : bankAccounts as AnyObject,
             "traits" : [
                 "attitude" : attitude,
                 "bodily" : [
@@ -89,7 +89,7 @@ class PersonStub {
         ]
     }
     
-    func matches(object: Person) -> Bool {
+    func matches(_ object: Person) -> Bool {
         var matches = true
         matches &&= attitude == object.attitude
         matches &&= hairColor == object.hairColor

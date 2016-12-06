@@ -1,20 +1,20 @@
 import Crust
 
-class MockAdaptor<T: AnyMappable> : Adaptor {
+class MockAdaptor<T: AnyMappable>: Adaptor {
     typealias BaseType = T
     typealias ResultsType = Array<T>
     
     func mappingBegins() throws { }
     func mappingEnded() throws { }
-    func mappingErrored(error: ErrorType) { }
+    func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(type: BaseType.Type, keyValues: Dictionary<String, CVarArgType>) -> ResultsType? { return [] }
-    func createObject(objType: BaseType.Type) throws -> BaseType { return objType.init() }
-    func deleteObject(obj: BaseType) throws { }
-    func saveObjects(objects: [ BaseType ]) throws { }
+    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType? { return [] }
+    func createObject(_ objType: BaseType.Type) throws -> BaseType { return objType.init() }
+    func deleteObject(_ obj: BaseType) throws { }
+    func saveObjects(_ objects: [ BaseType ]) throws { }
 }
 
-protocol MockMapping : Mapping {
-    typealias BaseType: AnyMappable
+protocol MockMapping: Mapping {
+    associatedtype BaseType: AnyMappable
     init(adaptor: MockAdaptor<BaseType>)
 }

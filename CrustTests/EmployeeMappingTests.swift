@@ -2,7 +2,7 @@ import XCTest
 import Crust
 import JSONValueRX
 
-class EmployeeMappingTests : XCTestCase {
+class EmployeeMappingTests: XCTestCase {
     
     func testJsonToEmployee() {
         

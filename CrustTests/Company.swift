@@ -7,14 +7,14 @@ class Company {
     var employees = Array<Employee>()
     var uuid: String = ""
     var name: String = ""
-    var foundingDate: NSDate = NSDate()
+    var foundingDate: Date = Date()
     var founder: Employee?
     var pendingLawsuits: Int = 0
 }
 
 extension Company: AnyMappable { }
 
-class CompanyMapping : Mapping {
+class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
     var primaryKeys: Dictionary<String, CRMappingKey>? {
@@ -25,7 +25,7 @@ class CompanyMapping : Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(inout tomap: Company, context: MappingContext) {
+    func mapping(_ tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
         tomap.employees             <- KeyExtensions.Mapping("employees", employeeMapping) >*<
@@ -38,13 +38,13 @@ class CompanyMapping : Mapping {
     }
 }
 
-class CompanyMappingWithDupes : CompanyMapping {
+class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(inout tomap: Company, context: MappingContext) {
+    override func mapping(_ tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         let mappingExtension = KeyExtensions.Mapping("employees", employeeMapping)
         
-        tomap.employees             <- KeyExtensions.MappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.employees             <- KeyExtensions.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
         tomap.founder               <- .Mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<

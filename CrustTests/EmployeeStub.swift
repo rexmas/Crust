@@ -4,12 +4,12 @@ import Crust
 class EmployeeStub {
     
     var employer: CompanyStub?
-    var uuid: String = NSUUID().UUIDString
+    var uuid: String = UUID().uuidString
     var name: String = "John"
-    var joinDate: NSDate = NSDate()
-    var salary: NSNumber = 44                   // Int64
-    var isEmployeeOfMonth: NSNumber = false     // Bool
-    var percentYearlyRaise: NSNumber = 0.5      // Double
+    var joinDate: Date = Date()
+    var salary: Int = 44
+    var isEmployeeOfMonth: Bool = false
+    var percentYearlyRaise: Double = 0.5
     
     init() { }
     
@@ -18,20 +18,20 @@ class EmployeeStub {
         copy.employer = employer?.copy()
         copy.uuid = uuid
         copy.name = name
-        copy.joinDate = joinDate.copy() as! NSDate
-        copy.salary = salary.copy() as! NSNumber
-        copy.isEmployeeOfMonth = isEmployeeOfMonth.copy() as! NSNumber
-        copy.percentYearlyRaise = percentYearlyRaise.copy() as! NSNumber
+        copy.joinDate = joinDate
+        copy.salary = salary
+        copy.isEmployeeOfMonth = isEmployeeOfMonth
+        copy.percentYearlyRaise = percentYearlyRaise
         
         return copy
     }
     
-    func generateJsonObject() -> Dictionary<String, AnyObject> {
+    func generateJsonObject() -> [AnyHashable : Any] {
         let company = employer?.generateJsonObject()
         return [
-            "uuid" : uuid,
-            "name" : name,
-            "joinDate" : joinDate.toISOString(),
+            "uuid" : uuid as AnyObject,
+            "name" : name as AnyObject,
+            "joinDate" : joinDate.isoString,
             "company" :  company == nil ? NSNull() : company! as NSDictionary,
             "data" : [
                 "salary" : salary,
@@ -41,7 +41,7 @@ class EmployeeStub {
         ]
     }
     
-    func matches(object: Employee) -> Bool {
+    func matches(_ object: Employee) -> Bool {
         var matches = true
         matches &&= uuid == object.uuid
         matches &&= name == object.name
