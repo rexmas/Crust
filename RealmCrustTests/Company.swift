@@ -31,12 +31,12 @@ public class CompanyMapping : RealmMapping {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
         tomap.employees             <- Spec.mapping("employees", employeeMapping) >*< context
-//        tomap.founder               <- Spec.mapping("founder", employeeMapping) >*< context
-//        tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
-        //tomap.name                  <- "name" >*<
-        //tomap.foundingDate          <- "data.founding_date"  >*<
-        //tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
-        //context
+        tomap.founder               <- Spec.mapping("founder", employeeMapping) >*< context
+        tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
+        tomap.name                  <- "name" >*<
+        tomap.foundingDate          <- "data.founding_date"  >*<
+        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        context
     }
 }
 
