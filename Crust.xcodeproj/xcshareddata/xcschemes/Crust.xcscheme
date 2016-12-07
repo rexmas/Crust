@@ -38,6 +38,16 @@
                ReferencedContainer = "container:Crust.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1767B7251DF776FD00DE693C"
+               BuildableName = "RealmCrustTests.xctest"
+               BlueprintName = "RealmCrustTests"
+               ReferencedContainer = "container:Crust.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

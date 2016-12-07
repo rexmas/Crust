@@ -8,5 +8,10 @@ target 'Crust' do
   target 'CrustTests' do
     inherit! :complete
   end
+
+  target 'RealmCrustTests' do
+    inherit! :complete
+    pod 'Realm'
+  end
 end
 
