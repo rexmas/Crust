@@ -15,7 +15,7 @@ enum HairColor: String, AnyMappable {
 
 struct Person: AnyMappable {
     
-    var bankAccounts: Array<Int> = [ 1234, 5678 ]
+    var bankAccounts: [Int] = [ 1234, 5678 ]
     var attitude: String = "awesome"
     var hairColor: HairColor = .Unknown
     var ownsCat: Bool? = nil
@@ -51,10 +51,10 @@ class PersonMapping: AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(_ tomap: inout Person, context: MappingContext) {
+    func mapping(tomap: inout Person, context: MappingContext) {
         tomap.bankAccounts  <- "bank_accounts" >*<
         tomap.attitude      <- "traits.attitude" >*<
-        tomap.hairColor     <- .Mapping("traits.bodily.hair_color", HairColorMapping()) >*<
+        tomap.hairColor     <- .mapping("traits.bodily.hair_color", HairColorMapping()) >*<
         tomap.ownsCat       <- "owns_cat" >*<
         context
     }
@@ -62,7 +62,7 @@ class PersonMapping: AnyMapping {
 
 class PersonStub {
     
-    var bankAccounts: Array<Int> = [ 0987, 6543 ]
+    var bankAccounts: [Int] = [ 0987, 6543 ]
     var attitude: String = "whoaaaa"
     var hairColor: HairColor = .Blue
     var ownsCat: Bool? = true

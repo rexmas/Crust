@@ -21,7 +21,7 @@ class CompanyMappingTests: XCTestCase {
             self.company = company
         }
         
-        override func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> Array<Company> {
+        override func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> [Company] {
             return [ self.company ]
         }
     }

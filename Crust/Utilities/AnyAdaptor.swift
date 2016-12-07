@@ -15,7 +15,7 @@ public extension AnyMapping {
         return AnyAdaptorImp<MappedObject>()
     }
     
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: [String : Keypath]? {
         return nil
     }
 }
@@ -33,7 +33,7 @@ public struct AnyAdaptorImp<T: AnyMappable>: AnyAdaptor {
 /// outside of specifying the `BaseType`.
 public protocol AnyAdaptor: Adaptor {
     associatedtype BaseType: AnyMappable
-    associatedtype ResultsType = Array<BaseType>
+    associatedtype ResultsType = [BaseType]
 }
 
 public extension AnyAdaptor {
@@ -42,14 +42,14 @@ public extension AnyAdaptor {
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> Array<BaseType>? {
+    func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> [BaseType]? {
         return nil
     }
     
-    func createObject(_ objType: BaseType.Type) throws -> BaseType {
-        return objType.init()
+    func createObject(type: BaseType.Type) throws -> BaseType {
+        return type.init()
     }
     
     func deleteObject(_ obj: BaseType) throws { }
-    func saveObjects(_ objects: [ BaseType ]) throws { }
+    func save(objects: [ BaseType ]) throws { }
 }

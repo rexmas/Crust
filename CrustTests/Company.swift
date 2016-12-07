@@ -4,7 +4,7 @@ class Company {
     
     required init() { }
     
-    var employees = Array<Employee>()
+    var employees = [Employee]()
     var uuid: String = ""
     var name: String = ""
     var foundingDate: Date = Date()
@@ -17,7 +17,7 @@ extension Company: AnyMappable { }
 class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: [String : Keypath]? {
         return [ "uuid" : "data.uuid" ]
     }
     
@@ -25,11 +25,11 @@ class CompanyMapping: Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(_ tomap: inout Company, context: MappingContext) {
+    func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
-        tomap.employees             <- KeyExtensions.Mapping("employees", employeeMapping) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.employees             <- Spec.mapping("employees", employeeMapping) >*<
+        tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<
@@ -40,12 +40,12 @@ class CompanyMapping: Mapping {
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(_ tomap: inout Company, context: MappingContext) {
+    override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
-        let mappingExtension = KeyExtensions.Mapping("employees", employeeMapping)
+        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- KeyExtensions.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
-        tomap.founder               <- .Mapping("founder", employeeMapping) >*<
+        tomap.employees             <- Spec.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<

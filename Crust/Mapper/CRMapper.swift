@@ -8,10 +8,10 @@ public enum MappingDirection {
 
 internal let CRMappingDomain = "CRMappingDomain"
 
-public protocol CRMappingKey: JSONKeypath { }
+public protocol Keypath: JSONKeypath { }
 
-extension String: CRMappingKey { }
-extension Int: CRMappingKey { }
+extension String: Keypath { }
+extension Int: Keypath { }
 
 open class MappingContext {
     open var json: JSONValue
@@ -38,7 +38,7 @@ public struct CRMapper<T, U: Mapping> where U.MappedObject == T {
     }
     
     public func mapFromJSONToExistingObject(_ json: JSONValue, mapping: U, parentContext: MappingContext? = nil) throws -> T {
-        var object = try mapping.getExistingInstanceFromJSON(json)
+        var object = try mapping.getExistingInstance(json: json)
         if object == nil {
             object = try mapping.getNewInstance()
         }
@@ -62,7 +62,7 @@ public struct CRMapper<T, U: Mapping> where U.MappedObject == T {
 }
 
 public extension Mapping {
-    func getExistingInstanceFromJSON(_ json: JSONValue) throws -> MappedObject? {
+    func getExistingInstance(json: JSONValue) throws -> MappedObject? {
         
         try self.checkForAdaptorBaseTypeConformance()
         
@@ -81,7 +81,7 @@ public extension Mapping {
             }
         }
         
-        let obj = self.adaptor.fetchObjectsWithType(MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues)?.first
+        let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues)?.first
         return obj as! MappedObject?
     }
     
@@ -89,7 +89,7 @@ public extension Mapping {
         
         try self.checkForAdaptorBaseTypeConformance()
         
-        return try self.adaptor.createObject(MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
+        return try self.adaptor.createObject(type: MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
     }
     
     internal func checkForAdaptorBaseTypeConformance() throws {
@@ -102,7 +102,7 @@ public extension Mapping {
         }
     }
     
-    internal func startMappingWithContext(_ context: MappingContext) throws {
+    internal func startMapping(context: MappingContext) throws {
         if context.parent == nil {
             var underlyingError: NSError?
             do {
@@ -118,7 +118,7 @@ public extension Mapping {
         }
     }
     
-    internal func endMappingWithContext(_ context: MappingContext) throws {
+    internal func endMapping(context: MappingContext) throws {
         if context.parent == nil {
             var underlyingError: NSError?
             do {
@@ -134,20 +134,20 @@ public extension Mapping {
         }
     }
     
-    public func executeMappingWithObject(_ object: inout MappedObject, context: MappingContext) {
-        self.mapping(&object, context: context)
+    public func executeMapping(object: inout MappedObject, context: MappingContext) {
+        self.mapping(tomap: &object, context: context)
     }
     
     internal func performMappingWithObject(_ object: inout MappedObject, context: MappingContext) throws {
         
-        try self.startMappingWithContext(context)
+        try self.startMapping(context: context)
         
-        self.executeMappingWithObject(&object, context: context)
+        self.executeMapping(object: &object, context: context)
         
         if context.error == nil {
             do {
                 try self.checkForAdaptorBaseTypeConformance()
-                try self.adaptor.saveObjects([ object as! AdaptorKind.BaseType ])
+                try self.adaptor.save(objects: [ object as! AdaptorKind.BaseType ])
             } catch let error as NSError {
                 context.error = error
             }
@@ -160,7 +160,7 @@ public extension Mapping {
             throw error
         }
         
-        try self.endMappingWithContext(context)
+        try self.endMapping(context: context)
         
         context.object = object
     }

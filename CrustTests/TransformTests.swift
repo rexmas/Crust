@@ -77,7 +77,7 @@ extension User: AnyMappable { }
 class UserMapping: Mapping {
     
     var adaptor: MockAdaptor<User>
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: [String : Keypath]? {
         return [ "identifier" : "data.id_hash" ]
     }
     
@@ -85,13 +85,13 @@ class UserMapping: Mapping {
         self.adaptor = adaptor
     }
     
-    func mapping(_ toMap: inout User, context: MappingContext) {
+    func mapping(tomap: inout User, context: MappingContext) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
-        toMap.identifier        <- "data.id_hash" >*<
-        toMap.birthDate         <- KeyExtensions.Mapping("data.birthdate", userBirthdateMapping) >*<
-        toMap.name              <- "data.user_name" >*<
-        toMap.surname           <- "data.user_surname" >*<
+        tomap.identifier        <- "data.id_hash" >*<
+        tomap.birthDate         <- Spec.mapping("data.birthdate", userBirthdateMapping) >*<
+        tomap.name              <- "data.user_name" >*<
+        tomap.surname           <- "data.user_surname" >*<
         context
     }
 }

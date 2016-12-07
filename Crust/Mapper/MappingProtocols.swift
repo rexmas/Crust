@@ -1,13 +1,13 @@
 import Foundation
 import JSONValueRX
 
-public struct CRMappingOptions: OptionSet {
+public struct MappingOptions: OptionSet {
     public let rawValue: UInt
     public init(rawValue: UInt) {
         self.rawValue = rawValue
     }
-    public static let None = CRMappingOptions(rawValue: 0)
-    public static let AllowDuplicatesInCollection = CRMappingOptions(rawValue: 1)
+    public static let None = MappingOptions(rawValue: 0)
+    public static let AllowDuplicatesInCollection = MappingOptions(rawValue: 1)
 }
 
 public protocol Mapping {
@@ -15,9 +15,9 @@ public protocol Mapping {
     associatedtype AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
-    var primaryKeys: Dictionary<String, CRMappingKey>? { get }
+    var primaryKeys: [String : Keypath]? { get }
     
-    func mapping(_ tomap: inout MappedObject, context: MappingContext)
+    func mapping(tomap: inout MappedObject, context: MappingContext)
 }
 
 public protocol Adaptor {
@@ -28,10 +28,10 @@ public protocol Adaptor {
     func mappingEnded() throws
     func mappingErrored(_ error: Error)
     
-    func fetchObjectsWithType(_ type: BaseType.Type, keyValues: Dictionary<String, CVarArg>) -> ResultsType?
-    func createObject(_ objType: BaseType.Type) throws -> BaseType
+    func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType?
+    func createObject(type: BaseType.Type) throws -> BaseType
     func deleteObject(_ obj: BaseType) throws
-    func saveObjects(_ objects: [ BaseType ]) throws
+    func save(objects: [ BaseType ]) throws
 }
 
 public protocol Transform: AnyMapping {
@@ -40,7 +40,7 @@ public protocol Transform: AnyMapping {
 }
 
 public extension Transform {
-    func mapping(_ tomap: inout MappedObject, context: MappingContext) {
+    func mapping(tomap: inout MappedObject, context: MappingContext) {
         switch context.dir {
         case .fromJSON:
             do {
@@ -54,20 +54,20 @@ public extension Transform {
     }
 }
 
-public enum KeyExtensions<T: Mapping>: CRMappingKey {
-    case Mapping(CRMappingKey, T)
-    indirect case mappingOptions(KeyExtensions, CRMappingOptions)
+public enum Spec<T: Mapping>: Keypath {
+    case mapping(Keypath, T)
+    indirect case mappingOptions(Spec, MappingOptions)
     
     public var keyPath: String {
         switch self {
-        case .Mapping(let keyPath, _):
+        case .mapping(let keyPath, _):
             return keyPath.keyPath
         case .mappingOptions(let keyPath, _):
             return keyPath.keyPath
         }
     }
     
-    public var options: CRMappingOptions {
+    public var options: MappingOptions {
         switch self {
         case .mappingOptions(_, let options):
             return options
@@ -78,7 +78,7 @@ public enum KeyExtensions<T: Mapping>: CRMappingKey {
     
     public var mapping: T {
         switch self {
-        case .Mapping(_, let mapping):
+        case .mapping(_, let mapping):
             return mapping
         case .mappingOptions(let mapping, _):
             return mapping.mapping

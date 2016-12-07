@@ -18,7 +18,7 @@ extension Employee: AnyMappable { }
 class EmployeeMapping: MockMapping {
     
     var adaptor: MockAdaptor<Employee>
-    var primaryKeys: Dictionary<String, CRMappingKey>? {
+    var primaryKeys: [String : Keypath]? {
         return [ "uuid" : "uuid" ]
     }
     
@@ -26,10 +26,10 @@ class EmployeeMapping: MockMapping {
         self.adaptor = adaptor
     }
     
-    func mapping(_ tomap: inout Employee, context: MappingContext) {
+    func mapping(tomap: inout Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adaptor: MockAdaptor<Company>())
         
-        tomap.employer              <- .Mapping("company", companyMapping) >*<
+        tomap.employer              <- .mapping("company", companyMapping) >*<
         tomap.joinDate              <- "joinDate"  >*<
         tomap.uuid                  <- "uuid" >*<
         tomap.name                  <- "name" >*<
