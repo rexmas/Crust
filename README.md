@@ -19,7 +19,7 @@ A flexible Swift framework for converting classes and structs to and from JSON w
 
 #Requirements
 iOS 8.0+
-Swift 2.1+
+Swift 3.0+
 
 #Installation
 ### CocoaPods
