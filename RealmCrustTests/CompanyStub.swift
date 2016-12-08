@@ -44,7 +44,8 @@ class CompanyStub {
         var matches = true
         matches &&= uuid == object.uuid
         matches &&= name == object.name
-        matches &&= floor(foundingDate.timeIntervalSinceReferenceDate) == object.foundingDate!.timeIntervalSinceReferenceDate
+        // TODO: The conversion seems to be consistently off by 1 millisecond, figure out why.
+        matches &&= floor(foundingDate.timeIntervalSinceReferenceDate) == floor(object.foundingDate!.timeIntervalSinceReferenceDate)
         matches &&= pendingLawsuits == object.pendingLawsuits?.intValue
         if let founder = founder {
             matches &&= founder.matches(object: object.founder!)

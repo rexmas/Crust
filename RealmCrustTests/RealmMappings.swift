@@ -118,7 +118,9 @@ public class RealmAdaptor: Adaptor {
     
     public func fetchObjects(type: BaseType.Type, predicate: NSPredicate) -> ResultsType? {
         
-        let objects = self.cache.filter {
+        var objects = self.cache.filter {
+            type(of: $0) == type
+        }.filter {
             predicate.evaluate(with: $0)
         }
 //        let objects = self.cache.filtered(using: predicate)
@@ -131,10 +133,9 @@ public class RealmAdaptor: Adaptor {
             return nil
         }
         
-        var finalObjects = [BaseType]()
         let results = type.objects(in: realm, with: predicate)
         for obj in results {
-            finalObjects.append(obj)
+            objects.append(obj)
         }
         return objects
     }
