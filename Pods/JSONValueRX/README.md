@@ -16,7 +16,7 @@ enum JSONValue: CustomStringConvertible {
 ```
 #Requirements
 iOS 8.0+
-Swift 2.1+
+Swift 3.0+
 
 #Installation
 ### CocoaPods

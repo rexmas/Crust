@@ -246,14 +246,21 @@ private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout 
     field = try mapper.mapFromJSONToExistingObject(json, mapping: mapping, parentContext: context)
 }
 
-// MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol)
+// MARK: - Appendable - RangeReplaceableCollectionType subset (Array and Realm List follow this protocol)
+
+public protocol Appendable: Sequence {
+    mutating func append(_ newElement: Self.Iterator.Element)
+    mutating func append(contentsOf newElements: [Iterator.Element])
+}
+
+extension Array: Appendable { }
 
 public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
-    return mapField(&field, map: map)
+    return mapCollectionField(&field, map: map)
 }
 
-public func mapField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
     
     guard map.context.error == nil else {
         return map.context

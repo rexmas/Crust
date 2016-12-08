@@ -223,6 +223,8 @@ extension Int: JSONable {
         switch x {
         case let .number(n):
             return Int(n)
+        case let .string(s):
+            return Int(s)
         default:
             return nil
         }
@@ -238,6 +240,8 @@ extension Double: JSONable {
         switch x {
         case let .number(n):
             return n
+        case let .string(s):
+            return Double(s)
         default:
             return nil
         }
@@ -253,13 +257,25 @@ extension NSNumber: JSONable {
         switch x {
         case let .number(n):
             return NSNumber(value: n as Double)
+        case let .bool(b):
+            return NSNumber(value: b)
+        case let .string(s):
+            guard let n = Double(s) else {
+                return nil
+            }
+            return NSNumber(value: n)
         default:
             return nil
         }
     }
     
     public class func toJSON(_ x: NSNumber) -> JSONValue {
-        return JSONValue.number(Double(x))
+        if x.isBool {
+            return JSONValue.bool(x.boolValue)
+        }
+        else {
+            return JSONValue.number(x.doubleValue)
+        }
     }
 }
 
