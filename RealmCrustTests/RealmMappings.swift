@@ -1,5 +1,6 @@
 import Foundation
 import Crust
+import JSONValueRX
 import Realm
 
 public class RealmAdaptor: Adaptor {
@@ -9,6 +10,7 @@ public class RealmAdaptor: Adaptor {
     
     var realm: RLMRealm
     var cache: Set<BaseType>
+    var requiresPrimaryKeys = false
     
     public init(realm: RLMRealm) {
         self.realm = realm
@@ -48,15 +50,24 @@ public class RealmAdaptor: Adaptor {
         let saveBlock = {
             for obj in objects {
                 self.cache.remove(obj)
-                self.realm.addOrUpdate(obj)
+                if obj.objectSchema.primaryKeyProperty != nil {
+                    self.realm.addOrUpdate(obj)
+                }
+                else if !self.requiresPrimaryKeys {
+                    self.realm.add(obj)
+                }
+                else {
+                    let userInfo = [ NSLocalizedFailureReasonErrorKey : "Adaptor requires primary keys but obj of type \(type(of: obj)) does not have one" ]
+                    throw NSError(domain: "RealmAdaptorDomain", code: -1, userInfo: userInfo)
+                }
 //                self.realm.add(objects, update: type(of: obj).primaryKey() != nil)
             }
         }
         if self.realm.inWriteTransaction {
-            saveBlock()
+            try saveBlock()
         } else {
             self.realm.beginWriteTransaction()
-            saveBlock()
+            try saveBlock()
             try self.realm.commitWriteTransaction()
         }
     }
@@ -77,8 +88,25 @@ public class RealmAdaptor: Adaptor {
     
     public func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType? {
         
+        // Really we should be using either a mapping associated with the primary key or the primary key's
+        // Type's `fromJson(_:)` method. Unfortunately that method comes from JSONable which you cannot
+        // dynamically typecast to and Swift's reflection system doesn't appear fully baked enough to safely
+        // get the actual type of the property to call it's conversion method (Optional values aren't
+        // properly reflected coming from sources on SO). In the meantime we'll have to convert here on a
+        // case-by-case basis and possibly integrate better generics or primary key method mappings in the future.
+        
+        func sanitize(key: String, value: NSObject) -> NSObject {
+            if type.isProperty(key, ofType: NSDate.self), case let value as String = value {
+                return Date(isoString: value)! as NSDate
+            }
+            return type.sanitizeValue(value, fromProperty: key, realm: self.realm)
+        }
+        
         var predicates = Array<NSPredicate>()
-        for (key, value) in keyValues {
+        for (key, var value) in keyValues {
+            if case let obj as NSObject = value {
+                value = sanitize(key: key, value: obj)
+            }
             let predicate = NSPredicate(format: "%K == %@", key, value)
             predicates.append(predicate)
         }
