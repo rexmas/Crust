@@ -50,11 +50,10 @@ class CompanyMappingTests: RealmMappingTest {
         let mapper = CRMapper<Company, CompanyMapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
         
-        try! self.adaptor!.save(objects: [ object ])
-                
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 1)
-        XCTAssertEqual(object.employees.firstObject(), object.founder!)
+        XCTAssertTrue(employeeStub.matches(object: object.founder!))
+        XCTAssertTrue(employeeStub.matches(object: object.employees.firstObject()!))
         XCTAssertTrue(stub.matches(object: object))
     }
     
@@ -74,7 +73,7 @@ class CompanyMappingTests: RealmMappingTest {
         XCTAssertEqual(object.employees[1], object.employees[2])
     }
     
-    func testDuplicateJsonObjectsInArrayMergeToSingleObject() {
+    func testDuplicateJsonObjectsInArrayMergeToSingleObjectWhenEqualityIsPresent() {
         
         XCTAssertEqual(Company.allObjects(in: realm!).count, 0)
         let stub = CompanyStub()
@@ -85,8 +84,7 @@ class CompanyMappingTests: RealmMappingTest {
         let mapper = CRMapper<Company, CompanyMapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor!))
         
-        try! self.adaptor!.save(objects: [ object ])
-        
+        XCTAssertEqual(Employee.allObjects().count, 1)
         XCTAssertEqual(object.employees.count, 1)
     }
     

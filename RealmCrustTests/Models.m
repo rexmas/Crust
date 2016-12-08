@@ -2,6 +2,16 @@
 
 @implementation Employee
 
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[Employee class]])
+    {
+        return NO;
+    }
+    
+    return [self isEqualToObject:object];
+}
+
 @end
 
 @implementation Company
