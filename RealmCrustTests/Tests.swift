@@ -106,7 +106,7 @@ class Tests: RealmMappingTest {
         let json: [String : Any] = ["data": ["id_hash": "170", "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": "60", "sex": 2, "photo_path": "http://somwhere-over-the-internet.com/"]]
         
         
-        let mapping = CRMapper<User, UserMapping>()
+        let mapping = CRMapper<UserMapping>()
         let jsonValue = try! JSONValue(object: json)
         _ = try! mapping.mapFromJSONToExistingObject(jsonValue["data"]!, mapping: UserMapping(adaptor: adaptor!))
         
@@ -118,7 +118,7 @@ class Tests: RealmMappingTest {
         let jsonObj: [String : Any] = ["data": ["id_hash": "170", "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": "60", "sex": 2, "photo_path": "http://somwhere-over-the-internet.com/"]]
         
         
-        let mapping = CRMapper<User, UserMapping>()
+        let mapping = CRMapper<UserMapping>()
         let jsonValue = try! JSONValue(object: jsonObj)
         _ = try! mapping.mapFromJSONToExistingObject(jsonValue["data"]!, mapping: UserMapping(adaptor: adaptor!))
         
