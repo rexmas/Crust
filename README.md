@@ -123,7 +123,7 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
 
 2. Create your Crust Mapper.
     ```swift
-    let mapper = CRMapper()<CompanyMapping>
+    let mapper = CRMapper<CompanyMapping>()
     ```
 
 3. Use the mapper to convert to and from `JSONValue` objects
