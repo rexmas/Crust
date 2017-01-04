@@ -3,24 +3,6 @@ import Crust
 import JSONValueRX
 import Realm
 
-//class PrimaryObj1: RLMObject {
-//    dynamic var class2s: RLMArray<PrimaryObj2>
-//    dynamic var uuid: String = ""
-//    
-//    override class func primaryKey() -> String? {
-//        return "uuid"
-//    }
-//}
-//
-//class PrimaryObj2: RLMObject {
-//    dynamic var uuid: String = ""
-//    dynamic var class1: PrimaryObj1?
-//    
-//    override class func primaryKey() -> String? {
-//        return "uuid"
-//    }
-//}
-
 class PrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor

@@ -2,20 +2,6 @@ import Crust
 import JSONValueRX
 import Realm
 
-//public class Company: RLMObject {
-//    
-//    public dynamic var employees: RLMArray<Employee>
-//    public dynamic var uuid: String = ""
-//    public dynamic var name: String = ""
-//    public dynamic var foundingDate: NSDate = NSDate()
-//    public dynamic var founder: Employee?
-//    public dynamic var pendingLawsuits: Int = 0
-//    
-//    public override class func primaryKey() -> String? {
-//        return "uuid"
-//    }
-//}
-
 public class CompanyMapping : RealmMapping {
     
     public var adaptor: RealmAdaptor

@@ -28,7 +28,6 @@ public class RealmAdaptor: Adaptor {
     public func mappingEnded() throws {
         try self.realm.commitWriteTransaction()
         self.cache.removeAll()
-//        self.cache.removeAllObjects()
     }
     
     public func mappingErrored(_ error: Error) {
@@ -36,13 +35,11 @@ public class RealmAdaptor: Adaptor {
             self.realm.cancelWriteTransaction()
         }
         self.cache.removeAll()
-//        self.cache.removeAllObjects()
     }
     
     public func createObject(type: BaseType.Type) throws -> BaseType {
         let obj = type.init()
         self.cache.insert(obj)
-//        self.cache.add(obj)
         return obj
     }
     
@@ -60,7 +57,6 @@ public class RealmAdaptor: Adaptor {
                     let userInfo = [ NSLocalizedFailureReasonErrorKey : "Adaptor requires primary keys but obj of type \(type(of: obj)) does not have one" ]
                     throw NSError(domain: "RealmAdaptorDomain", code: -1, userInfo: userInfo)
                 }
-//                self.realm.add(objects, update: type(of: obj).primaryKey() != nil)
             }
         }
         if self.realm.inWriteTransaction {
@@ -123,7 +119,7 @@ public class RealmAdaptor: Adaptor {
         }.filter {
             predicate.evaluate(with: $0)
         }
-//        let objects = self.cache.filtered(using: predicate)
+
         if objects.count > 0 {
             return Array(objects)
         }
@@ -166,23 +162,8 @@ extension RLMArray: Appendable {
 public func <- <T, U: Mapping, C: MappingContext>(field: inout RLMArray<T>, map:(key: Spec<U>, context: C)) -> C
     where U.MappedObject == T {
 
-     // Realm specifies that List "must be declared with 'let'". Seems to actually work either way in practice, but for safety
-     // we're going to include a List mapper that accepts fields with a 'let' declaration and forward to our
-     // `RangeReplaceableCollectionType` mapper.
-
     var variableList = field.allObjects() as! [T]
     let context = mapCollectionField(&variableList, map: map)
     field.append(contentsOf: variableList)
     return context
 }
-
-//public func <- <T, U: Mapping, C: MappingContext>(field: List<T>, map:(key: KeyExtensions<U>, context: C)) -> C
-//    where U.MappedObject == T {
-
-//     // Realm specifies that List "must be declared with 'let'". Seems to actually work either way in practice, but for safety
-//     // we're going to include a List mapper that accepts fields with a 'let' declaration and forward to our
-//     // `RangeReplaceableCollectionType` mapper.
-    
-//    var variableList = field
-//    return mapField(&variableList, map: map)
-//}
