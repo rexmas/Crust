@@ -38,7 +38,7 @@ class CRMapperTests: XCTestCase {
         
         let json = try! JSONValue(object: [:])
         let parent = MappingContext(withObject: mockMap, json: json, direction: Crust.MappingDirection.fromJSON)
-        let mapper = CRMapper<MockMap, MockMap>()
+        let mapper = CRMapper<MockMap>()
         
         var tested = false
         mockMap.catchMapping = { (tomap, context) in
