@@ -14,11 +14,11 @@ extension String: Keypath { }
 extension Int: Keypath { }
 
 open class MappingContext {
-    open var json: JSONValue
-    open var object: Any
-    open fileprivate(set) var dir: MappingDirection
+    open internal(set) var json: JSONValue
+    open internal(set) var object: Any
     open internal(set) var error: Error?
     open internal(set) var parent: MappingContext? = nil
+    open fileprivate(set) var dir: MappingDirection
     
     init(withObject object: Any, json: JSONValue, direction: MappingDirection) {
         self.dir = direction
@@ -28,7 +28,7 @@ open class MappingContext {
 }
 
 /// Method caller used to perform mappings.
-public struct CRMapper<T: Mapping> {
+public struct Crust<T: Mapping> {
     
     public init() { }
     
@@ -81,7 +81,7 @@ public extension Mapping {
             }
         }
         
-        let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, keyValues: keyValues)?.first
+        let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, primaryKeyValues: [keyValues], isMapping: true)?.first
         return obj as! MappedObject?
     }
     

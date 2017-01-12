@@ -82,7 +82,7 @@ public class RealmAdaptor: Adaptor {
         }
     }
     
-    public func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType? {
+    public func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
         
         // Really we should be using either a mapping associated with the primary key or the primary key's
         // Type's `fromJson(_:)` method. Unfortunately that method comes from JSONable which you cannot
@@ -98,21 +98,27 @@ public class RealmAdaptor: Adaptor {
             return type.sanitizeValue(value, fromProperty: key, realm: self.realm)
         }
         
-        var predicates = Array<NSPredicate>()
-        for (key, var value) in keyValues {
-            if case let obj as NSObject = value {
-                value = sanitize(key: key, value: obj)
+        var totalPredicate = Array<NSPredicate>()
+        
+        for keyValues in primaryKeyValues {
+            var objectPredicates = Array<NSPredicate>()
+            for (key, var value) in keyValues {
+                if case let obj as NSObject = value {
+                    value = sanitize(key: key, value: obj)
+                }
+                let predicate = NSPredicate(format: "%K == %@", key, value)
+                objectPredicates.append(predicate)
             }
-            let predicate = NSPredicate(format: "%K == %@", key, value)
-            predicates.append(predicate)
+            let objectPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: objectPredicates)
+            totalPredicate.append(objectPredicate)
         }
         
-        let andPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        let orPredicate = NSCompoundPredicate(orPredicateWithSubpredicates: totalPredicate)
         
-        return fetchObjects(type: type, predicate: andPredicate)
+        return fetchObjects(type: type, predicate: orPredicate, isMapping: isMapping)
     }
     
-    public func fetchObjects(type: BaseType.Type, predicate: NSPredicate) -> ResultsType? {
+    public func fetchObjects(type: BaseType.Type, predicate: NSPredicate, isMapping: Bool) -> ResultsType? {
         
         var objects = self.cache.filter {
             type(of: $0) == type
@@ -124,8 +130,9 @@ public class RealmAdaptor: Adaptor {
             return Array(objects)
         }
         
-        if type.primaryKey() != nil {
-            // We're going to build an unstored object and update when saving based on the primary key.
+        // Since we use this function to fetch existing objects to map to, but we can't remap the primary key,
+        // we're going to build an unstored object and update when saving based on the primary key.
+        guard !isMapping || type.primaryKey() == nil else {
             return nil
         }
         

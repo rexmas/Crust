@@ -8,7 +8,7 @@ class MockAdaptor<T: AnyMappable>: Adaptor {
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType? { return [] }
+    func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return [] }
     func createObject(type: BaseType.Type) throws -> BaseType { return type.init() }
     func deleteObject(_ obj: BaseType) throws { }
     func save(objects: [ BaseType ]) throws { }

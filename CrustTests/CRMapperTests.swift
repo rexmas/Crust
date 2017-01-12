@@ -25,7 +25,7 @@ class MockMap: Mapping, Adaptor {
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> ResultsType? { return nil }
+    func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return nil }
     func createObject(type: BaseType.Type) -> BaseType { return self }
     func deleteObject(_ obj: BaseType) throws { }
     func save(objects: [ BaseType ]) throws { }
@@ -37,8 +37,8 @@ class CRMapperTests: XCTestCase {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [:])
-        let parent = MappingContext(withObject: mockMap, json: json, direction: Crust.MappingDirection.fromJSON)
-        let mapper = CRMapper<MockMap>()
+        let parent = MappingContext(withObject: mockMap, json: json, direction: MappingDirection.fromJSON)
+        let mapper = Crust<MockMap>()
         
         var tested = false
         mockMap.catchMapping = { (tomap, context) in
