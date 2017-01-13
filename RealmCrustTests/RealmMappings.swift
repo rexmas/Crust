@@ -1,8 +1,11 @@
+/// Include this file and `RLMSupport.swift` in order to use `RealmMapping` and `RealmAdaptor` and map to `RLMObject` using `Crust`.
+
 import Foundation
 import Crust
 import JSONValueRX
 import Realm
 
+/// Adaptor for Realm.
 public class RealmAdaptor: Adaptor {
     
     public typealias BaseType = RLMObject
@@ -143,11 +146,6 @@ public class RealmAdaptor: Adaptor {
         return objects
     }
 }
-
-/// Instructions:
-/// 1. `import Crust` and `import RealmCrust` dependencies.
-/// 2. Include this section of code in your app/lib and uncomment.
-/// This will allow our `RealmMapping` and `RealmAdaptor` to be used with Crust.
 
 public protocol RealmMapping: Mapping {
     init(adaptor: RealmAdaptor)
