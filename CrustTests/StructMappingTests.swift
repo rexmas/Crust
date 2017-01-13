@@ -8,7 +8,7 @@ class StructMappingTests: XCTestCase {
         
         let stub = PersonStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = CRMapper<PersonMapping>()
+        let mapper = Crust<PersonMapping>()
         let object = try! mapper.mapFromJSONToNewObject(json, mapping: PersonMapping())
         
         XCTAssertTrue(stub.matches(object))
@@ -18,7 +18,7 @@ class StructMappingTests: XCTestCase {
         
         let stub = PersonStub()
         var json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = CRMapper<PersonMapping>()
+        let mapper = Crust<PersonMapping>()
         var object = try! mapper.mapFromJSONToNewObject(json, mapping: PersonMapping())
         
         XCTAssertTrue(object.ownsCat!)

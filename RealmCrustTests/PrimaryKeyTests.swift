@@ -82,7 +82,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 0)
         
         let json = try! JSONValue(object: json1Dict)
-        let mapper = CRMapper<PrimaryObj1Mapping>()
+        let mapper = Crust<PrimaryObj1Mapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: PrimaryObj1Mapping(adaptor: adaptor!))
         
         XCTAssertEqual(PrimaryObj1.allObjects(in: realm!).count, 1)
@@ -105,7 +105,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         
         let json = try! JSONValue(object: json2Dict)
-        let mapper = CRMapper<PrimaryObj2Mapping>()
+        let mapper = Crust<PrimaryObj2Mapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: PrimaryObj2Mapping(adaptor: adaptor!))
         
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)

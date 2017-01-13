@@ -8,7 +8,7 @@ class CompanyMappingTests: XCTestCase {
         
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = CRMapper<CompanyMapping>()
+        let mapper = Crust<CompanyMapping>()
         let object = try! mapper.mapFromJSONToNewObject(json, mapping: CompanyMapping(adaptor: MockAdaptor<Company>()))
         
         XCTAssertTrue(stub.matches(object))
@@ -21,7 +21,7 @@ class CompanyMappingTests: XCTestCase {
             self.company = company
         }
         
-        override func fetchObjects(type: BaseType.Type, keyValues: [String : CVarArg]) -> [Company] {
+        override func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> [Company] {
             return [ self.company ]
         }
     }
@@ -37,7 +37,7 @@ class CompanyMappingTests: XCTestCase {
         let stub = CompanyStub()
         stub.uuid = uuid;
         let json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = CRMapper<CompanyMapping>()
+        let mapper = Crust<CompanyMapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor))
         
         XCTAssertTrue(object === original)
@@ -57,7 +57,7 @@ class CompanyMappingTests: XCTestCase {
         stub.uuid = uuid;
         stub.founder = nil;
         let json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = CRMapper<CompanyMapping>()
+        let mapper = Crust<CompanyMapping>()
         let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor))
         
         XCTAssertTrue(stub.matches(object))
