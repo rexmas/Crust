@@ -123,7 +123,7 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
 
 2. Create your Crust Mapper.
     ```swift
-    let mapper = Crust<CompanyMapping>()
+    let mapper = Mapper<CompanyMapping>()
     ```
 
 3. Use the mapper to convert to and from `JSONValue` objects
@@ -216,8 +216,8 @@ class CompanyMappingWithNameUUIDReversed: AnyMapping {
 ```
 Just use two different mappers.
 ```swift
-let mapper1 = Crust<CompanyMapping>()
-let mapper2 = Crust<CompanyMappingWithNameUUIDReversed>()
+let mapper1 = Mapper<CompanyMapping>()
+let mapper2 = Mapper<CompanyMappingWithNameUUIDReversed>()
 ```
 
 #Storage Adaptor
