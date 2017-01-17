@@ -6,7 +6,7 @@ public enum MappingDirection {
     case toJSON
 }
 
-internal let CRMappingDomain = "CRMappingDomain"
+internal let CrustMappingDomain = "CrustMappingDomain"
 
 public protocol Keypath: JSONKeypath { }
 
@@ -28,7 +28,7 @@ open class MappingContext {
 }
 
 /// Method caller used to perform mappings.
-public struct Crust<T: Mapping> {
+public struct Mapper<T: Mapping> {
     
     public init() { }
     
@@ -77,7 +77,7 @@ public extension Mapping {
                 keyValues[primaryKey] = val.valuesAsNSObjects()
             } else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(Self.self)" ]
-                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+                throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
             }
         }
         
@@ -98,7 +98,7 @@ public extension Mapping {
         
         guard MappedObject.self is AdaptorKind.BaseType.Type else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Type of object \(MappedObject.self) is not a subtype of \(AdaptorKind.BaseType.self)" ]
-            throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+            throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
     }
     
@@ -113,7 +113,7 @@ public extension Mapping {
                 var userInfo = [AnyHashable : Any]()
                 userInfo[NSLocalizedFailureReasonErrorKey] = "Errored during mappingBegins for adaptor \(self.adaptor)"
                 userInfo[NSUnderlyingErrorKey] = underlyingError
-                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+                throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
             }
         }
     }
@@ -129,7 +129,7 @@ public extension Mapping {
                 var userInfo = [AnyHashable : Any]()
                 userInfo[NSLocalizedFailureReasonErrorKey] = "Errored during mappingEnded for adaptor \(self.adaptor)"
                 userInfo[NSUnderlyingErrorKey] = underlyingError
-                throw NSError(domain: CRMappingDomain, code: -1, userInfo: userInfo)
+                throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
             }
         }
     }
