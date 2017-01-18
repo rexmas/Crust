@@ -273,10 +273,22 @@ public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: 
             let json = map.context.json
             try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: mapping)
         case .fromJSON:
-            if let baseJSON = map.context.json[map.key] {
+            
+            let mapper = { (json: JSONValue, field: inout V) in
                 let allowDupes = map.key.options.contains(.AllowDuplicatesInCollection)
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context, allowDuplicates: allowDupes)
-            } else {
+                try mapFromJson(json, toField: &field, mapping: mapping, context: map.context, allowDuplicates: allowDupes)
+            }
+            
+            let json = map.context.json
+            let baseJSON = json[map.key]
+            if case .some(.array(let arr)) = baseJSON, map.key.keyPath == "", arr.count == 0 {
+                print(json)
+                try mapper(json, &field)
+            }
+            else if let baseJSON = baseJSON {
+                try mapper(baseJSON, &field)
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
