@@ -4,9 +4,9 @@ import JSONValueRX
 
 extension EmployeeMapping: ArraySubMapping { }
 
-typealias AllEmployeesMapping = ArrayMapping<Employee, RealmAdaptor, EmployeeMapping>
+fileprivate typealias AllEmployeesMapping = ArrayMapping<Employee, RealmAdaptor, EmployeeMapping>
 
-public class AllEmployeesMappingWithDupes: ArrayMapping<Employee, RealmAdaptor, EmployeeMapping> {
+fileprivate class AllEmployeesMappingWithDupes: ArrayMapping<Employee, RealmAdaptor, EmployeeMapping> {
     public override var options: MappingOptions { return MappingOptions.AllowDuplicatesInCollection }
 }
 
@@ -24,7 +24,7 @@ class ArrayAdaptorTests: RealmMappingTest {
         let mapper = Mapper<AllEmployeesMapping>()
         let adaptor = RealmArrayAdaptor<Employee>()
         print(adaptor.realm)
-        let obj = try! mapper.mapFromJSONToExistingObject(employeesJSON, mapping: AllEmployeesMapping(adaptor: adaptor))
+        let obj = try! mapper.map(from: employeesJSON, using: AllEmployeesMapping(adaptor: adaptor))
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(obj.count, 2)
@@ -45,7 +45,7 @@ class ArrayAdaptorTests: RealmMappingTest {
         let mapper = Mapper<AllEmployeesMappingWithDupes>()
         let adaptor = RealmArrayAdaptor<Employee>()
         print(adaptor.realm)
-        let obj = try! mapper.mapFromJSONToExistingObject(employeesJSON, mapping: AllEmployeesMappingWithDupes(adaptor: adaptor))
+        let obj = try! mapper.map(from: employeesJSON, using: AllEmployeesMappingWithDupes(adaptor: adaptor))
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(obj.count, 4)
