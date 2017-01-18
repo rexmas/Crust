@@ -42,6 +42,8 @@
 		29DE497B2A9E4FA2A31192FF /* Pods_Crust_RealmCrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DED40EDD9475BB525B3AEE0E /* Pods_Crust_RealmCrustTests.framework */; };
 		3C1EAD7F3E1C53F7D78345FD /* Pods_Crust.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */; };
 		97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */; };
+		CD20141C1E2EE96E00D16F14 /* ArrayAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141B1E2EE96E00D16F14 /* ArrayAdaptor.swift */; };
+		CD20141E1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +113,8 @@
 		8C49AD01D91DCA093FAEBE81 /* Pods-Crust.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust/Pods-Crust.release.xcconfig"; sourceTree = "<group>"; };
 		9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_CrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B69217840C166BBAD301629D /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD20141B1E2EE96E00D16F14 /* ArrayAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayAdaptor.swift; sourceTree = "<group>"; };
+		CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayAdaptorTests.swift; sourceTree = "<group>"; };
 		CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
 		DED40EDD9475BB525B3AEE0E /* Pods_Crust_RealmCrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_RealmCrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -148,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */,
+				CD20141B1E2EE96E00D16F14 /* ArrayAdaptor.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -155,8 +160,7 @@
 		1767B7271DF776FD00DE693C /* RealmCrustTests */ = {
 			isa = PBXGroup;
 			children = (
-				1767B7451DF7793800DE693C /* RealmMappings.swift */,
-				1767B7471DF78F0B00DE693C /* RLMSupport.swift */,
+				CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */,
 				1767B7311DF778E700DE693C /* Company.swift */,
 				1767B7321DF778E700DE693C /* CompanyMappingTests.swift */,
 				1767B7331DF778E700DE693C /* CompanyStub.swift */,
@@ -165,7 +169,9 @@
 				1767B7361DF778E700DE693C /* EmployeeStub.swift */,
 				1767B7371DF778E700DE693C /* Operators.swift */,
 				1767B7381DF778E700DE693C /* PrimaryKeyTests.swift */,
+				1767B7451DF7793800DE693C /* RealmMappings.swift */,
 				1767B7391DF778E700DE693C /* RealmMappingTest.swift */,
+				1767B7471DF78F0B00DE693C /* RLMSupport.swift */,
 				1767B73A1DF778E700DE693C /* Tests.swift */,
 				1767B74E1DF7B24400DE693C /* Models.h */,
 				1767B74F1DF7B24400DE693C /* Models.m */,
@@ -554,6 +560,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CD20141C1E2EE96E00D16F14 /* ArrayAdaptor.swift in Sources */,
 				175C9A431C311DB200B0D6E7 /* CRMapper.swift in Sources */,
 				175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */,
 				175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */,
@@ -578,6 +585,7 @@
 				1767B7401DF778E700DE693C /* EmployeeStub.swift in Sources */,
 				1767B74D1DF7A68900DE693C /* RLMArray+Utilities.m in Sources */,
 				1767B73E1DF778E700DE693C /* Employee.swift in Sources */,
+				CD20141E1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift in Sources */,
 				1767B73B1DF778E700DE693C /* Company.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

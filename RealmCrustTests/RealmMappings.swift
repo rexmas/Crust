@@ -5,15 +5,29 @@ import Crust
 import JSONValueRX
 import Realm
 
-/// Adaptor for Realm.
+public class RealmArrayAdaptor<RealmObject: RLMObject>: AbstractArrayAdaptor<RealmObject, RealmAdaptor> {
+    public let realm: RLMRealm
+    public let realmAdaptor: RealmAdaptor
+    
+    public init(realm: RLMRealm) {
+        self.realm = realm
+        self.realmAdaptor = RealmAdaptor(realm: realm)
+        super.init(subAdaptor: self.realmAdaptor)
+    }
+    
+    public convenience init() {
+        self.init(realm: RLMRealm.default())
+    }
+}
+
 public class RealmAdaptor: Adaptor {
     
     public typealias BaseType = RLMObject
     public typealias ResultsType = [BaseType]
     
-    var realm: RLMRealm
-    var cache: Set<BaseType>
-    var requiresPrimaryKeys = false
+    private var cache: Set<BaseType>
+    public let realm: RLMRealm
+    public var requiresPrimaryKeys = false
     
     public init(realm: RLMRealm) {
         self.realm = realm
@@ -21,7 +35,7 @@ public class RealmAdaptor: Adaptor {
     }
     
     public convenience init() throws {
-        self.init(realm: RLMRealm())
+        self.init(realm: RLMRealm.default())
     }
     
     public func mappingBegins() throws {
