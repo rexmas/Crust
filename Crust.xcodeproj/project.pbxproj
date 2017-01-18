@@ -44,6 +44,7 @@
 		97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */; };
 		CD20141C1E2EE96E00D16F14 /* ArrayAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141B1E2EE96E00D16F14 /* ArrayAdaptor.swift */; };
 		CD20141E1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */; };
+		CD2014201E30135100D16F14 /* CollectionMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141F1E30135100D16F14 /* CollectionMappingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +116,7 @@
 		B69217840C166BBAD301629D /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD20141B1E2EE96E00D16F14 /* ArrayAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayAdaptor.swift; sourceTree = "<group>"; };
 		CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayAdaptorTests.swift; sourceTree = "<group>"; };
+		CD20141F1E30135100D16F14 /* CollectionMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionMappingTests.swift; sourceTree = "<group>"; };
 		CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
 		DED40EDD9475BB525B3AEE0E /* Pods_Crust_RealmCrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_RealmCrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -161,6 +163,7 @@
 			isa = PBXGroup;
 			children = (
 				CD20141D1E2F2CDD00D16F14 /* ArrayAdaptorTests.swift */,
+				CD20141F1E30135100D16F14 /* CollectionMappingTests.swift */,
 				1767B7311DF778E700DE693C /* Company.swift */,
 				1767B7321DF778E700DE693C /* CompanyMappingTests.swift */,
 				1767B7331DF778E700DE693C /* CompanyStub.swift */,
@@ -574,6 +577,7 @@
 			files = (
 				1767B7461DF7793800DE693C /* RealmMappings.swift in Sources */,
 				1767B7411DF778E700DE693C /* Operators.swift in Sources */,
+				CD2014201E30135100D16F14 /* CollectionMappingTests.swift in Sources */,
 				1767B73D1DF778E700DE693C /* CompanyStub.swift in Sources */,
 				1767B7421DF778E700DE693C /* PrimaryKeyTests.swift in Sources */,
 				1767B7441DF778E700DE693C /* Tests.swift in Sources */,

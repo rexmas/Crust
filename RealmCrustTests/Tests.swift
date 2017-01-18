@@ -108,7 +108,7 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper<UserMapping>()
         let jsonValue = try! JSONValue(object: json)
-        _ = try! mapping.mapFromJSONToExistingObject(jsonValue["data"]!, mapping: UserMapping(adaptor: adaptor!))
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
         
         XCTAssertEqual(User.allObjects(in: realm!).count, 1)
     }
@@ -120,7 +120,7 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper<UserMapping>()
         let jsonValue = try! JSONValue(object: jsonObj)
-        _ = try! mapping.mapFromJSONToExistingObject(jsonValue["data"]!, mapping: UserMapping(adaptor: adaptor!))
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
         
         let user = User.allObjects(in: realm!).firstObject()!
         let json = try! mapping.mapFromObjectToJSON(user as! User, mapping: UserMapping(adaptor: adaptor!))

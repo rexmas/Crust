@@ -103,7 +103,7 @@ class TransformTests: XCTestCase {
         
         let json = try! JSONValue(object: 1)
         let mapper = Mapper<TransformableMapping>()
-        let object = try! mapper.mapFromJSONToNewObject(json, mapping: TransformableMapping())
+        let object = try! mapper.map(from: json, using: TransformableMapping())
         
         XCTAssertEqual(object.value, "1.0")
     }
@@ -121,7 +121,7 @@ class TransformTests: XCTestCase {
         let jsonObject: [AnyHashable : Any] = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
         let json = try! JSONValue(object: jsonObject)
         let mapper = Mapper<UserMapping>()
-        let object = try! mapper.mapFromJSONToNewObject(json, mapping: UserMapping(adaptor: MockAdaptor<User>()))
+        let object = try! mapper.map(from: json, using: UserMapping(adaptor: MockAdaptor<User>()))
         
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         

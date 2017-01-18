@@ -45,7 +45,7 @@ class CRMapperTests: XCTestCase {
             tested = true
             XCTAssertTrue(context.parent! === parent)
         }
-        let _ = try! mapper.mapFromJSONToExistingObject(json, mapping: mockMap, parentContext: parent)
+        let _ = try! mapper.map(from: json, using: mockMap, parentContext: parent)
         
         XCTAssertTrue(tested)
     }

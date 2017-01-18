@@ -9,7 +9,7 @@ class CompanyMappingTests: XCTestCase {
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper<CompanyMapping>()
-        let object = try! mapper.mapFromJSONToNewObject(json, mapping: CompanyMapping(adaptor: MockAdaptor<Company>()))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: MockAdaptor<Company>()))
         
         XCTAssertTrue(stub.matches(object))
     }
@@ -38,7 +38,7 @@ class CompanyMappingTests: XCTestCase {
         stub.uuid = uuid;
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper<CompanyMapping>()
-        let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: adaptor))
         
         XCTAssertTrue(object === original)
         XCTAssertTrue(stub.matches(object))
@@ -58,7 +58,7 @@ class CompanyMappingTests: XCTestCase {
         stub.founder = nil;
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper<CompanyMapping>()
-        let object = try! mapper.mapFromJSONToExistingObject(json, mapping: CompanyMapping(adaptor: adaptor))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: adaptor))
         
         XCTAssertTrue(stub.matches(object))
         XCTAssertNil(object.founder)
