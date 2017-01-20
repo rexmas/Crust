@@ -191,6 +191,5 @@ public extension Mapping {
         }
         
         try self.endMapping(context: context)
-        
     }
 }
