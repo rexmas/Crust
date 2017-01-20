@@ -24,7 +24,7 @@ open class ArrayMapping<SubType: Equatable, SubAdaptor: Adaptor, SubMapping: Arr
     open var keyPath: Keypath { return "" }
     open var options: MappingOptions { return MappingOptions.None }
     
-    public func mapping(tomap: inout [SubType], context: MappingContext) {
+    open func mapping(tomap: inout [SubType], context: MappingContext) {
         let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)
         _ = tomap <- (.mappingOptions(.mapping(self.keyPath, mapping), self.options), context)
     }
