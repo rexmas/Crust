@@ -23,7 +23,6 @@ class ArrayAdaptorTests: RealmMappingTest {
         
         let mapper = Mapper<AllEmployeesMapping>()
         let adaptor = RealmArrayAdaptor<Employee>()
-        print(adaptor.realm)
         let obj = try! mapper.map(from: employeesJSON, using: AllEmployeesMapping(adaptor: adaptor))
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
@@ -44,7 +43,6 @@ class ArrayAdaptorTests: RealmMappingTest {
         
         let mapper = Mapper<AllEmployeesMappingWithDupes>()
         let adaptor = RealmArrayAdaptor<Employee>()
-        print(adaptor.realm)
         let obj = try! mapper.map(from: employeesJSON, using: AllEmployeesMappingWithDupes(adaptor: adaptor))
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
