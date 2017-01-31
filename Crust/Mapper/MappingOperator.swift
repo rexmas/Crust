@@ -24,6 +24,11 @@ public func <- <T: JSONable, C: MappingContext>(field: inout T, map:(key: JSONKe
     return mapField(&field, map: map)
 }
 
+@discardableResult
+public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
+    return mapField(&field, map: map)
+}
+
 // Map a Mappable.
 
 @discardableResult
@@ -32,20 +37,14 @@ public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: Spec
 }
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
-// NOTE: Must supply two separate versions for optional and non-optional types or we'll have to continuously
-// guard against unsafe nil assignments.
+// Transform.
 
 @discardableResult
-public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
-    return mapField(&field, map: map)
-}
-
-@discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
@@ -71,11 +70,13 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T, map:(key:
         do {
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
-            } else {
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Could not find value in JSON \(map.context.json) from keyPath \(map.key)" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
-        } catch let error as NSError {
+        }
+        catch let error as NSError {
             map.context.error = error
         }
     }
@@ -98,11 +99,13 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key
         do {
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field)
-            } else {
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Value not present in JSON \(map.context.json) from keyPath \(map.key)" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
-        } catch let error as NSError {
+        }
+        catch let error as NSError {
             map.context.error = error
         }
     }
@@ -131,19 +134,20 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
         case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
-            } else {
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
-    } catch let error as NSError {
+    }
+    catch let error as NSError {
         map.context.error = error
     }
     
     return map.context
 }
 
-// TODO: Maybe we can just make Optional: Mappable and then this redudancy can safely go away...
 public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
@@ -164,12 +168,14 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
         case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
-            } else {
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
-    } catch let error as NSError {
+    }
+    catch let error as NSError {
         map.context.error = error
     }
     
@@ -183,7 +189,8 @@ private func mapToJson<T: JSONable>(_ json: JSONValue, fromField field: T?, viaK
     
     if let field = field {
         json[key] = T.toJSON(field)
-    } else {
+    }
+    else {
         json[key] = .null()
     }
     
@@ -208,7 +215,8 @@ private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T)
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson
-    } else {
+    }
+    else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Conversion of JSON \(json) to type \(T.self) failed" ]
         throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
     }
@@ -223,7 +231,8 @@ private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T?
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson
-    } else {
+    }
+    else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Conversion of JSON \(json) to type \(T.self) failed" ]
         throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
     }
@@ -256,12 +265,12 @@ public protocol Appendable: Sequence {
 extension Array: Appendable { }
 
 @discardableResult
-public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+public func <- <T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind == V, V.Iterator.Element == T, T: Equatable {
     
     return mapCollectionField(&field, map: map)
 }
 
-public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: MappingContext>(_ field: inout V, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind == V, V.Iterator.Element == T, T: Equatable {
     
     guard map.context.error == nil else {
         return map.context
@@ -276,8 +285,7 @@ public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: 
         case .fromJSON:
             
             let mapper = { (json: JSONValue, field: inout V) in
-                let allowDupes = map.key.options.contains(.AllowDuplicatesInCollection)
-                try mapFromJson(json, toField: &field, mapping: mapping, context: map.context, allowDuplicates: allowDupes)
+                try mapFromJson(json, toField: &field, mapping: mapping, context: map.context, insertionMethod: map.key.collectionInsertionMethod)
             }
             
             let json = map.context.json
@@ -293,7 +301,8 @@ public func mapCollectionField<T, U: Mapping, V: RangeReplaceableCollection, C: 
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
-    } catch let error as NSError {
+    }
+    catch let error as NSError {
         map.context.error = error
     }
     
@@ -311,26 +320,45 @@ private func mapToJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSO
     return json
 }
 
-private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, toField field: inout V, mapping: U, context: MappingContext, allowDuplicates: Bool) throws where U.MappedObject == T, V.Iterator.Element == T, T: Equatable {
+private func mapFromJson<T, U: Mapping, V: RangeReplaceableCollection>(_ json: JSONValue, toField field: inout V, mapping: U, context: MappingContext, insertionMethod: CollectionInsertionMethod<V>) throws where U.MappedObject == T, U.SequenceKind == V, V.Iterator.Element == T, T: Equatable {
     
-    if case .array(let xs) = json {
-        let mapper = Mapper<U>()
-        var results = [T]()
-        for x in xs {
-            if !allowDuplicates {
-                if let obj = try mapping.getExistingInstance(json: x) {
-                    if results.contains(obj) {
-                        continue
-                    }
-                }
-            }
-            
-            let obj = try mapper.map(from: x, using: mapping, parentContext: context)
-            results.append(obj)
-        }
-        field.append(contentsOf: results)
-    } else {
+    guard case .array(let xs) = json else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(V.self)<\(T.self)>" ]
         throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
+    }
+    
+    let mapper = Mapper<U>()
+    
+    var replaceResults = V()
+    
+    for x in xs {
+        let obj = try mapper.map(from: x, using: mapping, parentContext: context)
+        
+        switch insertionMethod {
+        case .append:
+            field.append(obj)
+            
+        case .union:
+            if !field.contains(obj) {
+                field.append(obj)
+            }
+            
+        case .replace(_):
+            replaceResults.append(obj)
+            if let index = field.index(of: obj) {
+                field.remove(at: index)
+            }
+        }
+    }
+    
+    if case .replace(let deletionBlock) = insertionMethod {
+        let orphans = field
+        field = replaceResults
+        
+        if let deletion = deletionBlock {
+            try deletion(orphans).forEach {
+                try mapping.delete(obj: $0)
+            }
+        }
     }
 }

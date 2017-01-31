@@ -107,6 +107,12 @@ public extension Mapping {
         return try self.adaptor.createObject(type: MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
     }
     
+    func delete(obj: MappedObject) throws {
+        try self.checkForAdaptorBaseTypeConformance()
+        
+        try self.adaptor.deleteObject(obj as! AdaptorKind.BaseType)
+    }
+    
     internal func checkForAdaptorBaseTypeConformance() throws {
         // NOTE: This sux but `MappedObject: AdaptorKind.BaseType` as a type constraint throws a compiler error as of 7.1 Xcode
         // and `MappedObject == AdaptorKind.BaseType` doesn't work with sub-types (i.e. expects MappedObject to be that exact type)

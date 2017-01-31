@@ -1,23 +1,58 @@
 import Foundation
 import JSONValueRX
 
-public struct MappingOptions: OptionSet {
-    public let rawValue: UInt
-    public init(rawValue: UInt) {
-        self.rawValue = rawValue
+public enum CollectionInsertionMethod<Container: Sequence> {
+    case append
+    case union
+    case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
+}
+
+public enum Spec<T: Mapping>: Keypath {
+    
+    case mapping(Keypath, T)
+    case collectionMapping(Keypath, T, CollectionInsertionMethod<T.SequenceKind>)
+    
+    public var keyPath: String {
+        switch self {
+        case .mapping(let keyPath, _):
+            return keyPath.keyPath
+        case .collectionMapping(let keyPath, _, _):
+            return keyPath.keyPath
+        }
     }
-    public static let None = MappingOptions(rawValue: 0)
-    public static let AllowDuplicatesInCollection = MappingOptions(rawValue: 1)
+    
+    public var mapping: T {
+        switch self {
+        case .mapping(_, let mapping):
+            return mapping
+        case .collectionMapping(_, let mapping, _):
+            return mapping
+        }
+    }
+    
+    public var collectionInsertionMethod: CollectionInsertionMethod<T.SequenceKind> {
+        switch self {
+        case .mapping(_, _):
+            return .union
+        case .collectionMapping(_, _, let method):
+            return method
+        }
+    }
 }
 
 public protocol Mapping {
     associatedtype MappedObject
+    associatedtype SequenceKind: Sequence = [MappedObject]
     associatedtype AdaptorKind: Adaptor
     
     var adaptor: AdaptorKind { get }
     var primaryKeys: [String : Keypath]? { get }
     
     func mapping(tomap: inout MappedObject, context: MappingContext)
+}
+
+extension Mapping {
+    typealias CollectionType = [MappedObject]
 }
 
 /// An Adaptor to use to write and read objects from a persistance layer.
@@ -83,38 +118,6 @@ public extension Transform {
             }
         case .toJSON:
             context.json = self.toJSON(tomap)
-        }
-    }
-}
-
-public enum Spec<T: Mapping>: Keypath {
-    case mapping(Keypath, T)
-    indirect case mappingOptions(Spec, MappingOptions)
-    
-    public var keyPath: String {
-        switch self {
-        case .mapping(let keyPath, _):
-            return keyPath.keyPath
-        case .mappingOptions(let keyPath, _):
-            return keyPath.keyPath
-        }
-    }
-    
-    public var options: MappingOptions {
-        switch self {
-        case .mappingOptions(_, let options):
-            return options
-        default:
-            return [ .None ]
-        }
-    }
-    
-    public var mapping: T {
-        switch self {
-        case .mapping(_, let mapping):
-            return mapping
-        case .mappingOptions(let mapping, _):
-            return mapping.mapping
         }
     }
 }
