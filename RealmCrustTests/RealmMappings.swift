@@ -179,7 +179,7 @@ extension RLMArray: Appendable {
 
 @discardableResult
 public func <- <T, U: Mapping, C: MappingContext>(field: inout RLMArray<T>, map:(key: Spec<U>, context: C)) -> C
-    where U.MappedObject == T {
+where U.MappedObject == T, T: Equatable, U.SequenceKind == [U.MappedObject] {
 
     var variableList = field.allObjects() as! [T]
     let context = mapCollectionField(&variableList, map: map)

@@ -15,8 +15,8 @@ class CollectionMappingTests: RealmMappingTest {
         
         let mapping = EmployeeMapping(adaptor: self.adaptor!)
         let mapper = Mapper<EmployeeMapping>()
-        var collection = [Employee]()
-        _ = try! mapper.map(from: employeesJSON, using: mapping, into: &collection)
+        
+        let collection: [Employee] = try! mapper.mapToCollection(from: employeesJSON, using: Spec.mapping("", mapping))
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(collection.count, 2)

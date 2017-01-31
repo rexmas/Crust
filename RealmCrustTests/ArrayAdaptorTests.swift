@@ -7,7 +7,6 @@ extension EmployeeMapping: ArraySubMapping { }
 fileprivate typealias AllEmployeesMapping = ArrayMapping<Employee, RealmAdaptor, EmployeeMapping>
 
 fileprivate class AllEmployeesMappingWithDupes: ArrayMapping<Employee, RealmAdaptor, EmployeeMapping> {
-    public override var options: MappingOptions { return MappingOptions.AllowDuplicatesInCollection }
 }
 
 class ArrayAdaptorTests: RealmMappingTest {

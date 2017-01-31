@@ -30,9 +30,8 @@ public class CompanyMappingWithDupes : CompanyMapping {
     
     public override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- .mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*< context
+        tomap.employees             <- .collectionMapping("employees", employeeMapping, .append) >*< context
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<

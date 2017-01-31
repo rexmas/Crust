@@ -42,9 +42,8 @@ class CompanyMappingWithDupes: CompanyMapping {
     
     override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
-        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- Spec.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.employees             <- Spec.collectionMapping("employees", employeeMapping, .append) >*<
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
