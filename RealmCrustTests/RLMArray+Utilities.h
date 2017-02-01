@@ -13,7 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMArray (Utilities)
 
++ (instancetype)createInstanceWithClass:(Class)class;
 - (void)addObjectNonGeneric:(RLMObject *)object;
+- (nullable NSNumber *)indexOfObjectNonGeneric:(RLMObject *)object;
 
 - (NSArray<RLMObject *> *)allObjects;
 

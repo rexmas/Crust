@@ -31,7 +31,20 @@ open class MappingContext {
 public struct Mapper<T: Mapping> {
     
     public init() { }
+    /*
+    public func mapToAppendable<M: Mapping, C: Appendable>(from json: JSONValue, using spec: Spec<M>) throws -> C
+    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C, M.MappedObject: AnyObject {
     
+            var collection = C.createInstance(with: M.MappedObject.self)
+            let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
+            
+            try spec.mapping.start(context: context)
+            collection <- (spec, context)
+            try spec.mapping.completeMapping(collection: collection, context: context)
+            
+            return collection
+    }
+    */
     public func mapToCollection<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using spec: Spec<M>) throws -> C
     where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C {
         
@@ -39,7 +52,7 @@ public struct Mapper<T: Mapping> {
         let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
         
         try spec.mapping.start(context: context)
-        collection <- (spec, context)
+        collection <*- (spec, context)
         try spec.mapping.completeMapping(collection: collection, context: context)
         
         return collection
@@ -202,12 +215,12 @@ public extension Mapping {
         context.object = object
     }
     
-    internal func completeMapping<C: RangeReplaceableCollection>(collection: C, context: MappingContext) throws where C.Iterator.Element == MappedObject {
+    internal func completeMapping<C: Sequence>(collection: C, context: MappingContext) throws where C.Iterator.Element == MappedObject {
         try self.completeMapping(objects: collection, context: context)
         context.object = collection
     }
     
-    private func completeMapping<C: RangeReplaceableCollection>(objects: C, context: MappingContext) throws where C.Iterator.Element == MappedObject {
+    private func completeMapping<C: Sequence>(objects: C, context: MappingContext) throws where C.Iterator.Element == MappedObject {
         if context.error == nil {
             do {
                 try self.checkForAdaptorBaseTypeConformance()

@@ -51,10 +51,6 @@ public protocol Mapping {
     func mapping(tomap: inout MappedObject, context: MappingContext)
 }
 
-extension Mapping {
-    typealias CollectionType = [MappedObject]
-}
-
 /// An Adaptor to use to write and read objects from a persistance layer.
 public protocol Adaptor {
     /// The type of object being mapped to. If Realm then RLMObject or Object. If Core Data then NSManagedObject.

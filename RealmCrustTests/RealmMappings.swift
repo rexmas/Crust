@@ -166,6 +166,15 @@ public protocol RealmMapping: Mapping {
 }
 
 extension RLMArray: Appendable {
+    public func findIndex(of object: RLMObject) -> UInt {
+        guard case let index as UInt = self.index(ofObjectNonGeneric: object) else {
+            return UInt.max
+        }
+        return index
+    }
+
+    public typealias Index = UInt
+
     public func append(_ newElement: RLMObject) {
         self.addObjectNonGeneric(newElement)
     }
@@ -175,14 +184,68 @@ extension RLMArray: Appendable {
             self.addObjectNonGeneric(obj)
         }
     }
+    
+    public func remove(at i: UInt) {
+        self.removeObject(at: i)
+    }
+    
+    public func removeAll(keepingCapacity keepCapacity: Bool) {
+        self.removeAllObjects()
+    }
 }
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout RLMArray<T>, map:(key: Spec<U>, context: C)) -> C
-where U.MappedObject == T, T: Equatable, U.SequenceKind == [U.MappedObject] {
+public func <- <T, U: Mapping, C: MappingContext>(
+    field: inout RLMArray<T>,
+    map:(key: Spec<U>, context: C))
+    -> C
+    where U.MappedObject == T, U.SequenceKind == [T], T: Equatable {
+        
+        return mapFromJson(toRLMArray: &field, map: map)
+}
 
-    var variableList = field.allObjects() as! [T]
-    let context = mapCollectionField(&variableList, map: map)
-    field.append(contentsOf: variableList)
-    return context
+@discardableResult
+public func mapFromJson<T, U: Mapping, C: MappingContext>(
+    toRLMArray field: inout RLMArray<T>,
+    map:(key: Spec<U>, context: C))
+    -> C
+    where U.MappedObject == T, U.SequenceKind == [T], T: Equatable {
+
+        //U.MappedObject == T, U.SequenceKind == V, V.Iterator.Element == T, T: Equatable
+        //var variableList = field.allObjects() as! [T]
+        //let context = mapCollectionField(&variableList, map: map)
+        //field.append(contentsOf: variableList)
+        //return context
+        
+        do {
+            let values = field.allObjects() as! U.SequenceKind
+            let fieldCopy = field
+            let (newObjects, _) = try mapFromJson(toCollection: values, map: map) {
+                fieldCopy.contains($0)
+            }
+            
+            if case .replace(let deletionBlock) = map.key.collectionInsertionMethod {
+                
+                var orphans = values
+                field.removeAll(keepingCapacity: false)
+                field.append(contentsOf: newObjects)
+                
+                if let deletion = deletionBlock {
+                    field.forEach {
+                        if let index = orphans.index(of: $0 as! T) {
+                            orphans.remove(at: index)
+                        }
+                    }
+                    
+                    try deletion(orphans).forEach {
+                        try map.key.mapping.delete(obj: $0)
+                    }
+                }
+            }
+        }
+        catch _ as NSError {
+            //map.context.error = error
+        }
+        
+        return map.context
 }

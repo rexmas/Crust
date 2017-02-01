@@ -25,8 +25,8 @@ open class ArrayMapping<SubType: Equatable, SubAdaptor: Adaptor, SubMapping: Arr
     open var options: CollectionInsertionMethod<SubMapping.SequenceKind> { return .union }
     
     open func mapping(tomap: inout [SubType], context: MappingContext) {
-        let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)
-        _ = tomap <- (.mappingOptions(.mapping(self.keyPath, mapping), self.options), context)
+        //let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)
+        //_ = tomap <- (.mapping(self.keyPath, mapping), context)
     }
 }
 
