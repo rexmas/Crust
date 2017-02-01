@@ -269,8 +269,8 @@ public protocol Appendable: Sequence {
 }
 
 // TODO: When using `RangeReplaceableCollection` vs `Array` we get a lot of "ambiguous use of operator '<-'".
-// This seems to be an issue with the type checker since when field is String this can still happen so we're
-// forced to create a separate operator :(. Isolate and report a bug.
+// This seems to be an issue with the type checker since when `field` is `String` this can still happen. We're
+// thus forced to create a separate operator :(. Isolate and report a bug.
 
 infix operator <*- : AssignmentPrecedence
 
