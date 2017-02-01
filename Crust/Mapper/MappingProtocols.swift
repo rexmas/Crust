@@ -118,14 +118,3 @@ public enum Spec<T: Mapping>: Keypath {
         }
     }
 }
-
-// TODO: Move into JSONValue lib.
-extension NSDate: JSONable {
-    public static func fromJSON(_ x: JSONValue) -> NSDate? {
-        return Date.fromJSON(x) as NSDate?
-    }
-    
-    public static func toJSON(_ x: NSDate) -> JSONValue {
-        return Date.toJSON(x as Date)
-    }
-}
