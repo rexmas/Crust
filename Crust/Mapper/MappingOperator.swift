@@ -275,7 +275,7 @@ public protocol Appendable: Sequence {
 infix operator <*- : AssignmentPrecedence
 
 @discardableResult
-public func <*- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
     return mapFromJson(toCollection: &field, map: map)
 }
@@ -430,7 +430,7 @@ private func generateNewValues<T, U: Mapping>(
 }
 
 @discardableResult
-public func <*- <T, U: Mapping, V: Appendable, C: MappingContext>(
+public func <- <T, U: Mapping, V: Appendable, C: MappingContext>(
     field: inout V,
     map:(key: Spec<U>, context: C))
     -> C

@@ -39,7 +39,7 @@ public struct Mapper<T: Mapping> {
         let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
         
         try spec.mapping.start(context: context)
-        collection <*- (spec, context)
+        collection <- (spec, context)
         try spec.mapping.completeMapping(collection: collection, context: context)
         
         return collection

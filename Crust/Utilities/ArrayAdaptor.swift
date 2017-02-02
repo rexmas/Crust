@@ -25,8 +25,8 @@ open class ArrayMapping<SubType: Equatable, SubAdaptor: Adaptor, SubMapping: Arr
     open var options: CollectionUpdatePolicy<SubMapping.SequenceKind> { return (.append, true) }
     
     open func mapping(tomap: inout [SubType], context: MappingContext) {
-        //let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)
-        //_ = tomap <- (.mapping(self.keyPath, mapping), context)
+        let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)
+        tomap <- (Spec.mapping(self.keyPath, mapping), context)
     }
 }
 
