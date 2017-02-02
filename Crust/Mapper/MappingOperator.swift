@@ -268,12 +268,6 @@ public protocol Appendable: Sequence {
     func findIndex(of object: Self.Iterator.Element) -> UInt
 }
 
-// TODO: When using `RangeReplaceableCollection` vs `Array` we get a lot of "ambiguous use of operator '<-'".
-// This seems to be an issue with the type checker since when `field` is `String` this can still happen. We're
-// thus forced to create a separate operator :(. Isolate and report a bug.
-
-infix operator <*- : AssignmentPrecedence
-
 @discardableResult
 public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
