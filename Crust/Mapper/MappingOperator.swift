@@ -280,29 +280,57 @@ public func <*- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, 
     return mapFromJson(toCollection: &field, map: map)
 }
 
+private func mapToJson<T, U: Mapping, V: Sequence>(
+    _ json: JSONValue,
+    fromField field: V,
+    viaKey key: Keypath,
+    mapping: U)
+    throws -> JSONValue
+    where U.MappedObject == T, V.Iterator.Element == T, U.SequenceKind.Iterator.Element == U.MappedObject {
+        
+        var json = json
+        
+        let results = try field.map {
+            try Mapper<U>().mapFromObjectToJSON($0, mapping: mapping)
+        }
+        json[key] = .array(results)
+        
+        return json
+}
+
 @discardableResult
 public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
-        let fieldCopy = field
-        let (newObjects, _) = try mapFromJson(toCollection: field, map: map) {
-            fieldCopy.contains($0)
-        }
-    
-        if case .replace(let deletionBlock) = map.key.collectionInsertionMethod {
+        switch map.context.dir {
+        case .toJSON:
+            let json = map.context.json
+            try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: map.key.mapping)
             
-            var orphans = field
-            field = U.SequenceKind(newObjects)
+        case .fromJSON:
+            let fieldCopy = field
+            let (newObjects, _) = try mapFromJsonToSequence(map: map) {
+                fieldCopy.contains($0)
+            }
             
-            if let deletion = deletionBlock {
-                field.forEach {
-                    if let index = orphans.index(of: $0) {
-                        orphans.remove(at: index)
-                    }
-                }
+            switch map.key.collectionUpdatePolicy.insert {
+            case .append:
+                field.append(contentsOf: newObjects)
                 
-                try deletion(orphans).forEach {
-                    try map.key.mapping.delete(obj: $0)
+            case .replace(delete: let deletionBlock):
+                var orphans = field
+                field = U.SequenceKind(newObjects)
+                
+                if let deletion = deletionBlock {
+                    field.forEach {
+                        if let index = orphans.index(of: $0) {
+                            orphans.remove(at: index)
+                        }
+                    }
+                    
+                    try deletion(orphans).forEach {
+                        try map.key.mapping.delete(obj: $0)
+                    }
                 }
             }
         }
@@ -314,10 +342,10 @@ public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: in
     return map.context
 }
 
-public func mapFromJson<T, U: Mapping, C: MappingContext>(
-    toCollection field: U.SequenceKind,
+// Gets all newly mapped data and returns it in an array, caller can decide to append and what-not.
+public func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
     map:(key: Spec<U>, context: C),
-    contains: (T) -> Bool)
+    fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: C)
     where U.MappedObject == T, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
@@ -328,123 +356,128 @@ public func mapFromJson<T, U: Mapping, C: MappingContext>(
         let mapping = map.key.mapping
         var newObjects: [T] = []
         
-        switch map.context.dir {
-        case .toJSON:
-            let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: mapping)
-            
-        case .fromJSON:
-            let json = map.context.json
-            let baseJSON = json[map.key]
-            let insertionMethod = map.key.collectionInsertionMethod
-            if case .some(.array(let arr)) = baseJSON, map.key.keyPath == "", arr.count == 0 {
-                newObjects = try mapFrom(json: json,
-                                         toCollection: field,
-                                         with: insertionMethod,
-                                         using: mapping,
-                                         contains: contains,
-                                         context: map.context)
-            }
-            else if let baseJSON = baseJSON {
-                newObjects = try mapFrom(json: baseJSON,
-                                         toCollection: field,
-                                         with: insertionMethod,
-                                         using: mapping,
-                                         contains: contains,
-                                         context: map.context)
-            }
-            else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
-            }
+        let json = map.context.json
+        let baseJSON = json[map.key]
+        let updatePolicy = map.key.collectionUpdatePolicy
+        
+        // TODO: Stupid hack for empty string keypaths. Fix by allowing `nil` keyPath.
+        if case .some(.array(let arr)) = baseJSON, map.key.keyPath == "", arr.count == 0 {
+            newObjects = try generateNewValues(fromJsonArray: json,
+                                     with: updatePolicy,
+                                     using: mapping,
+                                     fieldContains: fieldContains,
+                                     context: map.context)
+        }
+        else if let baseJSON = baseJSON {
+            newObjects = try generateNewValues(fromJsonArray: baseJSON,
+                                     with: updatePolicy,
+                                     using: mapping,
+                                     fieldContains: fieldContains,
+                                     context: map.context)
+        }
+        else {
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+            throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
         }
         
         return (newObjects, map.context)
 }
 
-private func mapToJson<T, U: Mapping, V: Sequence>(
-    _ json: JSONValue,
-    fromField field: V,
-    viaKey key: Keypath,
-    mapping: U)
-    throws -> JSONValue
-    where U.MappedObject == T, V.Iterator.Element == T, U.SequenceKind.Iterator.Element == U.MappedObject {
-    
-    var json = json
-    
-    let results = try field.map {
-        try Mapper<U>().mapFromObjectToJSON($0, mapping: mapping)
-    }
-    json[key] = .array(results)
-    
-    return json
-}
-
-private func mapFrom<T, U: Mapping>(
-    json: JSONValue,
-    toCollection field: U.SequenceKind,
-    with insertionMethod: CollectionInsertionMethod<U.SequenceKind>,
+private func generateNewValues<T, U: Mapping>(
+    fromJsonArray json: JSONValue,
+    with updatePolicy: CollectionUpdatePolicy<U.SequenceKind>,
     using mapping: U,
-    contains: (T) -> Bool,
+    fieldContains: (T) -> Bool,
     context: MappingContext)
     throws -> [T]
     where U.MappedObject == T, T: Equatable, U.SequenceKind.Iterator.Element == U.MappedObject {
     
-    guard case .array(let xs) = json else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(U.SequenceKind.self)<\(T.self)>" ]
-        throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
-    }
-    
-    let mapper = Mapper<U>()
-    
-    var newObjects = [T]()
-    
-    for x in xs {
-        let obj = try mapper.map(from: x, using: mapping, parentContext: context)
+        guard case .array(let xs) = json else {
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(U.SequenceKind.self)<\(T.self)>" ]
+            throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
+        }
         
-        switch insertionMethod {
-        case .append, .replace(_):
-            newObjects.append(obj)
+        let mapper = Mapper<U>()
+        
+        var newObjects = [T]()
+        
+        let isUnique = { (obj: T, newObjects: [T], fieldContains: (T) -> Bool) -> Bool in
+            let newObjectsContainsObj = newObjects.contains(obj)
             
-        case .union:
-            if !contains(obj) {
-                newObjects.append(obj)
+            switch updatePolicy.insert {
+            case .replace(_):
+                return !newObjectsContainsObj
+            case .append:
+                return !(newObjectsContainsObj || fieldContains(obj))
             }
         }
-    }
-    
-    return newObjects
+        
+        for x in xs {
+            let obj = try mapper.map(from: x, using: mapping, parentContext: context)
+            
+            switch updatePolicy.unique {
+            case false:
+                newObjects.append(obj)
+                
+            case true:
+                if isUnique(obj, newObjects, fieldContains) {
+                    newObjects.append(obj)
+                }
+            }
+        }
+        
+        return newObjects
 }
-/*
+
 @discardableResult
-public func <- <T, U: Mapping, V: Appendable, C: MappingContext>(
+public func <*- <T, U: Mapping, V: Appendable, C: MappingContext>(
     field: inout V,
     map:(key: Spec<U>, context: C))
     -> C
-    where U.MappedObject == T, U.SequenceKind == V, V.Iterator.Element == T, T: Equatable {
+    where U.MappedObject == T, U.SequenceKind == [T], V.Iterator.Element == T, T: Equatable {
+        
+        return mapFromJson(toAppendable: &field, map: map)
+}
+
+public func mapFromJson<T, U: Mapping, V: Appendable, C: MappingContext>(
+    toAppendable field: inout V,
+    map:(key: Spec<U>, context: C))
+    -> C
+    where U.MappedObject == T, U.SequenceKind == [T], V.Iterator.Element == T, T: Equatable {
         
         do {
-            let fieldCopy = field
-            let (newObjects, _) = try mapFromJson(toCollection: field, map: map) {
-                fieldCopy.contains($0)
-            }
-            //todo
-            if case .replace(let deletionBlock) = map.key.collectionInsertionMethod {
+            switch map.context.dir {
+            case .toJSON:
+                let json = map.context.json
+                try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: map.key.mapping)
                 
-                var orphans = field
-                field.removeAll(keepingCapacity: false)
-                field.append(contentsOf: newObjects)
+            case .fromJSON:
+                let fieldCopy = field
+                let (newObjects, _) = try mapFromJsonToSequence(map: map) {
+                    fieldCopy.contains($0)
+                }
                 
-                if let deletion = deletionBlock {
-                    field.forEach {
-                        let index = orphans.findIndex(of: $0)
-                        if index != UInt.max {
-                            orphans.remove(at: index)
-                        }
-                    }
+                switch map.key.collectionUpdatePolicy.insert {
+                case .append:
+                    field.append(contentsOf: newObjects)
                     
-                    try deletion(orphans).forEach {
-                        try map.key.mapping.delete(obj: $0)
+                case .replace(delete: let deletionBlock):
+                    
+                    var orphans = field
+                    field.removeAll(keepingCapacity: false)
+                    field.append(contentsOf: newObjects)
+                    
+                    if let deletion = deletionBlock {
+                        field.forEach {
+                            let index = orphans.findIndex(of: $0)
+                            if index != UInt.max {
+                                orphans.remove(at: index)
+                            }
+                        }
+                        
+                        try deletion(Array(orphans)).forEach {
+                            try map.key.mapping.delete(obj: $0)
+                        }
                     }
                 }
             }
@@ -455,4 +488,4 @@ public func <- <T, U: Mapping, V: Appendable, C: MappingContext>(
         
         return map.context
 }
-*/
+

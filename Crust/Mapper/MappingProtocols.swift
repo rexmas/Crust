@@ -3,14 +3,16 @@ import JSONValueRX
 
 public enum CollectionInsertionMethod<Container: Sequence> {
     case append
-    case union
     case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
 }
+
+public typealias CollectionUpdatePolicy<Container: Sequence> =
+    (insert: CollectionInsertionMethod<Container>, unique: Bool)
 
 public enum Spec<T: Mapping>: Keypath {
     
     case mapping(Keypath, T)
-    case collectionMapping(Keypath, T, CollectionInsertionMethod<T.SequenceKind>)
+    case collectionMapping(Keypath, T, CollectionUpdatePolicy<T.SequenceKind>)
     
     public var keyPath: String {
         switch self {
@@ -30,10 +32,10 @@ public enum Spec<T: Mapping>: Keypath {
         }
     }
     
-    public var collectionInsertionMethod: CollectionInsertionMethod<T.SequenceKind> {
+    public var collectionUpdatePolicy: CollectionUpdatePolicy<T.SequenceKind> {
         switch self {
         case .mapping(_, _):
-            return .union
+            return (.append, true)
         case .collectionMapping(_, _, let method):
             return method
         }

@@ -22,7 +22,7 @@ open class ArrayMapping<SubType: Equatable, SubAdaptor: Adaptor, SubMapping: Arr
     
     public var primaryKeys: [String : Keypath]? { return nil }
     open var keyPath: Keypath { return "" }
-    open var options: CollectionInsertionMethod<SubMapping.SequenceKind> { return .union }
+    open var options: CollectionUpdatePolicy<SubMapping.SequenceKind> { return (.append, true) }
     
     open func mapping(tomap: inout [SubType], context: MappingContext) {
         //let mapping = SubMapping(adaptor: self.adaptor.subAdaptor)

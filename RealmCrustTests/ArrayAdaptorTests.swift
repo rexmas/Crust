@@ -10,7 +10,7 @@ fileprivate class AllEmployeesMappingWithDupes: ArrayMapping<Employee, RealmAdap
 }
 
 class ArrayAdaptorTests: RealmMappingTest {
-    
+    /*
     func testArrayWithDupesNotAllowed() {
         let employeeStub = EmployeeStub()
         let employeeStub2 = EmployeeStub()
@@ -52,4 +52,5 @@ class ArrayAdaptorTests: RealmMappingTest {
         XCTAssertTrue(employeeStub.matches(object: obj[0]))
         XCTAssertTrue(employeeStub2.matches(object: obj[2]))
     }
+ */
 }
