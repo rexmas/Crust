@@ -137,7 +137,7 @@ NS_ASSUME_NONNULL_BEGIN
     return @(index);
 }
 
-- (NSArray<RLMObject *> *)allObjects
+- (NSArray<__kindof RLMObject *> *)allObjects
 {
     NSMutableArray *objects = [NSMutableArray array];
     

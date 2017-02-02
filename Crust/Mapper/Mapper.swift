@@ -32,7 +32,7 @@ public struct Mapper<T: Mapping> {
     
     public init() { }
     
-    public func mapToCollection<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using spec: Spec<M>) throws -> C
+    public func map<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using spec: Spec<M>) throws -> C
     where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C {
         
         var collection = C()

@@ -18,7 +18,7 @@ class CollectionMappingTests: RealmMappingTest {
         
         let spec = Spec.mapping("", mapping)
         //let collection: RLMArray<EmployeeMapping.MappedObject> = try! mapper.mapToAppendable(from: employeesJSON, using: spec)
-        let collection: [Employee] = try! mapper.mapToCollection(from: employeesJSON, using: spec)
+        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec)
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(collection.count, 2)
