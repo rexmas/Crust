@@ -31,20 +31,7 @@ open class MappingContext {
 public struct Mapper<T: Mapping> {
     
     public init() { }
-    /*
-    public func mapToAppendable<M: Mapping, C: Appendable>(from json: JSONValue, using spec: Spec<M>) throws -> C
-    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C, M.MappedObject: AnyObject {
     
-            var collection = C.createInstance(with: M.MappedObject.self)
-            let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
-            
-            try spec.mapping.start(context: context)
-            collection <- (spec, context)
-            try spec.mapping.completeMapping(collection: collection, context: context)
-            
-            return collection
-    }
-    */
     public func mapToCollection<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using spec: Spec<M>) throws -> C
     where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C {
         
@@ -112,19 +99,6 @@ public struct Mapper<T: Mapping> {
         object <- (spec, context)
         try mapping.complete(object: &object, context: context)
     }
-    /*
-    internal func perform<Collection: RangeReplaceableCollection>(
-        _ spec: Spec<T>,
-        on collection: inout Collection,
-        with context: MappingContext) throws
-    where T.MappedObject == Collection.Iterator.Element, T.SequenceKind == Collection, T.MappedObject: Equatable {
-        
-        let mapping = spec.mapping
-        try mapping.start(context: context)
-        collection <- (spec, context)
-        try mapping.completeMapping(collection: collection, context: context)
-    }
- */
 }
 
 public extension Mapping {
