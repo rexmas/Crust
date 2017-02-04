@@ -2,8 +2,6 @@ import Crust
 import Realm
 
 public class EmployeeMapping : RealmMapping {
-    //TODO:
-    //public typealias SequenceKind = RLMArray<Employee>
     
     public var adaptor: RealmAdaptor
     public var primaryKeys: [String : Keypath]? {

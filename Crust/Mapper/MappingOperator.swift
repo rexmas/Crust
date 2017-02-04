@@ -132,7 +132,15 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
             let json = map.context.json
             try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
         case .fromJSON:
-            if let baseJSON = map.context.json[map.key] {
+            // TODO: again, need to allow for `nil` keypaths.
+            if let baseJSON: JSONValue = {
+                let key = map.key
+                let json = map.context.json[map.key]
+                if json == nil && key.keyPath == "" {
+                    return map.context.json
+                }
+                return json
+            }() {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
             }
             else {
@@ -482,4 +490,3 @@ public func mapFromJson<T, U: Mapping, V: Appendable, C: MappingContext>(
         
         return map.context
 }
-

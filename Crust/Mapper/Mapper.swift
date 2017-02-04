@@ -47,17 +47,18 @@ public struct Mapper<T: Mapping> {
     
     public func map(from json: JSONValue, using spec: Spec<T>, parentContext: MappingContext? = nil) throws -> T.MappedObject {
         
+        // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
+        let baseJson = json[spec.keyPath] ?? json
+        
         var object = try { () -> T.MappedObject in
             let mapping = spec.mapping
-            // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
-            let baseJson = json[spec.keyPath] ?? json
             guard let object = try mapping.getExistingInstance(json: baseJson) else {
                 return try mapping.getNewInstance()
             }
             return object
         }()
         
-        let context = MappingContext(withObject: object, json: json, direction: MappingDirection.fromJSON)
+        let context = MappingContext(withObject: object, json: baseJson, direction: MappingDirection.fromJSON)
         context.parent = parentContext
         try self.perform(spec, on: &object, with: context)
         
