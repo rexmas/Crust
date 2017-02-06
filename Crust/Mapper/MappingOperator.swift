@@ -266,16 +266,16 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
-    return mapFromJson(toCollection: &field, map: map)
+    return map(toCollection: &field, using: binding)
 }
 
 private func map<T, U: Mapping, V: Sequence>(
     to json: JSONValue,
-    fromField field: V,
-    viaKey key: Keypath,
-    mapping: U)
+    from field: V,
+    via key: Keypath,
+    using mapping: U)
     throws -> JSONValue
     where U.MappedObject == T, V.Iterator.Element == T, U.SequenceKind.Iterator.Element == U.MappedObject {
         
@@ -290,21 +290,21 @@ private func map<T, U: Mapping, V: Sequence>(
 }
 
 @discardableResult
-public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
-        switch map.context.dir {
+        switch binding.context.dir {
         case .toJSON:
-            let json = map.context.json
-            try map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key, mapping: map.key.mapping)
+            let json = binding.context.json
+            try binding.context.json = Crust.map(to: json, from: field, via: binding.key, using: binding.key.mapping)
             
         case .fromJSON:
             let fieldCopy = field
-            let (newObjects, _) = try mapFromJsonToSequence(map: map) {
+            let (newObjects, _) = try mapFromJsonToSequence(map: binding) {
                 fieldCopy.contains($0)
             }
             
-            switch map.key.collectionUpdatePolicy.insert {
+            switch binding.key.collectionUpdatePolicy.insert {
             case .append:
                 field.append(contentsOf: newObjects)
                 
@@ -320,17 +320,17 @@ public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: in
                     }
                     
                     try deletion(orphans).forEach {
-                        try map.key.mapping.delete(obj: $0)
+                        try binding.key.mapping.delete(obj: $0)
                     }
                 }
             }
         }
     }
     catch let error as NSError {
-        map.context.error = error
+        binding.context.error = error
     }
     
-    return map.context
+    return binding.context
 }
 
 // Gets all newly mapped data and returns it in an array, caller can decide to append and what-not.
