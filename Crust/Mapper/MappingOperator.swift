@@ -17,7 +17,7 @@ public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
 
 infix operator <- : AssignmentPrecedence
 
-// Map arbitrary object.
+// Map with a key path.
 
 @discardableResult
 public func <- <T: JSONable, C: MappingContext>(field: inout T, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
@@ -29,27 +29,27 @@ public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONK
     return mapField(&field, map: map)
 }
 
-// Map a Mappable.
+// Map with a generic binding.
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
     return mapFieldWithMapping(&field, map: map)
 }
 
 // Transform.
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
     return mapFieldWithMapping(&field, map: map)
 }
 
@@ -114,7 +114,7 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key
 }
 
 // Mappable.
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
@@ -156,7 +156,7 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
     return map.context
 }
 
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T {
+public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
     
     guard map.context.error == nil else {
         return map.context
@@ -277,7 +277,7 @@ public protocol Appendable: Sequence {
 }
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
     return mapFromJson(toCollection: &field, map: map)
 }
@@ -301,7 +301,7 @@ private func map<T, U: Mapping, V: Sequence>(
 }
 
 @discardableResult
-public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, map:(key: Spec<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
         switch map.context.dir {
@@ -346,7 +346,7 @@ public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: in
 
 // Gets all newly mapped data and returns it in an array, caller can decide to append and what-not.
 public func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
-    map:(key: Spec<U>, context: C),
+    map:(key: Binding<U>, context: C),
     fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: C)
     where U.MappedObject == T, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
