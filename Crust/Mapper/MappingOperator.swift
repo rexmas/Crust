@@ -69,7 +69,7 @@ public func map<T: JSONable, C: MappingContext>(to field: inout T, via keyPath:(
     case .fromJSON:
         do {
             if let baseJSON = keyPath.context.json[keyPath.key] {
-                try mapFromJson(baseJSON, toField: &field)
+                try map(from: baseJSON, to: &field)
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Could not find value in JSON \(keyPath.context.json) from keyPath \(keyPath.key)" ]
@@ -98,7 +98,7 @@ public func map<T: JSONable, C: MappingContext>(to field: inout T?, via keyPath:
     case .fromJSON:
         do {
             if let baseJSON = keyPath.context.json[keyPath.key] {
-                try mapFromJson(baseJSON, toField: &field)
+                try map(from: baseJSON, to: &field)
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Value not present in JSON \(keyPath.context.json) from keyPath \(keyPath.key)" ]
@@ -219,7 +219,7 @@ private func map<T, U: Mapping>(to json: JSONValue, from field: T?, via key: Key
 
 // MARK: - From JSON
 
-private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T) throws where T.ConversionType == T {
+private func map<T: JSONable>(from json: JSONValue, to field: inout T) throws where T.ConversionType == T {
     
     if let fromJson = T.fromJSON(json) {
         field = fromJson
@@ -230,7 +230,7 @@ private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T)
     }
 }
 
-private func mapFromJson<T: JSONable>(_ json: JSONValue, toField field: inout T?) throws where T.ConversionType == T {
+private func map<T: JSONable>(from json: JSONValue, to field: inout T?) throws where T.ConversionType == T {
     
     if case .null = json {
         field = nil
