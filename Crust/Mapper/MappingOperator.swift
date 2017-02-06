@@ -334,7 +334,7 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
 }
 
 // Gets all newly mapped data and returns it in an array, caller can decide to append and what-not.
-public func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
+private func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
     map:(key: Binding<U>, context: C),
     fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: C)
