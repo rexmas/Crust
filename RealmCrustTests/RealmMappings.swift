@@ -5,21 +5,6 @@ import Crust
 import JSONValueRX
 import Realm
 
-public class RealmArrayAdaptor<RealmObject: RLMObject>: AbstractArrayAdaptor<RealmObject, RealmAdaptor> {
-    public let realm: RLMRealm
-    public let realmAdaptor: RealmAdaptor
-    
-    public init(realm: RLMRealm) {
-        self.realm = realm
-        self.realmAdaptor = RealmAdaptor(realm: realm)
-        super.init(subAdaptor: self.realmAdaptor)
-    }
-    
-    public convenience init() {
-        self.init(realm: RLMRealm.default())
-    }
-}
-
 public class RealmAdaptor: Adaptor {
     
     public typealias BaseType = RLMObject

@@ -394,7 +394,7 @@ private func generateNewValues<T, U: Mapping, S: Sequence>(
     throws -> [T]
     where U.MappedObject == T, T: Equatable, U.SequenceKind.Iterator.Element == U.MappedObject {
     
-        guard case .array(let xs) = json else {
+        guard case .array(let jsonArray) = json else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(U.SequenceKind.self)<\(T.self)>" ]
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
@@ -414,17 +414,16 @@ private func generateNewValues<T, U: Mapping, S: Sequence>(
             }
         }
         
-        for x in xs {
-            let obj = try mapper.map(from: x, using: mapping, parentContext: context)
+        for json in jsonArray {
+            let obj = try mapper.map(from: json, using: mapping, parentContext: context)
             
-            switch updatePolicy.unique {
-            case false:
-                newObjects.append(obj)
-                
-            case true:
+            if updatePolicy.unique {
                 if isUnique(obj, newObjects, fieldContains) {
                     newObjects.append(obj)
                 }
+            }
+            else {
+                newObjects.append(obj)
             }
         }
         
