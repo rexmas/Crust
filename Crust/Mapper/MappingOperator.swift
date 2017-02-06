@@ -32,8 +32,8 @@ public func <- <T: JSONable, C: MappingContext>(field: inout T?, keyPath:(key: J
 // Map with a generic binding.
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
-    return mapFieldWithMapping(&field, map: map)
+public func <- <T, U: Mapping, C: MappingContext>(field: inout T, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
+    return map(to: &field, using: binding)
 }
 
 @discardableResult
@@ -44,8 +44,8 @@ public func <- <T, U: Mapping, C: MappingContext>(field: inout T?, map:(key: Bin
 // Transform.
 
 @discardableResult
-public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
-    return mapFieldWithMapping(&field, map: map)
+public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T == T.ConversionType {
+    return map(to: &field, using: binding)
 }
 
 @discardableResult
@@ -114,46 +114,46 @@ public func map<T: JSONable, C: MappingContext>(to field: inout T?, via keyPath:
 }
 
 // Mappable.
-public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
+public func map<T, U: Mapping, C: MappingContext>(to field: inout T, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
     
-    guard map.context.error == nil else {
-        return map.context
+    guard binding.context.error == nil else {
+        return binding.context
     }
     
-    guard case .mapping(let key, let mapping) = map.key else {
+    guard case .mapping(let key, let mapping) = binding.key else {
         let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.mapping to map type \(T.self)" ]
-        map.context.error = NSError(domain: CrustMappingDomain, code: -1000, userInfo: userInfo)
-        return map.context
+        binding.context.error = NSError(domain: CrustMappingDomain, code: -1000, userInfo: userInfo)
+        return binding.context
     }
     
     do {
-        switch map.context.dir {
+        switch binding.context.dir {
         case .toJSON:
-            let json = map.context.json
-            try map.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
+            let json = binding.context.json
+            try binding.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
         case .fromJSON:
             // TODO: again, need to allow for `nil` keypaths.
             if let baseJSON: JSONValue = {
-                let key = map.key
-                let json = map.context.json[map.key]
+                let key = binding.key
+                let json = binding.context.json[binding.key]
                 if json == nil && key.keyPath == "" {
-                    return map.context.json
+                    return binding.context.json
                 }
                 return json
             }() {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
+                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: binding.context)
             }
             else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(binding.key) does not exist to map from" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
     }
     catch let error as NSError {
-        map.context.error = error
+        binding.context.error = error
     }
     
-    return map.context
+    return binding.context
 }
 
 public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout T?, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
