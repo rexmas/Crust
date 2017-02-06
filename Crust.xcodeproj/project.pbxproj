@@ -10,7 +10,7 @@
 		172FBC8C1C15140300CF2C71 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8B1C15140300CF2C71 /* Person.swift */; };
 		172FBC921C152DA500CF2C71 /* StructMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC911C152DA500CF2C71 /* StructMappingTests.swift */; };
 		175C9A3D1C311D8400B0D6E7 /* Crust.h in Headers */ = {isa = PBXBuildFile; fileRef = 175C9A3C1C311D8400B0D6E7 /* Crust.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		175C9A431C311DB200B0D6E7 /* CRMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */; };
+		175C9A431C311DB200B0D6E7 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* Mapper.swift */; };
 		175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */; };
 		175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */; };
 		175C9A471C311DB200B0D6E7 /* AnyAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */; };
@@ -101,7 +101,7 @@
 		17B983D31BDC8D7E006BD35C /* CompanyMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CompanyMappingTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		17B983D51BDC8DB1006BD35C /* CompanyStub.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CompanyStub.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CRMapperTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CRMapper.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		17F95FFD1BCB39C400CC6D4A /* Mapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Mapper.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MappingOperator.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		26951C231AFB401A007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26951C341AFB401B007B0E07 /* CrustTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CrustTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,7 +189,7 @@
 		17F95FFC1BCB39C400CC6D4A /* Mapper */ = {
 			isa = PBXGroup;
 			children = (
-				17F95FFD1BCB39C400CC6D4A /* CRMapper.swift */,
+				17F95FFD1BCB39C400CC6D4A /* Mapper.swift */,
 				17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */,
 				17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */,
 			);
@@ -564,7 +564,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CD20141C1E2EE96E00D16F14 /* ArrayAdaptor.swift in Sources */,
-				175C9A431C311DB200B0D6E7 /* CRMapper.swift in Sources */,
+				175C9A431C311DB200B0D6E7 /* Mapper.swift in Sources */,
 				175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */,
 				175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */,
 				175C9A471C311DB200B0D6E7 /* AnyAdaptor.swift in Sources */,

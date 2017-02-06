@@ -166,6 +166,15 @@ public protocol RealmMapping: Mapping {
 }
 
 extension RLMArray: Appendable {
+    public func findIndex(of object: RLMObject) -> UInt {
+        guard case let index as UInt = self.index(ofObjectNonGeneric: object) else {
+            return UInt.max
+        }
+        return index
+    }
+
+    public typealias Index = UInt
+
     public func append(_ newElement: RLMObject) {
         self.addObjectNonGeneric(newElement)
     }
@@ -175,14 +184,12 @@ extension RLMArray: Appendable {
             self.addObjectNonGeneric(obj)
         }
     }
-}
-
-@discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout RLMArray<T>, map:(key: Spec<U>, context: C)) -> C
-    where U.MappedObject == T {
-
-    var variableList = field.allObjects() as! [T]
-    let context = mapCollectionField(&variableList, map: map)
-    field.append(contentsOf: variableList)
-    return context
+    
+    public func remove(at i: UInt) {
+        self.removeObject(at: i)
+    }
+    
+    public func removeAll(keepingCapacity keepCapacity: Bool) {
+        self.removeAllObjects()
+    }
 }

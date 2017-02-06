@@ -25,7 +25,7 @@ class StructMappingTests: XCTestCase {
         
         stub.ownsCat = nil
         json = try! JSONValue(object: stub.generateJsonObject())
-        object = try! mapper.mapFromJSON(json, toObject: object, mapping: PersonMapping())
+        object = try! mapper.map(from: json, to: object, using: PersonMapping())
         
         XCTAssertNil(object.ownsCat)
     }
