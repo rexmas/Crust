@@ -141,7 +141,7 @@ public func map<T, U: Mapping, C: MappingContext>(to field: inout T, using bindi
                 }
                 return json
             }() {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: binding.context)
+                try map(from: baseJSON, to: &field, using: mapping, context: binding.context)
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(binding.key) does not exist to map from" ]
@@ -175,7 +175,7 @@ public func map<T, U: Mapping, C: MappingContext>(to field: inout T?, using bind
             try binding.context.json = Crust.map(to: json, from: field, via: key, using: mapping)
         case .fromJSON:
             if let baseJSON = binding.context.json[binding.key] {
-                try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: binding.context)
+                try map(from: baseJSON, to: &field, using: mapping, context: binding.context)
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(binding.key) does not exist to map from" ]
@@ -246,13 +246,13 @@ private func map<T: JSONable>(from json: JSONValue, to field: inout T?) throws w
     }
 }
 
-private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout T, mapping: U, context: MappingContext) throws where U.MappedObject == T {
+private func map<T, U: Mapping>(from json: JSONValue, to field: inout T, using mapping: U, context: MappingContext) throws where U.MappedObject == T {
     
     let mapper = Mapper<U>()
     field = try mapper.map(from: json, using: mapping, parentContext: context)
 }
 
-private func mapFromJson<T, U: Mapping>(_ json: JSONValue, toField field: inout T?, mapping: U, context: MappingContext) throws where U.MappedObject == T {
+private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using mapping: U, context: MappingContext) throws where U.MappedObject == T {
     
     if case .null = json {
         field = nil
