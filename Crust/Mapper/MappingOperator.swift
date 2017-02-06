@@ -65,7 +65,7 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T, map:(key:
     switch map.context.dir {
     case .toJSON:
         let json = map.context.json
-        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
+        map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key)
     case .fromJSON:
         do {
             if let baseJSON = map.context.json[map.key] {
@@ -94,7 +94,7 @@ public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key
     switch map.context.dir {
     case .toJSON:
         let json = map.context.json
-        map.context.json = mapToJson(json, fromField: field, viaKey: map.key)
+        map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key)
     case .fromJSON:
         do {
             if let baseJSON = map.context.json[map.key] {
@@ -130,7 +130,7 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
         switch map.context.dir {
         case .toJSON:
             let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+            try map.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
         case .fromJSON:
             // TODO: again, need to allow for `nil` keypaths.
             if let baseJSON: JSONValue = {
@@ -172,7 +172,7 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
         switch map.context.dir {
         case .toJSON:
             let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: key, mapping: mapping)
+            try map.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
         case .fromJSON:
             if let baseJSON = map.context.json[map.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: map.context)
@@ -192,7 +192,7 @@ public func mapFieldWithMapping<T, U: Mapping, C: MappingContext>(_ field: inout
 
 // MARK: - To JSON
 
-private func mapToJson<T: JSONable>(_ json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue where T == T.ConversionType {
+private func map<T: JSONable>(to json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue where T == T.ConversionType {
     var json = json
     
     if let field = field {
@@ -205,7 +205,7 @@ private func mapToJson<T: JSONable>(_ json: JSONValue, fromField field: T?, viaK
     return json
 }
 
-private func mapToJson<T, U: Mapping>(_ json: JSONValue, fromField field: T?, viaKey key: Keypath, mapping: U) throws -> JSONValue where U.MappedObject == T {
+private func map<T, U: Mapping>(to json: JSONValue, fromField field: T?, viaKey key: Keypath, mapping: U) throws -> JSONValue where U.MappedObject == T {
     var json = json
     
     guard let field = field else {
@@ -282,8 +282,8 @@ public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, m
     return mapFromJson(toCollection: &field, map: map)
 }
 
-private func mapToJson<T, U: Mapping, V: Sequence>(
-    _ json: JSONValue,
+private func map<T, U: Mapping, V: Sequence>(
+    to json: JSONValue,
     fromField field: V,
     viaKey key: Keypath,
     mapping: U)
@@ -307,7 +307,7 @@ public func mapFromJson<T, U: Mapping, C: MappingContext>(toCollection field: in
         switch map.context.dir {
         case .toJSON:
             let json = map.context.json
-            try map.context.json = mapToJson(json, fromField: field, viaKey: map.key, mapping: map.key.mapping)
+            try map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key, mapping: map.key.mapping)
             
         case .fromJSON:
             let fieldCopy = field
