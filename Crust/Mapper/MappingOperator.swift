@@ -263,18 +263,7 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
     field = try mapper.map(from: json, using: mapping, parentContext: context)
 }
 
-// MARK: - Appendable - RangeReplaceableCollectionType subset (Array and Realm List follow this protocol while RLMArray follows Appendable)
-
-public protocol Appendable: Sequence {
-    static func createInstance(with class: Swift.AnyClass) -> Self
-    mutating func append(_ newElement: Self.Iterator.Element)
-    mutating func append(contentsOf newElements: [Iterator.Element])
-    mutating func remove(at i: UInt)
-    mutating func removeAll(keepingCapacity keepCapacity: Bool)
-    
-    // Can't be index(of object:) because Realm Obj-C.
-    func findIndex(of object: Self.Iterator.Element) -> UInt
-}
+// MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
 @discardableResult
 public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
