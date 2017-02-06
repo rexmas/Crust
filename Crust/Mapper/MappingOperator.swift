@@ -65,7 +65,7 @@ public func map<T: JSONable, C: MappingContext>(to field: inout T, via keyPath:(
     switch keyPath.context.dir {
     case .toJSON:
         let json = keyPath.context.json
-        keyPath.context.json = Crust.map(to: json, fromField: field, viaKey: keyPath.key)
+        keyPath.context.json = Crust.map(to: json, from: field, via: keyPath.key)
     case .fromJSON:
         do {
             if let baseJSON = keyPath.context.json[keyPath.key] {
@@ -94,7 +94,7 @@ public func map<T: JSONable, C: MappingContext>(to field: inout T?, via keyPath:
     switch keyPath.context.dir {
     case .toJSON:
         let json = keyPath.context.json
-        keyPath.context.json = Crust.map(to: json, fromField: field, viaKey: keyPath.key)
+        keyPath.context.json = Crust.map(to: json, from: field, via: keyPath.key)
     case .fromJSON:
         do {
             if let baseJSON = keyPath.context.json[keyPath.key] {
@@ -130,7 +130,7 @@ public func map<T, U: Mapping, C: MappingContext>(to field: inout T, using bindi
         switch binding.context.dir {
         case .toJSON:
             let json = binding.context.json
-            try binding.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
+            try binding.context.json = Crust.map(to: json, from: field, via: key, using: mapping)
         case .fromJSON:
             // TODO: again, need to allow for `nil` keypaths.
             if let baseJSON: JSONValue = {
@@ -172,7 +172,7 @@ public func map<T, U: Mapping, C: MappingContext>(to field: inout T?, using bind
         switch binding.context.dir {
         case .toJSON:
             let json = binding.context.json
-            try binding.context.json = Crust.map(to: json, fromField: field, viaKey: key, mapping: mapping)
+            try binding.context.json = Crust.map(to: json, from: field, via: key, using: mapping)
         case .fromJSON:
             if let baseJSON = binding.context.json[binding.key] {
                 try mapFromJson(baseJSON, toField: &field, mapping: mapping, context: binding.context)
@@ -192,7 +192,7 @@ public func map<T, U: Mapping, C: MappingContext>(to field: inout T?, using bind
 
 // MARK: - To JSON
 
-private func map<T: JSONable>(to json: JSONValue, fromField field: T?, viaKey key: JSONKeypath) -> JSONValue where T == T.ConversionType {
+private func map<T: JSONable>(to json: JSONValue, from field: T?, via key: JSONKeypath) -> JSONValue where T == T.ConversionType {
     var json = json
     
     if let field = field {
@@ -205,7 +205,7 @@ private func map<T: JSONable>(to json: JSONValue, fromField field: T?, viaKey ke
     return json
 }
 
-private func map<T, U: Mapping>(to json: JSONValue, fromField field: T?, viaKey key: Keypath, mapping: U) throws -> JSONValue where U.MappedObject == T {
+private func map<T, U: Mapping>(to json: JSONValue, from field: T?, via key: Keypath, using mapping: U) throws -> JSONValue where U.MappedObject == T {
     var json = json
     
     guard let field = field else {
