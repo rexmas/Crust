@@ -20,13 +20,13 @@ infix operator <- : AssignmentPrecedence
 // Map with a key path.
 
 @discardableResult
-public func <- <T: JSONable, C: MappingContext>(field: inout T, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
-    return mapField(&field, map: map)
+public func <- <T: JSONable, C: MappingContext>(field: inout T, keyPath:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
+    return map(to: &field, via: keyPath)
 }
 
 @discardableResult
-public func <- <T: JSONable, C: MappingContext>(field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
-    return mapField(&field, map: map)
+public func <- <T: JSONable, C: MappingContext>(field: inout T?, keyPath:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
+    return map(to: &field, via: keyPath)
 }
 
 // Map with a generic binding.
@@ -56,61 +56,61 @@ public func <- <T: JSONable, U: Transform, C: MappingContext>(field: inout T?, m
 // MARK: - Map funcs
 
 // Arbitrary object.
-public func mapField<T: JSONable, C: MappingContext>(_ field: inout T, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
+public func map<T: JSONable, C: MappingContext>(to field: inout T, via keyPath:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     
-    guard map.context.error == nil else {
-        return map.context
+    guard keyPath.context.error == nil else {
+        return keyPath.context
     }
     
-    switch map.context.dir {
+    switch keyPath.context.dir {
     case .toJSON:
-        let json = map.context.json
-        map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key)
+        let json = keyPath.context.json
+        keyPath.context.json = Crust.map(to: json, fromField: field, viaKey: keyPath.key)
     case .fromJSON:
         do {
-            if let baseJSON = map.context.json[map.key] {
+            if let baseJSON = keyPath.context.json[keyPath.key] {
                 try mapFromJson(baseJSON, toField: &field)
             }
             else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Could not find value in JSON \(map.context.json) from keyPath \(map.key)" ]
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Could not find value in JSON \(keyPath.context.json) from keyPath \(keyPath.key)" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
         catch let error as NSError {
-            map.context.error = error
+            keyPath.context.error = error
         }
     }
     
-    return map.context
+    return keyPath.context
 }
 
 // Arbitrary Optional.
-public func mapField<T: JSONable, C: MappingContext>(_ field: inout T?, map:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
+public func map<T: JSONable, C: MappingContext>(to field: inout T?, via keyPath:(key: JSONKeypath, context: C)) -> C where T == T.ConversionType {
     
-    guard map.context.error == nil else {
-        return map.context
+    guard keyPath.context.error == nil else {
+        return keyPath.context
     }
     
-    switch map.context.dir {
+    switch keyPath.context.dir {
     case .toJSON:
-        let json = map.context.json
-        map.context.json = Crust.map(to: json, fromField: field, viaKey: map.key)
+        let json = keyPath.context.json
+        keyPath.context.json = Crust.map(to: json, fromField: field, viaKey: keyPath.key)
     case .fromJSON:
         do {
-            if let baseJSON = map.context.json[map.key] {
+            if let baseJSON = keyPath.context.json[keyPath.key] {
                 try mapFromJson(baseJSON, toField: &field)
             }
             else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Value not present in JSON \(map.context.json) from keyPath \(map.key)" ]
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Value not present in JSON \(keyPath.context.json) from keyPath \(keyPath.key)" ]
                 throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
             }
         }
         catch let error as NSError {
-            map.context.error = error
+            keyPath.context.error = error
         }
     }
     
-    return map.context
+    return keyPath.context
 }
 
 // Mappable.
