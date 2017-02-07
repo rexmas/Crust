@@ -28,7 +28,7 @@ open class MappingContext {
 }
 
 /// Method caller used to perform mappings.
-public struct Mapper<T: Mapping> {
+public struct Mapper<M: Mapping> {
     
     public init() { }
     
@@ -45,19 +45,12 @@ public struct Mapper<T: Mapping> {
         return collection
     }
     
-    public func map(from json: JSONValue, using binding: Binding<T>, parentContext: MappingContext? = nil) throws -> T.MappedObject {
+    public func map(from json: JSONValue, using binding: Binding<M>, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         
         // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
         let baseJson = json[binding.keyPath] ?? json
         
-        var object = try { () -> T.MappedObject in
-            let mapping = binding.mapping
-            guard let object = try mapping.getExistingInstance(json: baseJson) else {
-                return try mapping.getNewInstance()
-            }
-            return object
-        }()
-        
+        var object = try binding.mapping.fetchOrCreateObject(from: json)
         let context = MappingContext(withObject: object, json: baseJson, direction: MappingDirection.fromJSON)
         context.parent = parentContext
         try self.perform(binding, on: &object, with: context)
@@ -65,17 +58,12 @@ public struct Mapper<T: Mapping> {
         return object
     }
     
-    public func map(from json: JSONValue, using mapping: T, parentContext: MappingContext? = nil) throws -> T.MappedObject {
-        let object = try { () -> T.MappedObject in
-            guard let object = try mapping.getExistingInstance(json: json) else {
-                return try mapping.getNewInstance()
-            }
-            return object
-        }()
+    public func map(from json: JSONValue, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
+        let object = try mapping.fetchOrCreateObject(from: json)
         return try map(from: json, to: object, using: mapping, parentContext: parentContext)
     }
     
-    public func map(from json: JSONValue, to object: T.MappedObject, using mapping: T, parentContext: MappingContext? = nil) throws -> T.MappedObject {
+    public func map(from json: JSONValue, to object: M.MappedObject, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         var object = object
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.fromJSON)
         context.parent = parentContext
@@ -83,20 +71,20 @@ public struct Mapper<T: Mapping> {
         return object
     }
     
-    public func mapFromObjectToJSON(_ object: T.MappedObject, mapping: T) throws -> JSONValue {
+    public func mapFromObjectToJSON(_ object: M.MappedObject, mapping: M) throws -> JSONValue {
         var object = object
         let context = MappingContext(withObject: object, json: JSONValue.object([:]), direction: MappingDirection.toJSON)
         try self.perform(mapping, on: &object, with: context)
         return context.json
     }
     
-    internal func perform(_ mapping: T, on object: inout T.MappedObject, with context: MappingContext) throws {
+    internal func perform(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext) throws {
         try mapping.start(context: context)
         mapping.execute(object: &object, context: context)
         try mapping.complete(object: &object, context: context)
     }
     
-    internal func perform(_ binding: Binding<T>, on object: inout T.MappedObject, with context: MappingContext) throws {
+    internal func perform(_ binding: Binding<M>, on object: inout M.MappedObject, with context: MappingContext) throws {
         let mapping = binding.mapping
         try mapping.start(context: context)
         object <- (binding, context)
@@ -105,30 +93,59 @@ public struct Mapper<T: Mapping> {
 }
 
 public extension Mapping {
-    func getExistingInstance(json: JSONValue) throws -> MappedObject? {
+    public func fetchOrCreateObject(from json: JSONValue) throws -> MappedObject {
+        guard let primaryKeyValues = try self.primaryKeyValuePairs(from: json) else {
+            return try self.generateNewInstance()
+        }
         
-        try self.checkForAdaptorBaseTypeConformance()
+        let (object, newInstance) = try { () -> (MappedObject, Bool) in
+            guard let object = try self.fetchExistingInstance(json: json, primaryKeyValues: primaryKeyValues) else {
+                return try (self.generateNewInstance(), true)
+            }
+            return (object, false)
+        }()
         
+        if case let nsObject as NSObject = object, newInstance {
+            primaryKeyValues.forEach { (key, value) in
+                nsObject.setValue(value, forKey: key)
+            }
+        }
+        
+        return object
+    }
+    
+    public func primaryKeyValuePairs(from json: JSONValue) throws -> [String: CVarArg]? {
         guard let primaryKeys = self.primaryKeys else {
             return nil
         }
         
-        var keyValues = [ String : CVarArg ]()
+        var keyValues = [String : CVarArg]()
         try primaryKeys.forEach { primaryKey, jsonKey in
             let keyPath = jsonKey.keyPath
             if let val = json[keyPath] {
                 keyValues[primaryKey] = val.valuesAsNSObjects()
-            } else {
+            }
+            else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(Self.self)" ]
                 throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
             }
+        }
+        return keyValues
+    }
+    
+    func fetchExistingInstance(json: JSONValue, primaryKeyValues: [String : CVarArg]?) throws -> MappedObject? {
+        
+        try self.checkForAdaptorBaseTypeConformance()
+        
+        guard let keyValues = try (primaryKeyValues ?? self.primaryKeyValuePairs(from: json)) else {
+            return nil
         }
         
         let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, primaryKeyValues: [keyValues], isMapping: true)?.first
         return obj as! MappedObject?
     }
     
-    func getNewInstance() throws -> MappedObject {
+    func generateNewInstance() throws -> MappedObject {
         
         try self.checkForAdaptorBaseTypeConformance()
         
