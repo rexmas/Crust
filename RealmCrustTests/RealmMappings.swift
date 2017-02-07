@@ -150,7 +150,7 @@ public protocol RealmMapping: Mapping {
     init(adaptor: RealmAdaptor)
 }
 
-extension RLMArray: Appendable {
+extension RLMArray {
     public func findIndex(of object: RLMObject) -> UInt {
         guard case let index as UInt = self.index(ofObjectNonGeneric: object) else {
             return UInt.max

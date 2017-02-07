@@ -16,7 +16,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = EmployeeMapping(adaptor: self.adaptor!)
         let mapper = Mapper<EmployeeMapping>()
         
-        let spec = Spec.mapping("", mapping)
+        let spec = Binding.mapping("", mapping)
         let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec)
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
@@ -30,7 +30,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Spec.collectionMapping("employees", employeeMapping, (.append, true)), context)
+                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }
@@ -55,7 +55,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = CompanyMapping(adaptor: self.adaptor!)
         let mapper = Mapper<CompanyMapping>()
         
-        let spec = Spec.mapping("", mapping)
+        let spec = Binding.mapping("", mapping)
         let company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         
@@ -71,7 +71,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingReplaceUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Spec.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context)
+                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context)
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }
@@ -96,7 +96,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = CompanyMappingReplaceUnique(adaptor: self.adaptor!)
         let mapper = Mapper<CompanyMappingReplaceUnique>()
         
-        let spec = Spec.mapping("", mapping)
+        let spec = Binding.mapping("", mapping)
         let company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         
@@ -110,7 +110,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Spec.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context)
+                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context)
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }
@@ -135,7 +135,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = CompanyMappingReplaceDeleteUnique(adaptor: self.adaptor!)
         let mapper = Mapper<CompanyMappingReplaceDeleteUnique>()
         
-        let spec = Spec.mapping("", mapping)
+        let spec = Binding.mapping("", mapping)
         let company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         

@@ -32,26 +32,26 @@ public struct Mapper<T: Mapping> {
     
     public init() { }
     
-    public func map<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using spec: Spec<M>) throws -> C
+    public func map<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using binding: Binding<M>) throws -> C
     where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C {
         
         var collection = C()
         let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
         
-        try spec.mapping.start(context: context)
-        collection <- (spec, context)
-        try spec.mapping.completeMapping(collection: collection, context: context)
+        try binding.mapping.start(context: context)
+        collection <- (binding, context)
+        try binding.mapping.completeMapping(collection: collection, context: context)
         
         return collection
     }
     
-    public func map(from json: JSONValue, using spec: Spec<T>, parentContext: MappingContext? = nil) throws -> T.MappedObject {
+    public func map(from json: JSONValue, using binding: Binding<T>, parentContext: MappingContext? = nil) throws -> T.MappedObject {
         
         // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
-        let baseJson = json[spec.keyPath] ?? json
+        let baseJson = json[binding.keyPath] ?? json
         
         var object = try { () -> T.MappedObject in
-            let mapping = spec.mapping
+            let mapping = binding.mapping
             guard let object = try mapping.getExistingInstance(json: baseJson) else {
                 return try mapping.getNewInstance()
             }
@@ -60,7 +60,7 @@ public struct Mapper<T: Mapping> {
         
         let context = MappingContext(withObject: object, json: baseJson, direction: MappingDirection.fromJSON)
         context.parent = parentContext
-        try self.perform(spec, on: &object, with: context)
+        try self.perform(binding, on: &object, with: context)
         
         return object
     }
@@ -96,10 +96,10 @@ public struct Mapper<T: Mapping> {
         try mapping.complete(object: &object, context: context)
     }
     
-    internal func perform(_ spec: Spec<T>, on object: inout T.MappedObject, with context: MappingContext) throws {
-        let mapping = spec.mapping
+    internal func perform(_ binding: Binding<T>, on object: inout T.MappedObject, with context: MappingContext) throws {
+        let mapping = binding.mapping
         try mapping.start(context: context)
-        object <- (spec, context)
+        object <- (binding, context)
         try mapping.complete(object: &object, context: context)
     }
 }

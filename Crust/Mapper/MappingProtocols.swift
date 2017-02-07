@@ -9,7 +9,7 @@ public enum CollectionInsertionMethod<Container: Sequence> {
 public typealias CollectionUpdatePolicy<Container: Sequence> =
     (insert: CollectionInsertionMethod<Container>, unique: Bool)
 
-public enum Spec<T: Mapping>: Keypath {
+public enum Binding<T: Mapping>: Keypath {
     
     case mapping(Keypath, T)
     case collectionMapping(Keypath, T, CollectionUpdatePolicy<T.SequenceKind>)

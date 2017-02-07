@@ -17,7 +17,7 @@ class PrimaryObj1Mapping : RealmMapping {
     func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
         let obj2Mapping = PrimaryObj2Mapping(adaptor: self.adaptor)
         
-        tomap.class2s       <- (Spec.mapping("class2s", obj2Mapping), context)
+        tomap.class2s       <- (Binding.mapping("class2s", obj2Mapping), context)
         tomap.uuid          <- "data.uuid" >*<
         context
     }
@@ -62,7 +62,7 @@ class PrimaryObj2Mapping : RealmMapping {
         
         let obj1Mapping = NestedPrimaryObj1Mapping(adaptor: self.adaptor)
         
-        tomap.class1        <- Spec.mapping("class1", obj1Mapping) >*<
+        tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
         tomap.uuid          <- "data.more_data.uuid" >*<
         context
     }
