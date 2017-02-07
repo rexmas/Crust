@@ -6,8 +6,8 @@ import Realm
 class PrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -27,8 +27,8 @@ class PrimaryObj1Mapping : RealmMapping {
 class NestedPrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -44,8 +44,8 @@ class NestedPrimaryObj1Mapping : RealmMapping {
 class PrimaryObj2Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.more_data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.more_data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {

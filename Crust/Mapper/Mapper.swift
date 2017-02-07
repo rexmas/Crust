@@ -120,10 +120,11 @@ public extension Mapping {
         }
         
         var keyValues = [String : CVarArg]()
-        try primaryKeys.forEach { primaryKey, jsonKey in
-            let keyPath = jsonKey.keyPath
-            if let val = json[keyPath] {
-                keyValues[primaryKey] = val.valuesAsNSObjects()
+        try primaryKeys.forEach { (primaryKey, keyPath, transform) in
+            let key = keyPath?.keyPath
+            let baseJson = key != nil ? json[key!] : json
+            if let val = baseJson {
+                keyValues[primaryKey] = transform?(val) ?? val.valuesAsNSObjects()
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(Self.self)" ]

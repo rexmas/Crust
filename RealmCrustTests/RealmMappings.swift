@@ -100,10 +100,10 @@ public class RealmAdaptor: Adaptor {
             return type.sanitizeValue(value, fromProperty: key, realm: self.realm)
         }
         
-        var totalPredicate = Array<NSPredicate>()
+        var totalPredicate = [NSPredicate]()
         
         for keyValues in primaryKeyValues {
-            var objectPredicates = Array<NSPredicate>()
+            var objectPredicates = [NSPredicate]()
             for (key, var value) in keyValues {
                 if case let obj as NSObject = value {
                     value = sanitize(key: key, value: obj)
@@ -134,9 +134,9 @@ public class RealmAdaptor: Adaptor {
         
         // Since we use this function to fetch existing objects to map to, but we can't remap the primary key,
         // we're going to build an unstored object and update when saving based on the primary key.
-        guard !isMapping || type.primaryKey() == nil else {
-            return nil
-        }
+        //guard !isMapping || type.primaryKey() == nil else {
+        //    return nil
+        //}
         
         let results = type.objects(in: realm, with: predicate)
         for obj in results {

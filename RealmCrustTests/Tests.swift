@@ -24,8 +24,8 @@ public class User: RLMObject {
 public class UserMapping: RealmMapping {
     
     public var adaptor: RealmAdaptor
-    public var primaryKeys: [String : Keypath]? {
-        return ["identifier" : "id_hash"]
+    public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [("identifier", "id_hash", nil)]
     }
     
     public required init(adaptor: RealmAdaptor) {

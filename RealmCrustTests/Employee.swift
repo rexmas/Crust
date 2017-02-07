@@ -4,8 +4,8 @@ import Realm
 public class EmployeeMapping : RealmMapping {
     
     public var adaptor: RealmAdaptor
-    public var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "uuid" ]
+    public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "uuid", nil) ]
     }
     
     public required init(adaptor: RealmAdaptor) {

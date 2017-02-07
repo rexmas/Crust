@@ -77,8 +77,8 @@ extension User: AnyMappable { }
 class UserMapping: Mapping {
     
     var adaptor: MockAdaptor<User>
-    var primaryKeys: [String : Keypath]? {
-        return [ "identifier" : "data.id_hash" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("identifier", "data.id_hash", nil) ]
     }
     
     required init(adaptor: MockAdaptor<User>) {
@@ -87,7 +87,7 @@ class UserMapping: Mapping {
     
     func mapping(tomap: inout User, context: MappingContext) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
-        
+        // TODO:
         tomap.identifier        <- "data.id_hash" >*<
         tomap.birthDate         <- Binding.mapping("data.birthdate", userBirthdateMapping) >*<
         tomap.name              <- "data.user_name" >*<
