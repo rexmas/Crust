@@ -36,12 +36,16 @@ class CollectionMappingTests: RealmMappingTest {
         }
         
         let uuid = NSUUID().uuidString
+        let dupEmployeeStub = EmployeeStub()
         
         let original = Company()
         let originalEmployee = Employee()
+        let dupEmployee = Employee()
         original.uuid = uuid
         originalEmployee.uuid = uuid
+        dupEmployee.uuid = dupEmployeeStub.uuid
         original.employees.append(originalEmployee)
+        original.employees.append(dupEmployee)
         try! self.adaptor!.save(objects: [ original ])
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 1)
@@ -49,7 +53,8 @@ class CollectionMappingTests: RealmMappingTest {
         let companyStub = CompanyStub()
         let employeeStub = EmployeeStub()
         let employeeStub2 = EmployeeStub()
-        companyStub.employees = [employeeStub, employeeStub, employeeStub2, employeeStub]
+        companyStub.uuid = uuid
+        companyStub.employees = [employeeStub, employeeStub, employeeStub2, employeeStub, dupEmployeeStub]
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
         let mapping = CompanyMapping(adaptor: self.adaptor!)
@@ -58,6 +63,9 @@ class CollectionMappingTests: RealmMappingTest {
         let spec = Binding.mapping("", mapping)
         let company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
+        
+        print(dupEmployee)
+        print(company.employees)
         
         // 4 because `founder`.
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 4)
