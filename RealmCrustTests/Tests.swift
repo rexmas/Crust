@@ -20,7 +20,6 @@ public class User: RLMObject {
     
 }
 
-
 public class UserMapping: RealmMapping {
     
     public var adaptor: RealmAdaptor

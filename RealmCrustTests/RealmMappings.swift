@@ -4,6 +4,9 @@ import Foundation
 import Crust
 import JSONValueRX
 import Realm
+import RealmSwift
+
+public let RealmAdaptorDomain = "RealmAdaptorDomain"
 
 public class RealmAdaptor: Adaptor {
     
@@ -39,7 +42,7 @@ public class RealmAdaptor: Adaptor {
         self.cache.removeAll()
     }
     
-    public func createObject(type: BaseType.Type) throws -> BaseType {
+    public func createObject(type: RLMObject.Type) throws -> RLMObject {
         let obj = type.init()
         self.cache.insert(obj)
         return obj
@@ -57,7 +60,7 @@ public class RealmAdaptor: Adaptor {
                 }
                 else {
                     let userInfo = [ NSLocalizedFailureReasonErrorKey : "Adaptor requires primary keys but obj of type \(type(of: obj)) does not have one" ]
-                    throw NSError(domain: "RealmAdaptorDomain", code: -1, userInfo: userInfo)
+                    throw NSError(domain: RealmAdaptorDomain, code: -1, userInfo: userInfo)
                 }
             }
         }
@@ -84,7 +87,7 @@ public class RealmAdaptor: Adaptor {
         }
     }
     
-    public func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
+    public func fetchObjects(type: RLMObject.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
         
         // Really we should be using either a mapping associated with the primary key or the primary key's
         // Type's `fromJson(_:)` method. Unfortunately that method comes from JSONable which you cannot
@@ -124,7 +127,8 @@ public class RealmAdaptor: Adaptor {
         
         var objects = self.cache.filter {
             type(of: $0) == type
-        }.filter {
+        }
+        .filter {
             predicate.evaluate(with: $0)
         }
 
@@ -177,4 +181,96 @@ extension RLMArray {
     public func removeAll(keepingCapacity keepCapacity: Bool) {
         self.removeAllObjects()
     }
+}
+
+public class RealmSwiftObjectAdaptorBridge: Adaptor {
+    public typealias BaseType = Object
+    public typealias ResultsType = [BaseType]
+    
+    public let realmObjCAdaptor: RealmAdaptor
+    public let rlmObjectType: RLMObject.Type
+    
+    public init(realmObjCAdaptor: RealmAdaptor, rlmObjectType: RLMObject.Type) {
+        self.realmObjCAdaptor = realmObjCAdaptor
+        self.rlmObjectType = rlmObjectType
+    }
+    
+    public func mappingBegins() throws {
+        try self.realmObjCAdaptor.mappingBegins()
+    }
+    
+    public func mappingEnded() throws {
+        try self.realmObjCAdaptor.mappingEnded()
+    }
+    
+    public func mappingErrored(_ error: Error) {
+        self.realmObjCAdaptor.mappingErrored(error)
+    }
+    
+    public func createObject(type: Object.Type) throws -> Object {
+        let obj = try self.realmObjCAdaptor.createObject(type: self.rlmObjectType)
+        return unsafeBitCast(obj, to: Object.self)
+    }
+    
+    public func save(objects: [BaseType]) throws {
+        let rlmObjs = objects.map { unsafeBitCast($0, to: type(of: self.realmObjCAdaptor).BaseType.self) }
+        try self.realmObjCAdaptor.save(objects: rlmObjs)
+    }
+    
+    public func deleteObject(_ obj: BaseType) throws {
+        let rlmObj = unsafeBitCast(obj, to: type(of: self.realmObjCAdaptor).BaseType.self)
+        try self.realmObjCAdaptor.deleteObject(rlmObj)
+    }
+    
+    public func fetchObjects(type: Object.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
+        guard let rlmObjects = self.realmObjCAdaptor.fetchObjects(type: self.rlmObjectType,
+                                                                  primaryKeyValues: primaryKeyValues,
+                                                                  isMapping: isMapping)
+            else {
+                return nil
+        }
+        
+        return rlmObjects.map { unsafeBitCast($0, to: Object.self) }
+    }
+}
+
+/// Subclass this to map RLMObjects.
+
+public class RealmSwiftObjectMappingBridge: Mapping {
+    public let adaptor: RealmSwiftObjectAdaptorBridge
+    public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
+    public let rlmObjectMapping: (inout RLMObject, MappingContext) -> Void
+    
+    public required init<Obj: RLMObject, OGMapping: RealmMapping>(adaptor: RealmAdaptor, rlmObjectMapping: OGMapping) where OGMapping.MappedObject == Obj {
+        
+        self.adaptor = RealmSwiftObjectAdaptorBridge(realmObjCAdaptor: adaptor,
+                                                     rlmObjectType: OGMapping.MappedObject.self)
+        self.primaryKeys = rlmObjectMapping.primaryKeys
+        
+        self.rlmObjectMapping = { (obj: inout RLMObject, context: MappingContext) -> Void in
+            var rlmObj = obj as! OGMapping.MappedObject
+            rlmObjectMapping.mapping(tomap: &rlmObj, context: context)
+        }
+    }
+    
+    public final func mapping(tomap: inout Object, context: MappingContext) {
+        var ogObject = unsafeDowncast(tomap, to: RLMObject.self)
+        self.rlmObjectMapping(&ogObject, context)
+    }
+}
+
+public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArray<T>, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
+    
+    // Realm specifies that List "must be declared with 'let'". Seems to actually work either way in practice, but for safety
+    // we're going to include a List mapper that accepts fields with a 'let' declaration and forward to our
+    // `RangeReplaceableCollectionType` mapper.
+    
+    var variableList = ObjectiveCSupport.convert(object: field as! RLMArray<RLMObject>)
+    return Crust.map(toCollection: &variableList, using: map)
+}
+
+public func map<T: RLMObject, U: Mapping, C: MappingContext>(field: inout RLMArray<T>, map:(key: Binding<U>, context: C)) -> C where U.MappedObject == T {
+    
+    var variableList = ObjectiveCSupport.convert(object: field)
+    return Crust.map(toCollection: &variableList, using: map)
 }
