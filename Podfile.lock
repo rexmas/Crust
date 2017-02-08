@@ -3,15 +3,18 @@ PODS:
   - Realm (2.4.2):
     - Realm/Headers (= 2.4.2)
   - Realm/Headers (2.4.2)
+  - RealmSwift (2.4.2):
+    - Realm (= 2.4.2)
 
 DEPENDENCIES:
   - JSONValueRX
-  - Realm
+  - RealmSwift
 
 SPEC CHECKSUMS:
   JSONValueRX: 5d6b5805a704a43b7b3ca481e8d0ce71d3823f18
   Realm: d27b758e12d62a3371879a065d4c40aa212c5a54
+  RealmSwift: 9556c0fe0f0cfecacfb755ae9e68ff379fc6bead
 
-PODFILE CHECKSUM: edab89e6f2972b3b9576458d214eac9338b133b5
+PODFILE CHECKSUM: '0008050a51736e756c5218e5839602e8a7e0a478'
 
 COCOAPODS: 1.1.1
