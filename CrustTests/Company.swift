@@ -17,8 +17,8 @@ extension Company: AnyMappable { }
 class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: MockAdaptor<Company>) {

@@ -6,8 +6,8 @@ import Realm
 class PrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -17,7 +17,7 @@ class PrimaryObj1Mapping : RealmMapping {
     func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
         let obj2Mapping = PrimaryObj2Mapping(adaptor: self.adaptor)
         
-        tomap.class2s       <- (Binding.mapping("class2s", obj2Mapping), context)
+        map(toRLMArray: tomap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
         tomap.uuid          <- "data.uuid" >*<
         context
     }
@@ -27,25 +27,22 @@ class PrimaryObj1Mapping : RealmMapping {
 class NestedPrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
         self.adaptor = adaptor
     }
     
-    func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
-        tomap.uuid          <- "data.uuid" >*<
-        context
-    }
+    func mapping(tomap: inout PrimaryObj1, context: MappingContext) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.more_data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.more_data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -63,7 +60,6 @@ class PrimaryObj2Mapping : RealmMapping {
         let obj1Mapping = NestedPrimaryObj1Mapping(adaptor: self.adaptor)
         
         tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
-        tomap.uuid          <- "data.more_data.uuid" >*<
         context
     }
 }

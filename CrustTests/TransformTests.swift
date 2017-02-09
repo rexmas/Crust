@@ -77,8 +77,8 @@ extension User: AnyMappable { }
 class UserMapping: Mapping {
     
     var adaptor: MockAdaptor<User>
-    var primaryKeys: [String : Keypath]? {
-        return [ "identifier" : "data.id_hash" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("identifier", "data.id_hash", nil) ]
     }
     
     required init(adaptor: MockAdaptor<User>) {
@@ -126,6 +126,7 @@ class TransformTests: XCTestCase {
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         
         XCTAssertEqual(object.birthDate, targetDate)
+        XCTAssertEqual(object.identifier, 170)
     }
 }
 

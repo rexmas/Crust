@@ -13,7 +13,7 @@ class MockMap: Mapping, Adaptor {
     var adaptor: MockMap {
         return self
     }
-    var primaryKeys: [String : Keypath]? {
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return nil
     }
     
