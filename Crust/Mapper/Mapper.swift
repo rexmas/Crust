@@ -28,7 +28,7 @@ open class MappingContext {
 }
 
 /// Method caller used to perform mappings.
-public struct Mapper<M: Mapping> {
+public struct Mapper {
     
     public init() { }
     
@@ -45,7 +45,7 @@ public struct Mapper<M: Mapping> {
         return collection
     }
     
-    public func map(from json: JSONValue, using binding: Binding<M>, parentContext: MappingContext? = nil) throws -> M.MappedObject {
+    public func map<M: Mapping>(from json: JSONValue, using binding: Binding<M>, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         
         // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
         let baseJson = json[binding.keyPath] ?? json
@@ -58,12 +58,12 @@ public struct Mapper<M: Mapping> {
         return object
     }
     
-    public func map(from json: JSONValue, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
+    public func map<M: Mapping>(from json: JSONValue, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         let object = try mapping.fetchOrCreateObject(from: json)
         return try map(from: json, to: object, using: mapping, parentContext: parentContext)
     }
     
-    public func map(from json: JSONValue, to object: M.MappedObject, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
+    public func map<M: Mapping>(from json: JSONValue, to object: M.MappedObject, using mapping: M, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         var object = object
         let context = MappingContext(withObject: object, json: json, direction: MappingDirection.fromJSON)
         context.parent = parentContext
@@ -71,20 +71,20 @@ public struct Mapper<M: Mapping> {
         return object
     }
     
-    public func mapFromObjectToJSON(_ object: M.MappedObject, mapping: M) throws -> JSONValue {
+    public func mapFromObjectToJSON<M: Mapping>(_ object: M.MappedObject, mapping: M) throws -> JSONValue {
         var object = object
         let context = MappingContext(withObject: object, json: JSONValue.object([:]), direction: MappingDirection.toJSON)
         try self.perform(mapping, on: &object, with: context)
         return context.json
     }
     
-    internal func perform(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext) throws {
+    internal func perform<M: Mapping>(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext) throws {
         try mapping.start(context: context)
         mapping.execute(object: &object, context: context)
         try mapping.complete(object: &object, context: context)
     }
     
-    internal func perform(_ binding: Binding<M>, on object: inout M.MappedObject, with context: MappingContext) throws {
+    internal func perform<M: Mapping>(_ binding: Binding<M>, on object: inout M.MappedObject, with context: MappingContext) throws {
         let mapping = binding.mapping
         try mapping.start(context: context)
         object <- (binding, context)

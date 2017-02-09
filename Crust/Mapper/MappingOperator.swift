@@ -213,7 +213,7 @@ private func map<T, U: Mapping>(to json: JSONValue, from field: T?, via key: Key
         return json
     }
     
-    json[key] = try Mapper<U>().mapFromObjectToJSON(field, mapping: mapping)
+    json[key] = try Mapper().mapFromObjectToJSON(field, mapping: mapping)
     return json
 }
 
@@ -248,7 +248,7 @@ private func map<T: JSONable>(from json: JSONValue, to field: inout T?) throws w
 
 private func map<T, U: Mapping>(from json: JSONValue, to field: inout T, using mapping: U, context: MappingContext) throws where U.MappedObject == T {
     
-    let mapper = Mapper<U>()
+    let mapper = Mapper()
     field = try mapper.map(from: json, using: mapping, parentContext: context)
 }
 
@@ -259,7 +259,7 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
         return
     }
     
-    let mapper = Mapper<U>()
+    let mapper = Mapper()
     field = try mapper.map(from: json, using: mapping, parentContext: context)
 }
 
@@ -282,7 +282,7 @@ private func map<T, U: Mapping, V: Sequence>(
         var json = json
         
         let results = try field.map {
-            try Mapper<U>().mapFromObjectToJSON($0, mapping: mapping)
+            try Mapper().mapFromObjectToJSON($0, mapping: mapping)
         }
         json[key] = .array(results)
         
@@ -399,7 +399,7 @@ private func generateNewValues<T, U: Mapping, S: Sequence>(
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
         
-        let mapper = Mapper<U>()
+        let mapper = Mapper()
         
         var newObjects = [T]()
         

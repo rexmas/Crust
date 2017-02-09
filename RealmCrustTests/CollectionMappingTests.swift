@@ -14,7 +14,7 @@ class CollectionMappingTests: RealmMappingTest {
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 0)
         
         let mapping = EmployeeMapping(adaptor: self.adaptor!)
-        let mapper = Mapper<EmployeeMapping>()
+        let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
         let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec)
@@ -57,10 +57,10 @@ class CollectionMappingTests: RealmMappingTest {
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
         let mapping = CompanyMappingAppendUnique(adaptor: self.adaptor!)
-        let mapper = Mapper<CompanyMappingAppendUnique>()
+        let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -100,10 +100,10 @@ class CollectionMappingTests: RealmMappingTest {
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
         let mapping = CompanyMappingReplaceUnique(adaptor: self.adaptor!)
-        let mapper = Mapper<CompanyMappingReplaceUnique>()
+        let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -146,10 +146,10 @@ class CollectionMappingTests: RealmMappingTest {
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
         let mapping = CompanyMappingReplaceDeleteUnique(adaptor: self.adaptor!)
-        let mapper = Mapper<CompanyMappingReplaceDeleteUnique>()
+        let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec)
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
