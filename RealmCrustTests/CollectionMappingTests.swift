@@ -30,7 +30,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
+                map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }
@@ -79,7 +79,8 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingReplaceUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context)
+                map(toRLMArray: tomap.employees,
+                    using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }
@@ -118,7 +119,8 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-                tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context)
+                map(toRLMArray: tomap.employees,
+                    using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
                 tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
             }
         }

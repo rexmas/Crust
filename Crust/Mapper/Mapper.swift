@@ -142,15 +142,19 @@ public extension Mapping {
             return nil
         }
         
-        let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, primaryKeyValues: [keyValues], isMapping: true)?.first
-        return obj as! MappedObject?
+        guard let obj = self.adaptor.fetchObjects(type: MappedObject.self as! AdaptorKind.BaseType.Type, primaryKeyValues: [keyValues], isMapping: true)?.first else {
+            return nil
+        }
+        
+        return unsafeBitCast(obj, to: MappedObject.self)
     }
     
     func generateNewInstance() throws -> MappedObject {
         
         try self.checkForAdaptorBaseTypeConformance()
         
-        return try self.adaptor.createObject(type: MappedObject.self as! AdaptorKind.BaseType.Type) as! MappedObject
+        let obj = try self.adaptor.createObject(type: MappedObject.self as! AdaptorKind.BaseType.Type)
+        return unsafeBitCast(obj, to: MappedObject.self)
     }
     
     func delete(obj: MappedObject) throws {
@@ -170,6 +174,8 @@ public extension Mapping {
     }
     
     internal func start(context: MappingContext) throws {
+        try self.checkForAdaptorBaseTypeConformance()
+        
         if context.parent == nil {
             var underlyingError: NSError?
             do {
@@ -219,7 +225,7 @@ public extension Mapping {
         if context.error == nil {
             do {
                 try self.checkForAdaptorBaseTypeConformance()
-                let objects = objects.map { $0 as! AdaptorKind.BaseType }
+                let objects = objects.map { unsafeBitCast($0, to: AdaptorKind.BaseType.self) }
                 try self.adaptor.save(objects: objects)
             } catch let error as NSError {
                 context.error = error

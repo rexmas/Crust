@@ -9,10 +9,10 @@ public enum CollectionInsertionMethod<Container: Sequence> {
 public typealias CollectionUpdatePolicy<Container: Sequence> =
     (insert: CollectionInsertionMethod<Container>, unique: Bool)
 
-public enum Binding<T: Mapping>: Keypath {
+public enum Binding<M: Mapping>: Keypath {
     
-    case mapping(Keypath, T)
-    case collectionMapping(Keypath, T, CollectionUpdatePolicy<T.SequenceKind>)
+    case mapping(Keypath, M)
+    case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.SequenceKind>)
     
     public var keyPath: String {
         switch self {
@@ -23,7 +23,7 @@ public enum Binding<T: Mapping>: Keypath {
         }
     }
     
-    public var mapping: T {
+    public var mapping: M {
         switch self {
         case .mapping(_, let mapping):
             return mapping
@@ -32,7 +32,7 @@ public enum Binding<T: Mapping>: Keypath {
         }
     }
     
-    public var collectionUpdatePolicy: CollectionUpdatePolicy<T.SequenceKind> {
+    public var collectionUpdatePolicy: CollectionUpdatePolicy<M.SequenceKind> {
         switch self {
         case .mapping(_, _):
             return (.append, true)
