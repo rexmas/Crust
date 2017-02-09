@@ -310,10 +310,18 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                 
             case .replace(delete: let deletionBlock):
                 var orphans = field
-                field = U.SequenceKind(newObjects)
+                
+                // For reference types we have to create a new instance for orphans.
+                if
+                    case let objectOrphans as AnyObject = orphans,
+                    case let objectField as AnyObject = field,
+                    objectOrphans === objectField
+                {
+                    orphans = U.SequenceKind(field)
+                }
                 
                 if let deletion = deletionBlock {
-                    field.forEach {
+                    newObjects.forEach {
                         if let index = orphans.index(of: $0) {
                             orphans.remove(at: index)
                         }
@@ -323,6 +331,9 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                         try binding.key.mapping.delete(obj: $0)
                     }
                 }
+                
+                field.removeAll(keepingCapacity: true)
+                field.append(contentsOf: newObjects)
             }
         }
     }

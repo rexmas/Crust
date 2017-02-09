@@ -35,10 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adaptor = adaptor
     }
     
-    func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
-        tomap.uuid          <- "data.uuid" >*<
-        context
-    }
+    func mapping(tomap: inout PrimaryObj1, context: MappingContext) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -63,7 +60,6 @@ class PrimaryObj2Mapping : RealmMapping {
         let obj1Mapping = NestedPrimaryObj1Mapping(adaptor: self.adaptor)
         
         tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
-        tomap.uuid          <- "data.more_data.uuid" >*<
         context
     }
 }

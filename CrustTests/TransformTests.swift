@@ -87,7 +87,7 @@ class UserMapping: Mapping {
     
     func mapping(tomap: inout User, context: MappingContext) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
-        // TODO:
+        
         tomap.identifier        <- "data.id_hash" >*<
         tomap.birthDate         <- Binding.mapping("data.birthdate", userBirthdateMapping) >*<
         tomap.name              <- "data.user_name" >*<
@@ -126,6 +126,7 @@ class TransformTests: XCTestCase {
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         
         XCTAssertEqual(object.birthDate, targetDate)
+        XCTAssertEqual(object.identifier, 170)
     }
 }
 

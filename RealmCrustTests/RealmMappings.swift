@@ -89,12 +89,7 @@ public class RealmAdaptor: Adaptor {
     
     public func fetchObjects(type: RLMObject.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
         
-        // Really we should be using either a mapping associated with the primary key or the primary key's
-        // Type's `fromJson(_:)` method. Unfortunately that method comes from JSONable which you cannot
-        // dynamically typecast to and Swift's reflection system doesn't appear fully baked enough to safely
-        // get the actual type of the property to call it's conversion method (Optional values aren't
-        // properly reflected coming from sources on SO). In the meantime we'll have to convert here on a
-        // case-by-case basis and possibly integrate better generics or primary key method mappings in the future.
+        // Since Date is converted as such so often we won't require implementors to write their own transform.
         
         func sanitize(key: String, value: NSObject) -> NSObject {
             if type.isProperty(key, ofType: NSDate.self), case let value as String = value {
@@ -135,12 +130,6 @@ public class RealmAdaptor: Adaptor {
         if objects.count > 0 {
             return Array(objects)
         }
-        
-        // Since we use this function to fetch existing objects to map to, but we can't remap the primary key,
-        // we're going to build an unstored object and update when saving based on the primary key.
-        //guard !isMapping || type.primaryKey() == nil else {
-        //    return nil
-        //}
         
         let results = type.objects(in: realm, with: predicate)
         for obj in results {
@@ -235,33 +224,7 @@ public class RealmSwiftObjectAdaptorBridge<T>: Adaptor {
     }
 }
 
-/// Subclass this to map RLMObjects.
-
-public class RealmSwiftObjectMappingBridge: Mapping {
-    public typealias SequenceKind = ListWrapper<Object>
-    
-    public let adaptor: RealmSwiftObjectAdaptorBridge<Object>
-    public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
-    public let rlmObjectMapping: (inout RLMObject, MappingContext) -> Void
-    
-    public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject {
-        
-        self.adaptor = RealmSwiftObjectAdaptorBridge(realmObjCAdaptor: rlmObjectMapping.adaptor as! RealmAdaptor,
-                                                     rlmObjectType: OGMapping.MappedObject.self)
-        self.primaryKeys = rlmObjectMapping.primaryKeys
-        
-        self.rlmObjectMapping = { (obj: inout RLMObject, context: MappingContext) -> Void in
-            var rlmObj = obj as! OGMapping.MappedObject
-            rlmObjectMapping.mapping(tomap: &rlmObj, context: context)
-        }
-    }
-    
-    public final func mapping(tomap: inout Object, context: MappingContext) {
-        var ogObject = unsafeDowncast(tomap, to: RLMObject.self)
-        self.rlmObjectMapping(&ogObject, context)
-    }
-}
-
+/// Wrapper used to map `RLMObjects`. Relies on `RLMArrayBridge` since `RLMArray` does not support `RangeReplaceableCollection`.
 public class RLMArrayMappingBridge<T: RLMObject>: Mapping {//where S.Iterator.Element == M {
     public typealias MappedObject = T
     public typealias SequenceKind = RLMArrayBridge<MappedObject>
@@ -325,82 +288,8 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject, M.Seq
             return .collectionMapping(keyPath, bridge, (insert: bridgedInsert, unique: updatePolicy.unique))
         }
     }
-    
-    func generateRealmSwiftObjectMappingBridge() -> Binding<RealmSwiftObjectMappingBridge> {
-        
-        switch self {
-        case .mapping(let keyPath, let mapping):
-            let bridge = RealmSwiftObjectMappingBridge(rlmObjectMapping: mapping)
-            return .mapping(keyPath, bridge)
-            
-        case .collectionMapping(let keyPath, let mapping, let updatePolicy):
-            let bridge = RealmSwiftObjectMappingBridge(rlmObjectMapping: mapping)
-            let bridgedType = M.MappedObject.self
-            
-            let bridgedInsert: CollectionInsertionMethod<ListWrapper<Object>> = {
-                switch updatePolicy.insert {
-                    
-                case .append:
-                    return .append
-                    
-                case .replace(let deletion):
-                    guard let deletion = deletion else {
-                        return .replace(delete: nil)
-                    }
-                    
-                    let bridgedDeletion = { (objs: ListWrapper<Object>) -> ListWrapper<Object> in
-                        let rlmObjsToDelete = deletion( objs.map { unsafeDowncast($0, to: bridgedType) } as! M.SequenceKind )
-                        let listToDelete = ListWrapper<Object>()
-                        rlmObjsToDelete.forEach {
-                            listToDelete.append(unsafeBitCast($0, to: Object.self))
-                        }
-                        return listToDelete
-                    }
-                    return .replace(delete: bridgedDeletion)
-                }
-            }()
-            return .collectionMapping(keyPath, bridge, (insert: bridgedInsert, unique: updatePolicy.unique))
-        }
-    }
 }
-/*
-func generateRLMArrayMappingBridge<M: RealmMapping>(binding: Binding<M>) -> Binding<RLMArrayMappingBridge<M.MappedObject, RLMArrayBridge<M.MappedObject>>> where M.SequenceKind.Iterator.Element == M.MappedObject, M.MappedObject: Equatable {
-    
-    switch binding {
-    case .mapping(let keyPath, let mapping):
-        let bridge = RLMArrayMappingBridge<M.MappedObject, RLMArrayBridge<M.MappedObject>>(rlmObjectMapping: mapping)
-        return .mapping(keyPath, bridge)
-        
-    case .collectionMapping(let keyPath, let mapping, let updatePolicy):
-        let bridge = RLMArrayMappingBridge<M.MappedObject, RLMArrayBridge<M.MappedObject>>(rlmObjectMapping: mapping)
-        
-        let bridgedInsert: CollectionInsertionMethod<RLMArrayBridge<M.MappedObject>> = {
-            switch updatePolicy.insert {
-                
-            case .append:
-                return .append
-                
-            case .replace(let deletion):
-                guard let deletion = deletion else {
-                    return .replace(delete: nil)
-                }
-                
-                let bridgedDeletion = { (objs: RLMArrayBridge<M.MappedObject>) -> RLMArrayBridge<M.MappedObject> in
-                    let rlmObjsToDelete = deletion( objs.map { $0 } as! M.SequenceKind )
-                    let listToDelete = RLMArrayBridge<M.MappedObject>()
-                    for obj in rlmObjsToDelete {
-                        listToDelete.append(obj)
-                    }
-                    return listToDelete
-                }
-                return .replace(delete: bridgedDeletion)
-            }
-        }()
-        
-        return .collectionMapping(keyPath, bridge, (insert: bridgedInsert, unique: updatePolicy.unique))
-    }
-}
-*/
+
 // TODO: Currently this leads to "Ambiguous use of operator '<-'" conflicting with the `RangeReplaceableCollection` version.
 // Considering this is more specialized and that `RLMArray` does not implement `RangeReplaceableCollection` this seems like
 // a bug. Report the bug. In the meantime we're forced to break convention and use `map(toRLMArray:using:)` instead of `<-`.
@@ -414,16 +303,7 @@ public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArra
 @discardableResult
 public func map<U: RealmMapping, C: MappingContext>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<U>, context: C)) -> C where U.SequenceKind.Iterator.Element == U.MappedObject, U.MappedObject: Equatable {
     
-    //let converted = ObjectiveCSupport.convert(object: field as! RLMArray<RLMObject>)
-    //var variableList = ListWrapper<Object>(list: converted)
     var variableList = RLMArrayBridge(rlmArray: field)
     let bridge = binding.key.generateRLMArrayMappingBridge()
-    doBridge(binding: bridge)
-    print(type(of: variableList))
-    print(type(of: variableList).Iterator.Element.self)
-    print(type(of: bridge))
-    print(type(of: bridge.mapping).SequenceKind.self)
-    print(type(of: bridge.mapping).SequenceKind.Iterator.Element.self)
-    //return binding.context
     return map(toCollection: &variableList, using: (bridge, binding.context))
 }
