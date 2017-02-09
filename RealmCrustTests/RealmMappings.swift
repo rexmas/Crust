@@ -225,7 +225,7 @@ public class RealmSwiftObjectAdaptorBridge<T>: Adaptor {
 }
 
 /// Wrapper used to map `RLMObjects`. Relies on `RLMArrayBridge` since `RLMArray` does not support `RangeReplaceableCollection`.
-public class RLMArrayMappingBridge<T: RLMObject>: Mapping {//where S.Iterator.Element == M {
+public class RLMArrayMappingBridge<T: RLMObject>: Mapping {
     public typealias MappedObject = T
     public typealias SequenceKind = RLMArrayBridge<MappedObject>
     
