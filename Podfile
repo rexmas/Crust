@@ -11,7 +11,7 @@ target 'Crust' do
 
   target 'RealmCrustTests' do
     inherit! :complete
-    pod 'Realm'
+    pod 'RealmSwift'
   end
 end
 
