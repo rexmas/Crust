@@ -9,9 +9,13 @@ target 'Crust' do
     inherit! :complete
   end
 
-  target 'RealmCrustTests' do
+  target 'RealmCrust' do
     inherit! :complete
     pod 'RealmSwift'
+
+    target 'RealmCrustTests' do
+      inherit! :complete
+    end
   end
 end
 

@@ -1,6 +1,7 @@
 import XCTest
 @testable import Crust
 import JSONValueRX
+import RealmCrust
 
 class CollectionMappingTests: RealmMappingTest {
     

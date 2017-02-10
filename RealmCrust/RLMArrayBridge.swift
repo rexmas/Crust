@@ -1,3 +1,4 @@
+import Realm
 import RealmSwift
 
 public final class RLMArrayBridgeIterator<T: RLMObject>: IteratorProtocol {
