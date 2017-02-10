@@ -5,11 +5,21 @@ import JSONValueRX
 class CompanyMappingTests: XCTestCase {
     
     func testJsonToCompany() {
-        
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
         let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: MockAdaptor<Company>()))
+        
+        XCTAssertTrue(stub.matches(object))
+    }
+    
+    func testNestedJsonToCompany() {
+        let stub = CompanyStub()
+        let jsonObj = [ "data.company" : stub.generateJsonObject() ]
+        let json = try! JSONValue(object: jsonObj)
+        let mapper = Mapper()
+        let binding = Binding.mapping("data.company", CompanyMapping(adaptor: MockAdaptor<Company>()))
+        let object = try! mapper.map(from: json, using: binding)
         
         XCTAssertTrue(stub.matches(object))
     }
