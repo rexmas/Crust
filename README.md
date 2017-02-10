@@ -169,22 +169,19 @@ func mapping(inout tomap: Company, context: MappingContext) {
 
 ###Binding and collections
 
-`Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper that it should replace and/or delete objects instead of appending them directly to an existing collection and whether or not to append duplicate objects or not have duplicates. By default `.mapping` will `(insert: .append, unique: true)`.
+`Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper of these directives. They include
+* replace and/or delete objects
+* append objects to the collection
+* unique objects in collection (remove duplicates)
+By default using `.mapping` will `(insert: .append, unique: true)`.
 
+Usage:
 ```swift
-public enum CollectionInsertionMethod<Container: Sequence> {
-    case append
-    case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
-}
-
-public typealias CollectionUpdatePolicy<Container: Sequence> =
-    (insert: CollectionInsertionMethod<Container>, unique: Bool)
-
-public enum Binding<M: Mapping>: Keypath {
-    case mapping(Keypath, M)
-    case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.SequenceKind>)
-}
+let employeeMapping = EmployeeMapping(adaptor: CoreDataAdaptor())
+let binding = Binding.collectionMapping("", employeeMapping, (.replace(delete: nil), true))
+tomap.employees <- (binding, context)
 ```
+Look in ./Mapper/MappingProtocols.swift for more.
 
 ###Mapping Context
 Every `mapping` passes through a `context: MappingContext` which must be included during the mapping. The `context` includes error information that is propagated back from the mapping to the caller and contextual information about the json and object being mapped to/from.
