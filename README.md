@@ -175,6 +175,21 @@ func mapping(inout tomap: Company, context: MappingContext) {
 * unique objects in collection (remove duplicates)
 By default using `.mapping` will `(insert: .append, unique: true)`.
 
+```swift
+public enum CollectionInsertionMethod<Container: Sequence> {
+    case append
+    case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
+}
+
+public typealias CollectionUpdatePolicy<Container: Sequence> =
+    (insert: CollectionInsertionMethod<Container>, unique: Bool)
+
+public enum Binding<M: Mapping>: Keypath {
+    case mapping(Keypath, M)
+    case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.SequenceKind>)
+}
+```
+
 Usage:
 ```swift
 let employeeMapping = EmployeeMapping(adaptor: CoreDataAdaptor())
