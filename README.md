@@ -173,6 +173,7 @@ func mapping(inout tomap: Company, context: MappingContext) {
 * replace and/or delete objects
 * append objects to the collection
 * unique objects in collection (remove duplicates)
+
 By default using `.mapping` will `(insert: .append, unique: true)`.
 
 ```swift
