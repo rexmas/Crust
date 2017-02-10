@@ -6,8 +6,8 @@ import Realm
 class PrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -17,7 +17,7 @@ class PrimaryObj1Mapping : RealmMapping {
     func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
         let obj2Mapping = PrimaryObj2Mapping(adaptor: self.adaptor)
         
-        tomap.class2s       <- Spec.mapping("class2s", obj2Mapping) >*<
+        map(toRLMArray: tomap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
         tomap.uuid          <- "data.uuid" >*<
         context
     }
@@ -27,25 +27,22 @@ class PrimaryObj1Mapping : RealmMapping {
 class NestedPrimaryObj1Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
         self.adaptor = adaptor
     }
     
-    func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
-        tomap.uuid          <- "data.uuid" >*<
-        context
-    }
+    func mapping(tomap: inout PrimaryObj1, context: MappingContext) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
     
     var adaptor: RealmAdaptor
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.more_data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.more_data.uuid", nil) ]
     }
     
     required init(adaptor: RealmAdaptor) {
@@ -62,8 +59,7 @@ class PrimaryObj2Mapping : RealmMapping {
         
         let obj1Mapping = NestedPrimaryObj1Mapping(adaptor: self.adaptor)
         
-        tomap.class1        <- Spec.mapping("class1", obj1Mapping) >*<
-        tomap.uuid          <- "data.more_data.uuid" >*<
+        tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
         context
     }
 }
@@ -82,7 +78,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 0)
         
         let json = try! JSONValue(object: json1Dict)
-        let mapper = Mapper<PrimaryObj1Mapping>()
+        let mapper = Mapper()
         let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adaptor: adaptor!))
         
         XCTAssertEqual(PrimaryObj1.allObjects(in: realm!).count, 1)
@@ -105,7 +101,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         
         let json = try! JSONValue(object: json2Dict)
-        let mapper = Mapper<PrimaryObj2Mapping>()
+        let mapper = Mapper()
         let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adaptor: adaptor!))
         
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)

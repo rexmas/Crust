@@ -5,8 +5,8 @@ import Realm
 public class CompanyMapping : RealmMapping {
     
     public var adaptor: RealmAdaptor
-    public var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     public required init(adaptor: RealmAdaptor) {
@@ -16,9 +16,8 @@ public class CompanyMapping : RealmMapping {
     public func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
-        tomap.employees             <- Spec.mapping("employees", employeeMapping) >*< context
-        tomap.founder               <- Spec.mapping("founder", employeeMapping) >*< context
-        tomap.uuid                  <- ("data.uuid" as JSONKeypath, context)
+        map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
+        tomap.founder               <- .mapping("founder", employeeMapping) >*< context
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<
         tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
@@ -30,9 +29,8 @@ public class CompanyMappingWithDupes : CompanyMapping {
     
     public override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
-        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- .mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*< context
+        map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, false)), context))
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<

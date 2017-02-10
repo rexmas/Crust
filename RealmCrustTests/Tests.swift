@@ -20,12 +20,11 @@ public class User: RLMObject {
     
 }
 
-
 public class UserMapping: RealmMapping {
     
     public var adaptor: RealmAdaptor
-    public var primaryKeys: [String : Keypath]? {
-        return ["identifier" : "id_hash"]
+    public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [("identifier", "id_hash", nil)]
     }
     
     public required init(adaptor: RealmAdaptor) {
@@ -36,8 +35,8 @@ public class UserMapping: RealmMapping {
         let birthdateMapping = DateMapping(dateFormatter: DateFormatter.isoFormatter)
         let primaryKeyMapping = PrimaryKeyMapping()
         
-        tomap.birthDate     <- (Spec.mapping("birthdate", birthdateMapping), context)
-        tomap.identifier    <- (Spec.mapping("id_hash", primaryKeyMapping), context)
+        tomap.birthDate     <- (Binding.mapping("birthdate", birthdateMapping), context)
+        tomap.identifier    <- (Binding.mapping("id_hash", primaryKeyMapping), context)
         tomap.name          <- ("user_name", context)
         tomap.surname       <- ("user_surname", context)
         tomap.height        <- ("height", context)
@@ -106,7 +105,7 @@ class Tests: RealmMappingTest {
         let json: [String : Any] = ["data": ["id_hash": "170", "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": "60", "sex": 2, "photo_path": "http://somwhere-over-the-internet.com/"]]
         
         
-        let mapping = Mapper<UserMapping>()
+        let mapping = Mapper()
         let jsonValue = try! JSONValue(object: json)
         _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
         
@@ -118,7 +117,7 @@ class Tests: RealmMappingTest {
         let jsonObj: [String : Any] = ["data": ["id_hash": "170", "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": "60", "sex": 2, "photo_path": "http://somwhere-over-the-internet.com/"]]
         
         
-        let mapping = Mapper<UserMapping>()
+        let mapping = Mapper()
         let jsonValue = try! JSONValue(object: jsonObj)
         _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
         

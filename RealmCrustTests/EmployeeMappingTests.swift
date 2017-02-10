@@ -10,7 +10,7 @@ class EmployeeMappingTests: RealmMappingTest {
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 0)
         let stub = EmployeeStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
-        let mapper = Mapper<EmployeeMapping>()
+        let mapper = Mapper()
         let object = try! mapper.map(from: json, using: EmployeeMapping(adaptor: adaptor!))
         
         try! self.adaptor!.save(objects: [ object ])

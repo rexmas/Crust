@@ -17,8 +17,8 @@ extension Company: AnyMappable { }
 class CompanyMapping: Mapping {
     
     var adaptor: MockAdaptor<Company>
-    var primaryKeys: [String : Keypath]? {
-        return [ "uuid" : "data.uuid" ]
+    var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("uuid", "data.uuid", nil) ]
     }
     
     required init(adaptor: MockAdaptor<Company>) {
@@ -28,7 +28,7 @@ class CompanyMapping: Mapping {
     func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
         
-        tomap.employees             <- Spec.mapping("employees", employeeMapping) >*<
+        tomap.employees             <- Binding.mapping("employees", employeeMapping) >*<
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
@@ -42,9 +42,8 @@ class CompanyMappingWithDupes: CompanyMapping {
     
     override func mapping(tomap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
-        let mappingExtension = Spec.mapping("employees", employeeMapping)
         
-        tomap.employees             <- Spec.mappingOptions(mappingExtension, [ .AllowDuplicatesInCollection ]) >*<
+        tomap.employees             <- Binding.collectionMapping("employees", employeeMapping, (.append, true)) >*<
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
         tomap.uuid                  <- "data.uuid" >*<
         tomap.name                  <- "name" >*<
