@@ -370,7 +370,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0810;
-				LastUpgradeCheck = 0810;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Lucas Swift";
 				TargetAttributes = {
 					175C9A391C311D8400B0D6E7 = {
@@ -678,6 +678,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 27BCD4F191D3EE9916A014BD /* Pods-Crust-RealmCrustTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -700,6 +701,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8040A3CB739C888745EDBC5C /* Pods-Crust-RealmCrustTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -806,6 +808,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7676E6795FC34791C025C4B0 /* Pods-Crust-CrustTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -826,6 +829,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
