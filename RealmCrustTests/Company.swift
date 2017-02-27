@@ -17,6 +17,7 @@ public class CompanyMapping : RealmMapping {
         let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
         
         map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
+        tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
         tomap.founder               <- .mapping("founder", employeeMapping) >*< context
         tomap.name                  <- "name" >*<
         tomap.foundingDate          <- "data.founding_date"  >*<

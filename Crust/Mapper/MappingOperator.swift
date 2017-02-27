@@ -266,7 +266,7 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(field: inout Coll, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == Coll.Iterator.Element, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     return map(toCollection: &field, using: binding)
 }
@@ -290,7 +290,7 @@ private func map<T, U: Mapping, V: Sequence>(
 }
 
 @discardableResult
-public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(toCollection field: inout Coll, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == Coll.Iterator.Element, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
         switch binding.context.dir {
@@ -317,7 +317,7 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                     case let objectField as AnyObject = field,
                     objectOrphans === objectField
                 {
-                    orphans = U.SequenceKind(field)
+                    orphans = Coll(field)
                 }
                 
                 if let deletion = deletionBlock {
@@ -327,9 +327,9 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                         }
                     }
                     
-                    try deletion(orphans).forEach {
-                        try binding.key.mapping.delete(obj: $0)
-                    }
+//                    try deletion(orphans).forEach {
+//                        try binding.key.mapping.delete(obj: $0)
+//                    }
                 }
                 
                 field.removeAll(keepingCapacity: true)

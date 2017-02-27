@@ -1,12 +1,12 @@
 import Foundation
 import JSONValueRX
 
-public enum CollectionInsertionMethod<Container: Sequence> {
+public enum CollectionInsertionMethod<Container> {
     case append
     case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
 }
 
-public typealias CollectionUpdatePolicy<Container: Sequence> =
+public typealias CollectionUpdatePolicy<Container> =
     (insert: CollectionInsertionMethod<Container>, unique: Bool)
 
 public enum Binding<M: Mapping>: Keypath {
