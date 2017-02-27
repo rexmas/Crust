@@ -260,44 +260,19 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
             
         case .collectionMapping(let keyPath, let mapping, let updatePolicy):
             let bridge = RLMArrayMappingBridge<M.MappedObject>(rlmObjectMapping: mapping)
-            
-            let bridgedInsert: CollectionInsertionMethod<M.MappedObject> = {
-                switch updatePolicy.insert {
-                    
-                case .append:
-                    return .append
-                    
-                case .replace(let deletion):
-                    guard let deletion = deletion else {
-                        return .replace(delete: nil)
-                    }
-                    
-                    let bridgedDeletion = { (objs: AnyCollection<M.MappedObject>) -> AnyCollection<M.MappedObject> in
-                        let rlmObjsToDelete = deletion(objs)
-                        
-                        return rlmObjsToDelete
-                    }
-                    return .replace(delete: bridgedDeletion)
-                }
-            }()
-            
-            return .collectionMapping(keyPath, bridge, (insert: bridgedInsert, unique: updatePolicy.unique))
+            return .collectionMapping(keyPath, bridge, updatePolicy)
         }
     }
 }
 
-// TODO: Currently this leads to "Ambiguous use of operator '<-'" conflicting with the `RangeReplaceableCollection` version.
-// Considering this is more specialized and that `RLMArray` does not implement `RangeReplaceableCollection` this seems like
-// a bug. Report the bug. In the meantime we're forced to break convention and use `map(toRLMArray:using:)` instead of `<-`.
-
 @discardableResult
-public func <- <U: RealmMapping, C: MappingContext>(field: RLMArray<U.MappedObject>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject: Equatable {
+public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArray<T>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T: Equatable {
     
     return map(toRLMArray: field, using: binding)
 }
 
 @discardableResult
-public func map<U: RealmMapping, C: MappingContext>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject: Equatable {
+public func map<T: RLMObject, U: RealmMapping, C: MappingContext>(toRLMArray field: RLMArray<T>, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T: Equatable {
     
     var variableList = RLMArrayBridge(rlmArray: field)
     let bridge = binding.key.generateRLMArrayMappingBridge()
