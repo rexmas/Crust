@@ -1,18 +1,18 @@
 import Foundation
 import JSONValueRX
 
-public enum CollectionInsertionMethod<Container> {
+public enum CollectionInsertionMethod<Element> {
     case append
-    case replace(delete: ((_ orphansToDelete: Container) -> Container)?)
+    case replace(delete: ((_ orphansToDelete: AnyCollection<Element>) -> AnyCollection<Element>)?)
 }
 
-public typealias CollectionUpdatePolicy<Container> =
-    (insert: CollectionInsertionMethod<Container>, unique: Bool)
+public typealias CollectionUpdatePolicy<Element> =
+    (insert: CollectionInsertionMethod<Element>, unique: Bool)
 
 public enum Binding<M: Mapping>: Keypath {
     
     case mapping(Keypath, M)
-    case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.SequenceKind>)
+    case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.MappedObject>)
     
     public var keyPath: String {
         switch self {
@@ -32,7 +32,7 @@ public enum Binding<M: Mapping>: Keypath {
         }
     }
     
-    public var collectionUpdatePolicy: CollectionUpdatePolicy<M.SequenceKind> {
+    public var collectionUpdatePolicy: CollectionUpdatePolicy<M.MappedObject> {
         switch self {
         case .mapping(_, _):
             return (.append, true)

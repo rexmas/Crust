@@ -309,16 +309,7 @@ public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollecti
                 field.append(contentsOf: newObjects)
                 
             case .replace(delete: let deletionBlock):
-                var orphans = field
-                
-                // For reference types we have to create a new instance for orphans.
-                if
-                    case let objectOrphans as AnyObject = orphans,
-                    case let objectField as AnyObject = field,
-                    objectOrphans === objectField
-                {
-                    orphans = Coll(field)
-                }
+                var orphans: Coll = field
                 
                 if let deletion = deletionBlock {
                     newObjects.forEach {
@@ -327,9 +318,12 @@ public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollecti
                         }
                     }
                     
-//                    try deletion(orphans).forEach {
-//                        try binding.key.mapping.delete(obj: $0)
-//                    }
+                    // Unfortunately `AnyCollection<U.MappedObject>(orphans)` gives us "type is ambiguous without more context".
+                    let arrayOrphans = Array(orphans)
+                    let shouldDelete = AnyCollection<U.MappedObject>(arrayOrphans)
+                    try deletion(shouldDelete).forEach {
+                        try binding.key.mapping.delete(obj: $0)
+                    }
                 }
                 
                 field.removeAll(keepingCapacity: true)
@@ -385,9 +379,9 @@ private func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
         return (newObjects, map.context)
 }
 
-private func generateNewValues<T, U: Mapping, S: Sequence>(
+private func generateNewValues<T, U: Mapping>(
     fromJsonArray json: JSONValue,
-    with updatePolicy: CollectionUpdatePolicy<S>,
+    with updatePolicy: CollectionUpdatePolicy<U.MappedObject>,
     using mapping: U,
     fieldContains: (T) -> Bool,
     context: MappingContext)

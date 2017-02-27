@@ -262,7 +262,7 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject, M.Seq
         case .collectionMapping(let keyPath, let mapping, let updatePolicy):
             let bridge = RLMArrayMappingBridge<M.MappedObject>(rlmObjectMapping: mapping)
             
-            let bridgedInsert: CollectionInsertionMethod<RLMArrayBridge<M.MappedObject>> = {
+            let bridgedInsert: CollectionInsertionMethod<M.MappedObject> = {
                 switch updatePolicy.insert {
                     
                 case .append:
@@ -273,13 +273,10 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject, M.Seq
                         return .replace(delete: nil)
                     }
                     
-                    let bridgedDeletion = { (objs: RLMArrayBridge<M.MappedObject>) -> RLMArrayBridge<M.MappedObject> in
-                        let rlmObjsToDelete = deletion( objs.map { $0 } as! M.SequenceKind )
-                        let listToDelete = RLMArrayBridge<M.MappedObject>()
-                        for obj in rlmObjsToDelete {
-                            listToDelete.append(obj)
-                        }
-                        return listToDelete
+                    let bridgedDeletion = { (objs: AnyCollection<M.MappedObject>) -> AnyCollection<M.MappedObject> in
+                        let rlmObjsToDelete = deletion(objs)
+                        
+                        return rlmObjsToDelete
                     }
                     return .replace(delete: bridgedDeletion)
                 }
