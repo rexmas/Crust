@@ -227,7 +227,6 @@ public class RealmSwiftObjectAdaptorBridge<T>: Adaptor {
 /// Wrapper used to map `RLMObjects`. Relies on `RLMArrayBridge` since `RLMArray` does not support `RangeReplaceableCollection`.
 public class RLMArrayMappingBridge<T: RLMObject>: Mapping {
     public typealias MappedObject = T
-    public typealias SequenceKind = RLMArrayBridge<MappedObject>
     
     public let adaptor: RealmSwiftObjectAdaptorBridge<MappedObject>
     public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
@@ -250,7 +249,7 @@ public class RLMArrayMappingBridge<T: RLMObject>: Mapping {
     }
 }
 
-public extension Binding where M: RealmMapping, M.MappedObject: RLMObject, M.SequenceKind.Iterator.Element == M.MappedObject {
+public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
     
     func generateRLMArrayMappingBridge() -> Binding<RLMArrayMappingBridge<M.MappedObject>> {
         
@@ -292,13 +291,13 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject, M.Seq
 // a bug. Report the bug. In the meantime we're forced to break convention and use `map(toRLMArray:using:)` instead of `<-`.
 
 @discardableResult
-public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArray<T>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArray<T>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T: Equatable {
     
     return map(toRLMArray: field, using: binding)
 }
 
 @discardableResult
-public func map<U: RealmMapping, C: MappingContext>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<U>, context: C)) -> C where U.SequenceKind.Iterator.Element == U.MappedObject, U.MappedObject: Equatable {
+public func map<U: RealmMapping, C: MappingContext>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject: Equatable {
     
     var variableList = RLMArrayBridge(rlmArray: field)
     let bridge = binding.key.generateRLMArrayMappingBridge()

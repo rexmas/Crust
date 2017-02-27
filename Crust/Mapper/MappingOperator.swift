@@ -266,7 +266,7 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(field: inout Coll, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == Coll.Iterator.Element, Coll.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(field: inout Coll, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     return map(toCollection: &field, using: binding)
 }
@@ -277,7 +277,7 @@ private func map<T, U: Mapping, V: Sequence>(
     via key: Keypath,
     using mapping: U)
     throws -> JSONValue
-    where U.MappedObject == T, V.Iterator.Element == T, U.SequenceKind.Iterator.Element == U.MappedObject {
+    where U.MappedObject == T, V.Iterator.Element == T {
         
         var json = json
         
@@ -290,7 +290,7 @@ private func map<T, U: Mapping, V: Sequence>(
 }
 
 @discardableResult
-public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(toCollection field: inout Coll, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == Coll.Iterator.Element, Coll.Iterator.Element == U.MappedObject, T: Equatable {
+public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(toCollection field: inout Coll, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
         switch binding.context.dir {
@@ -343,7 +343,7 @@ private func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
     map:(key: Binding<U>, context: C),
     fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: C)
-    where U.MappedObject == T, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+    where U.MappedObject == T, T: Equatable {
     
         guard map.context.error == nil else {
             throw map.context.error!
@@ -386,10 +386,10 @@ private func generateNewValues<T, U: Mapping>(
     fieldContains: (T) -> Bool,
     context: MappingContext)
     throws -> [T]
-    where U.MappedObject == T, T: Equatable, U.SequenceKind.Iterator.Element == U.MappedObject {
+    where U.MappedObject == T, T: Equatable {
     
         guard case .array(let jsonArray) = json else {
-            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(U.SequenceKind.self)<\(T.self)>" ]
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
         

@@ -46,10 +46,6 @@ public protocol Mapping {
     /// The class, struct, enum type we are mapping to.
     associatedtype MappedObject
     
-    /// If we're mapping to a sequence instead of a single object,
-    /// this is the type of sequence we're allowed to map to. Defaults to `Array`.
-    associatedtype SequenceKind: Sequence = [MappedObject]
-    
     /// The DB adaptor type.
     associatedtype AdaptorKind: Adaptor
     
