@@ -291,7 +291,7 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
 // a bug. Report the bug. In the meantime we're forced to break convention and use `map(toRLMArray:using:)` instead of `<-`.
 
 @discardableResult
-public func <- <T: RLMObject, U: RealmMapping, C: MappingContext>(field: RLMArray<T>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, T: Equatable {
+public func <- <U: RealmMapping, C: MappingContext>(field: RLMArray<U.MappedObject>, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject: Equatable {
     
     return map(toRLMArray: field, using: binding)
 }
