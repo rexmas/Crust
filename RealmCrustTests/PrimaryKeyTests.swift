@@ -64,6 +64,23 @@ class PrimaryObj2Mapping : RealmMapping {
     }
 }
 
+public class DatePrimaryObjMapping : RealmMapping {
+    
+    public var adaptor: RealmAdaptor
+    public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+        return [ ("remoteId", "remoteId", nil) ]
+    }
+    
+    public required init(adaptor: RealmAdaptor) {
+        self.adaptor = adaptor
+    }
+    
+    public func mapping(tomap: inout DatePrimaryObj, context: MappingContext) {
+        tomap.date <- ("date", context)
+        tomap.junk <- ("junk", context)
+    }
+}
+
 class PrimaryKeyTests: RealmMappingTest {
 
     func testMappingsWithPrimaryKeys() {
@@ -107,5 +124,81 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         XCTAssertEqual(object, obj)
+    }
+    
+    func testFeatchingWithStringDateCorrectlySantizesValue() {
+        let date = Date().isoString
+        let obj = DatePrimaryObj()
+        obj.remoteId = 1
+        obj.date = Date(isoString: date)
+        realm!.beginWriteTransaction()
+        realm!.add(obj)
+        try! realm!.commitWriteTransaction()
+        
+        let mapping = DatePrimaryObjMapping(adaptor: adaptor!)
+        let object = mapping.adaptor.fetchObjects(type: DatePrimaryObj.self, primaryKeyValues: [["date" : date as CVarArg]], isMapping: false)?.first as! DatePrimaryObj
+        XCTAssertEqual(object.date!, Date(isoString: date))
+    }
+    
+    func testPrimaryKeyIsSantizedFromJSONDoubleToInt() {
+        let finalDate = Date()
+        let json2Dict = [ "remoteId" : 1, "date" : finalDate.isoString, "junk" : "junk" ] as [String : Any]
+        let json = try! JSONValue(object: json2Dict)
+        
+        XCTAssertTrue(json["remoteId"]!.values() is Double)
+        
+        let mapper = Mapper()
+        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adaptor: adaptor!))
+        
+        XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(object.remoteId!, 1)
+    }
+    
+    func testPrimaryKeyTransformIsRespected() {
+        class DatePrimaryObjMappingWithTransform : DatePrimaryObjMapping {
+            var called = false
+            override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+                return [ ("remoteId", "remoteId", { [weak self] in
+                    self?.called = true
+                    let remoteId = $0["data"]
+                    return Int.fromJSON(remoteId!)
+                }) ]
+            }
+        }
+        
+        let finalDate = Date()
+        let json2Dict = [ "remoteId" : ["data" : "1"], "date" : finalDate.isoString, "junk" : "junk" ] as [String : Any]
+        let json = try! JSONValue(object: json2Dict)
+        let mapper = Mapper()
+        let mapping = DatePrimaryObjMappingWithTransform(adaptor: adaptor!)
+        let object = try! mapper.map(from: json, using: mapping)
+        
+        XCTAssertTrue(mapping.called)
+        XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(object.remoteId!, 1)
+    }
+    
+    func testPrimaryKeyTransformThrownErrorIsReturned() {
+        struct Garbage: Error { }
+        class DatePrimaryObjMappingWithTransform : DatePrimaryObjMapping {
+            var called = false
+            override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+                return [ ("remoteId", "remoteId", { (json: JSONValue?) throws -> CVarArg? in
+                    throw Garbage()
+                }) ]
+            }
+        }
+        
+        let finalDate = Date()
+        let json2Dict = [ "remoteId" : ["data" : "1"], "date" : finalDate.isoString, "junk" : "junk" ] as [String : Any]
+        let json = try! JSONValue(object: json2Dict)
+        let mapper = Mapper()
+        let mapping = DatePrimaryObjMappingWithTransform(adaptor: adaptor!)
+        do {
+            _ = try mapper.map(from: json, using: mapping)
+        }
+        catch let e {
+            XCTAssertTrue(e is Garbage)
+        }
     }
 }

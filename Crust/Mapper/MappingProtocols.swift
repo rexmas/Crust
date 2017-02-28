@@ -89,6 +89,12 @@ public protocol Adaptor {
     /// continue after this is called.
     func mappingErrored(_ error: Error)
     
+    /// Use this to globally transform the value of primary keys before they are mapped.
+    /// E.g. our JSON model uses Double for numbers. If the primary key is an Int you must
+    /// either transform the primary key in the mapping or you can dynamically check if the
+    /// property is an Int here and transform Double to properties of Int in all cases.
+    func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: BaseType.Type) -> CVarArg?
+    
     /// Fetch objects from local persistance.
     ///
     /// - parameter type: The type of object being returned by the query

@@ -46,3 +46,11 @@ RLM_ARRAY_TYPE(PrimaryObj2)
 @end
 
 NS_ASSUME_NONNULL_END
+
+@interface DatePrimaryObj : RLMObject
+
+@property (nullable) NSNumber<RLMInt> *remoteId;
+@property (nullable) NSDate *date;
+@property (nullable) NSString *junk;
+
+@end

@@ -37,3 +37,11 @@
 }
 
 @end
+
+@implementation DatePrimaryObj
+
++ (NSString *)primaryKey {
+    return @"remoteId";
+}
+
+@end

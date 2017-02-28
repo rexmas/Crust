@@ -119,12 +119,19 @@ public extension Mapping {
             return nil
         }
         
+        try self.checkForAdaptorBaseTypeConformance()
+        
         var keyValues = [String : CVarArg]()
         try primaryKeys.forEach { (primaryKey, keyPath, transform) in
             let key = keyPath?.keyPath
             let baseJson = key != nil ? json[key!] : json
             if let val = baseJson {
-                keyValues[primaryKey] = try transform?(val) ?? val.valuesAsNSObjects()
+                let transformedVal: CVarArg = try transform?(val) ?? val.valuesAsNSObjects()
+                let sanitizedVal = self.adaptor.sanitize(primaryKeyProperty: primaryKey,
+                                                         forValue: transformedVal,
+                                                         ofType: MappedObject.self as! AdaptorKind.BaseType.Type)
+                
+                keyValues[primaryKey] = sanitizedVal ?? transformedVal
             }
             else {
                 let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(String(describing: keyPath)) does not exist in JSON but is expected from mapping \(Self.self)" ]
