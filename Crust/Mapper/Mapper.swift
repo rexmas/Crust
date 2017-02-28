@@ -33,7 +33,7 @@ public struct Mapper {
     public init() { }
     
     public func map<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using binding: Binding<M>) throws -> C
-    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, M.SequenceKind == C {
+    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable {
         
         var collection = C()
         let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
@@ -127,7 +127,7 @@ public extension Mapping {
                 keyValues[primaryKey] = try transform?(val) ?? val.valuesAsNSObjects()
             }
             else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(keyPath) does not exist in JSON but is expected from mapping \(Self.self)" ]
+                let userInfo = [ NSLocalizedFailureReasonErrorKey : "Primary key of \(String(describing: keyPath)) does not exist in JSON but is expected from mapping \(Self.self)" ]
                 throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
             }
         }

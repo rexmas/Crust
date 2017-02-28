@@ -266,7 +266,7 @@ private func map<T, U: Mapping>(from json: JSONValue, to field: inout T?, using 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
 @discardableResult
-public func <- <T, U: Mapping, C: MappingContext>(field: inout U.SequenceKind, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func <- <T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(field: inout Coll, binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     return map(toCollection: &field, using: binding)
 }
@@ -277,7 +277,7 @@ private func map<T, U: Mapping, V: Sequence>(
     via key: Keypath,
     using mapping: U)
     throws -> JSONValue
-    where U.MappedObject == T, V.Iterator.Element == T, U.SequenceKind.Iterator.Element == U.MappedObject {
+    where U.MappedObject == T, V.Iterator.Element == T {
         
         var json = json
         
@@ -290,7 +290,7 @@ private func map<T, U: Mapping, V: Sequence>(
 }
 
 @discardableResult
-public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.SequenceKind, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, U.SequenceKind: RangeReplaceableCollection, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+public func map<T, U: Mapping, C: MappingContext, Coll: RangeReplaceableCollection>(toCollection field: inout Coll, using binding:(key: Binding<U>, context: C)) -> C where U.MappedObject == T, Coll.Iterator.Element == U.MappedObject, T: Equatable {
     
     do {
         switch binding.context.dir {
@@ -309,16 +309,7 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                 field.append(contentsOf: newObjects)
                 
             case .replace(delete: let deletionBlock):
-                var orphans = field
-                
-                // For reference types we have to create a new instance for orphans.
-                if
-                    case let objectOrphans as AnyObject = orphans,
-                    case let objectField as AnyObject = field,
-                    objectOrphans === objectField
-                {
-                    orphans = U.SequenceKind(field)
-                }
+                var orphans: Coll = field
                 
                 if let deletion = deletionBlock {
                     newObjects.forEach {
@@ -327,7 +318,10 @@ public func map<T, U: Mapping, C: MappingContext>(toCollection field: inout U.Se
                         }
                     }
                     
-                    try deletion(orphans).forEach {
+                    // Unfortunately `AnyCollection<U.MappedObject>(orphans)` gives us "type is ambiguous without more context".
+                    let arrayOrphans = Array(orphans)
+                    let shouldDelete = AnyCollection<U.MappedObject>(arrayOrphans)
+                    try deletion(shouldDelete).forEach {
                         try binding.key.mapping.delete(obj: $0)
                     }
                 }
@@ -349,7 +343,7 @@ private func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
     map:(key: Binding<U>, context: C),
     fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: C)
-    where U.MappedObject == T, U.SequenceKind.Iterator.Element == U.MappedObject, T: Equatable {
+    where U.MappedObject == T, T: Equatable {
     
         guard map.context.error == nil else {
             throw map.context.error!
@@ -385,17 +379,17 @@ private func mapFromJsonToSequence<T, U: Mapping, C: MappingContext>(
         return (newObjects, map.context)
 }
 
-private func generateNewValues<T, U: Mapping, S: Sequence>(
+private func generateNewValues<T, U: Mapping>(
     fromJsonArray json: JSONValue,
-    with updatePolicy: CollectionUpdatePolicy<S>,
+    with updatePolicy: CollectionUpdatePolicy<U.MappedObject>,
     using mapping: U,
     fieldContains: (T) -> Bool,
     context: MappingContext)
     throws -> [T]
-    where U.MappedObject == T, T: Equatable, U.SequenceKind.Iterator.Element == U.MappedObject {
+    where U.MappedObject == T, T: Equatable {
     
         guard case .array(let jsonArray) = json else {
-            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to \(U.SequenceKind.self)<\(T.self)>" ]
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
         
