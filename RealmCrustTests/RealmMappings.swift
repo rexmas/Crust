@@ -87,25 +87,23 @@ public class RealmAdaptor: Adaptor {
         }
     }
     
-    public func fetchObjects(type: RLMObject.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
+    public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: RLMObject.Type) -> CVarArg? {
         
         // Since Date is converted as such so often we won't require implementors to write their own transform.
-        
-        func sanitize(key: String, value: NSObject) -> NSObject {
-            if type.isProperty(key, ofType: NSDate.self), case let value as String = value {
-                return Date(isoString: value)! as NSDate
-            }
-            return type.sanitizeValue(value, fromProperty: key, realm: self.realm)
+        if type.isProperty(property, ofType: NSDate.self), case let value as String = value {
+            return Date(isoString: value)! as NSDate
         }
+        return type.sanitizeValue(value, fromProperty: property, realm: self.realm)
+    }
+    
+    public func fetchObjects(type: RLMObject.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
         
         var totalPredicate = [NSPredicate]()
         
         for keyValues in primaryKeyValues {
             var objectPredicates = [NSPredicate]()
             for (key, var value) in keyValues {
-                if case let obj as NSObject = value {
-                    value = sanitize(key: key, value: obj)
-                }
+                value = self.sanitize(primaryKeyProperty: key, forValue: value, ofType: type) ?? value
                 let predicate = NSPredicate(format: "%K == %@", key, value)
                 objectPredicates.append(predicate)
             }
@@ -210,6 +208,10 @@ public class RealmSwiftObjectAdaptorBridge<T>: Adaptor {
     public func deleteObject(_ obj: BaseType) throws {
         let rlmObj = unsafeBitCast(obj, to: type(of: self.realmObjCAdaptor).BaseType.self)
         try self.realmObjCAdaptor.deleteObject(rlmObj)
+    }
+    
+    public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: BaseType.Type) -> CVarArg? {
+        return self.realmObjCAdaptor.sanitize(primaryKeyProperty: property, forValue: value, ofType: type as! RLMObject.Type)
     }
     
     public func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
