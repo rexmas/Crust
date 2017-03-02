@@ -5,17 +5,17 @@ import Realm
 
 class PrimaryObj1Mapping : RealmMapping {
     
-    var adaptor: RealmAdaptor
+    var adapter: RealmAdapter
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.uuid", nil) ]
     }
     
-    required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
-        let obj2Mapping = PrimaryObj2Mapping(adaptor: self.adaptor)
+        let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
         map(toRLMArray: tomap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
         tomap.uuid          <- "data.uuid" >*<
@@ -26,13 +26,13 @@ class PrimaryObj1Mapping : RealmMapping {
 // Until we support optional mappings, have to make a nested version.
 class NestedPrimaryObj1Mapping : RealmMapping {
     
-    var adaptor: RealmAdaptor
+    var adapter: RealmAdapter
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.uuid", nil) ]
     }
     
-    required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     func mapping(tomap: inout PrimaryObj1, context: MappingContext) { }
@@ -40,13 +40,13 @@ class NestedPrimaryObj1Mapping : RealmMapping {
 
 class PrimaryObj2Mapping : RealmMapping {
     
-    var adaptor: RealmAdaptor
+    var adapter: RealmAdapter
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.more_data.uuid", nil) ]
     }
     
-    required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     func mapping(tomap: inout PrimaryObj2, context: MappingContext) {
@@ -55,9 +55,9 @@ class PrimaryObj2Mapping : RealmMapping {
         // from expecting json.
         //
         // In the meantime, user can write separate Nested Mappings for the top level object and nested objects.
-//        let obj1Mapping = PrimaryObj1Mapping(adaptor: self.adaptor)
+//        let obj1Mapping = PrimaryObj1Mapping(adapter: self.adapter)
         
-        let obj1Mapping = NestedPrimaryObj1Mapping(adaptor: self.adaptor)
+        let obj1Mapping = NestedPrimaryObj1Mapping(adapter: self.adapter)
         
         tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
         context
@@ -66,13 +66,13 @@ class PrimaryObj2Mapping : RealmMapping {
 
 public class DatePrimaryObjMapping : RealmMapping {
     
-    public var adaptor: RealmAdaptor
+    public var adapter: RealmAdapter
     public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("remoteId", "remoteId", nil) ]
     }
     
-    public required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    public required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     public func mapping(tomap: inout DatePrimaryObj, context: MappingContext) {
@@ -96,7 +96,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json1Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adaptor: adaptor!))
+        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adapter: adapter!))
         
         XCTAssertEqual(PrimaryObj1.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 2)
@@ -119,7 +119,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adaptor: adaptor!))
+        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!))
         
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
@@ -135,8 +135,8 @@ class PrimaryKeyTests: RealmMappingTest {
         realm!.add(obj)
         try! realm!.commitWriteTransaction()
         
-        let mapping = DatePrimaryObjMapping(adaptor: adaptor!)
-        let object = mapping.adaptor.fetchObjects(type: DatePrimaryObj.self, primaryKeyValues: [["date" : date as CVarArg]], isMapping: false)?.first as! DatePrimaryObj
+        let mapping = DatePrimaryObjMapping(adapter: adapter!)
+        let object = mapping.adapter.fetchObjects(type: DatePrimaryObj.self, primaryKeyValues: [["date" : date as CVarArg]], isMapping: false)?.first as! DatePrimaryObj
         XCTAssertEqual(object.date!, Date(isoString: date))
     }
     
@@ -148,7 +148,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertTrue(json["remoteId"]!.values() is Double)
         
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adaptor: adaptor!))
+        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!))
         
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
         XCTAssertEqual(object.remoteId!, 1)
@@ -170,7 +170,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let json2Dict = [ "remoteId" : ["data" : "1"], "date" : finalDate.isoString, "junk" : "junk" ] as [String : Any]
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
-        let mapping = DatePrimaryObjMappingWithTransform(adaptor: adaptor!)
+        let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
         let object = try! mapper.map(from: json, using: mapping)
         
         XCTAssertTrue(mapping.called)
@@ -193,7 +193,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let json2Dict = [ "remoteId" : ["data" : "1"], "date" : finalDate.isoString, "junk" : "junk" ] as [String : Any]
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
-        let mapping = DatePrimaryObjMappingWithTransform(adaptor: adaptor!)
+        let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
         do {
             _ = try mapper.map(from: json, using: mapping)
         }

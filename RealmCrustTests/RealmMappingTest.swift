@@ -4,7 +4,7 @@ import Realm
 
 class RealmMappingTest: XCTestCase {
     var realm: RLMRealm!
-    var adaptor: RealmAdaptor!
+    var adapter: RealmAdapter!
     
     override func setUp() {
         super.setUp()
@@ -18,7 +18,7 @@ class RealmMappingTest: XCTestCase {
         RLMRealmConfiguration.setDefault(config)
         realm = RLMRealm.default()
         
-        adaptor = RealmAdaptor(realm: realm)
+        adapter = RealmAdapter(realm: realm)
     }
 }
 

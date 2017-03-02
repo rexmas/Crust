@@ -13,7 +13,7 @@
 		175C9A431C311DB200B0D6E7 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFD1BCB39C400CC6D4A /* Mapper.swift */; };
 		175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */; };
 		175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */; };
-		175C9A471C311DB200B0D6E7 /* AnyAdaptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */; };
+		175C9A471C311DB200B0D6E7 /* AnyAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172FBC8F1C15279C00CF2C71 /* AnyAdapter.swift */; };
 		175C9A921C38A0A900B0D6E7 /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C9A911C38A0A900B0D6E7 /* Mocks.swift */; };
 		176675441BD31F3F0013DE5F /* EmployeeMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */; };
 		1767B72B1DF776FD00DE693C /* Crust.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175C9A3A1C311D8400B0D6E7 /* Crust.framework */; };
@@ -65,7 +65,7 @@
 
 /* Begin PBXFileReference section */
 		172FBC8B1C15140300CF2C71 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Person.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AnyAdaptor.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		172FBC8F1C15279C00CF2C71 /* AnyAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AnyAdapter.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		172FBC911C152DA500CF2C71 /* StructMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = StructMappingTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		175C9A3A1C311D8400B0D6E7 /* Crust.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Crust.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		175C9A3C1C311D8400B0D6E7 /* Crust.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crust.h; sourceTree = "<group>"; };
@@ -151,7 +151,7 @@
 		1710BF411BC38C3B00D4EAD8 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
-				172FBC8F1C15279C00CF2C71 /* AnyAdaptor.swift */,
+				172FBC8F1C15279C00CF2C71 /* AnyAdapter.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -563,7 +563,7 @@
 				175C9A431C311DB200B0D6E7 /* Mapper.swift in Sources */,
 				175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */,
 				175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */,
-				175C9A471C311DB200B0D6E7 /* AnyAdaptor.swift in Sources */,
+				175C9A471C311DB200B0D6E7 /* AnyAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

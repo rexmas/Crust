@@ -76,13 +76,13 @@ extension User: AnyMappable { }
 
 class UserMapping: Mapping {
     
-    var adaptor: MockAdaptor<User>
+    var adapter: MockAdapter<User>
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("identifier", "data.id_hash", nil) ]
     }
     
-    required init(adaptor: MockAdaptor<User>) {
-        self.adaptor = adaptor
+    required init(adapter: MockAdapter<User>) {
+        self.adapter = adapter
     }
     
     func mapping(tomap: inout User, context: MappingContext) {
@@ -121,7 +121,7 @@ class TransformTests: XCTestCase {
         let jsonObject: [AnyHashable : Any] = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
         let json = try! JSONValue(object: jsonObject)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: UserMapping(adaptor: MockAdaptor<User>()))
+        let object = try! mapper.map(from: json, using: UserMapping(adapter: MockAdapter<User>()))
         
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         
