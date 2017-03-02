@@ -16,17 +16,17 @@ extension Company: AnyMappable { }
 
 class CompanyMapping: Mapping {
     
-    var adaptor: MockAdaptor<Company>
+    var adapter: MockAdapter<Company>
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.uuid", nil) ]
     }
     
-    required init(adaptor: MockAdaptor<Company>) {
-        self.adaptor = adaptor
+    required init(adapter: MockAdapter<Company>) {
+        self.adapter = adapter
     }
     
     func mapping(tomap: inout Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
+        let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         tomap.employees             <- Binding.mapping("employees", employeeMapping) >*<
         tomap.founder               <- .mapping("founder", employeeMapping) >*<
@@ -41,7 +41,7 @@ class CompanyMapping: Mapping {
 class CompanyMappingWithDupes: CompanyMapping {
     
     override func mapping(tomap: inout Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: MockAdaptor<Employee>())
+        let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         tomap.employees             <- Binding.collectionMapping("employees", employeeMapping, (.append, true)) >*<
         tomap.founder               <- .mapping("founder", employeeMapping) >*<

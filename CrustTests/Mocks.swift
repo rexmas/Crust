@@ -1,6 +1,6 @@
 import Crust
 
-class MockAdaptor<T: AnyMappable>: Adaptor {
+class MockAdapter<T: AnyMappable>: Adapter {
     typealias BaseType = T
     typealias ResultsType = [T]
     
@@ -16,5 +16,5 @@ class MockAdaptor<T: AnyMappable>: Adaptor {
 
 protocol MockMapping: Mapping {
     associatedtype BaseType: AnyMappable
-    init(adaptor: MockAdaptor<BaseType>)
+    init(adapter: MockAdapter<BaseType>)
 }
