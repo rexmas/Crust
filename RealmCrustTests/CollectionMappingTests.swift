@@ -13,7 +13,7 @@ class CollectionMappingTests: RealmMappingTest {
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 0)
         
-        let mapping = EmployeeMapping(adaptor: self.adaptor!)
+        let mapping = EmployeeMapping(adapter: self.adapter!)
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
@@ -29,7 +29,7 @@ class CollectionMappingTests: RealmMappingTest {
     func testMappingCollectionByAppendUnique() {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
-                let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
             }
         }
@@ -45,7 +45,7 @@ class CollectionMappingTests: RealmMappingTest {
         dupEmployee.uuid = dupEmployeeStub.uuid
         original.employees.append(originalEmployee)
         original.employees.append(dupEmployee)
-        try! self.adaptor!.save(objects: [ original ])
+        try! self.adapter!.save(objects: [ original ])
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         
@@ -56,7 +56,7 @@ class CollectionMappingTests: RealmMappingTest {
         companyStub.employees = [employeeStub3, employeeStub3, employeeStub4, employeeStub3, dupEmployeeStub]
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
-        let mapping = CompanyMappingAppendUnique(adaptor: self.adaptor!)
+        let mapping = CompanyMappingAppendUnique(adapter: self.adapter!)
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
@@ -75,7 +75,7 @@ class CollectionMappingTests: RealmMappingTest {
     func testMappingCollectionByReplaceUnique() {
         class CompanyMappingReplaceUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
-                let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: tomap.employees,
                     using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
             }
@@ -88,7 +88,7 @@ class CollectionMappingTests: RealmMappingTest {
         original.uuid = uuid
         originalEmployee.uuid = uuid
         original.employees.append(originalEmployee)
-        try! self.adaptor!.save(objects: [ original ])
+        try! self.adapter!.save(objects: [ original ])
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 1)
         
@@ -99,7 +99,7 @@ class CollectionMappingTests: RealmMappingTest {
         companyStub.employees = [employeeStub, employeeStub, employeeStub2, employeeStub]
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
-        let mapping = CompanyMappingReplaceUnique(adaptor: self.adaptor!)
+        let mapping = CompanyMappingReplaceUnique(adapter: self.adapter!)
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
@@ -116,7 +116,7 @@ class CollectionMappingTests: RealmMappingTest {
     func testMappingCollectionByReplaceDeleteUnique() {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
             override func mapping(tomap: inout Company, context: MappingContext) {
-                let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: tomap.employees,
                     using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
             }
@@ -134,7 +134,7 @@ class CollectionMappingTests: RealmMappingTest {
         original.employees.append(originalEmployee)
         original.employees.append(dupEmployee)
         
-        try! self.adaptor!.save(objects: [ original ])
+        try! self.adapter!.save(objects: [ original ])
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         
@@ -145,7 +145,7 @@ class CollectionMappingTests: RealmMappingTest {
         companyStub.uuid = original.uuid!
         let json = try! JSONValue(object: companyStub.generateJsonObject())
         
-        let mapping = CompanyMappingReplaceDeleteUnique(adaptor: self.adaptor!)
+        let mapping = CompanyMappingReplaceDeleteUnique(adapter: self.adapter!)
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)

@@ -2,7 +2,7 @@ import XCTest
 @testable import Crust
 import JSONValueRX
 
-class MockMap: Mapping, Adaptor {
+class MockMap: Mapping, Adapter {
     typealias BaseType = MockMap
     typealias ResultsType = [MockMap]
     
@@ -10,7 +10,7 @@ class MockMap: Mapping, Adaptor {
     
     var catchMapping: ((_ tomap: MockMap, _ context: MappingContext) -> ())? = nil
     
-    var adaptor: MockMap {
+    var adapter: MockMap {
         return self
     }
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {

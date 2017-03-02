@@ -4,17 +4,17 @@ import Realm
 
 public class CompanyMapping : RealmMapping {
     
-    public var adaptor: RealmAdaptor
+    public var adapter: RealmAdapter
     public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.uuid", nil) ]
     }
     
-    public required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    public required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     public func mapping(tomap: inout Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+        let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         tomap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
         tomap.founder               <- .mapping("founder", employeeMapping) >*< context
@@ -28,7 +28,7 @@ public class CompanyMapping : RealmMapping {
 public class CompanyMappingWithDupes : CompanyMapping {
     
     public override func mapping(tomap: inout Company, context: MappingContext) {
-        let employeeMapping = EmployeeMapping(adaptor: self.adaptor)
+        let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         tomap.employees <- (Binding.collectionMapping("employees", employeeMapping, (.append, false)), context)
         tomap.founder               <- .mapping("founder", employeeMapping) >*<

@@ -8,7 +8,7 @@ class CompanyMappingTests: XCTestCase {
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: MockAdaptor<Company>()))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: MockAdapter<Company>()))
         
         XCTAssertTrue(stub.matches(object))
     }
@@ -18,13 +18,13 @@ class CompanyMappingTests: XCTestCase {
         let jsonObj = [ "data.company" : stub.generateJsonObject() ]
         let json = try! JSONValue(object: jsonObj)
         let mapper = Mapper()
-        let binding = Binding.mapping("data.company", CompanyMapping(adaptor: MockAdaptor<Company>()))
+        let binding = Binding.mapping("data.company", CompanyMapping(adapter: MockAdapter<Company>()))
         let object = try! mapper.map(from: json, using: binding)
         
         XCTAssertTrue(stub.matches(object))
     }
     
-    class MockAdaptorExistingCompany: MockAdaptor<Company> {
+    class MockAdapterExistingCompany: MockAdapter<Company> {
         var company: Company
         
         required init(withCompany company: Company) {
@@ -42,13 +42,13 @@ class CompanyMappingTests: XCTestCase {
         
         let original = Company()
         original.uuid = uuid
-        let adaptor = MockAdaptorExistingCompany(withCompany: original)
+        let adapter = MockAdapterExistingCompany(withCompany: original)
         
         let stub = CompanyStub()
         stub.uuid = uuid;
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: adaptor))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter))
         
         XCTAssertTrue(object === original)
         XCTAssertTrue(stub.matches(object))
@@ -61,14 +61,14 @@ class CompanyMappingTests: XCTestCase {
         original.uuid = uuid
         original.founder = Employee()
         
-        let adaptor = MockAdaptorExistingCompany(withCompany: original)
+        let adapter = MockAdapterExistingCompany(withCompany: original)
         
         let stub = CompanyStub()
         stub.uuid = uuid;
         stub.founder = nil;
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adaptor: adaptor))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter))
         
         XCTAssertTrue(stub.matches(object))
         XCTAssertNil(object.founder)

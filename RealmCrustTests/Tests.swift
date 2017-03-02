@@ -22,13 +22,13 @@ public class User: RLMObject {
 
 public class UserMapping: RealmMapping {
     
-    public var adaptor: RealmAdaptor
+    public var adapter: RealmAdapter
     public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [("identifier", "id_hash", nil)]
     }
     
-    public required init(adaptor: RealmAdaptor) {
-        self.adaptor = adaptor
+    public required init(adapter: RealmAdapter) {
+        self.adapter = adapter
     }
     
     public func mapping(tomap: inout User, context: MappingContext) {
@@ -107,7 +107,7 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper()
         let jsonValue = try! JSONValue(object: json)
-        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!))
         
         XCTAssertEqual(User.allObjects(in: realm!).count, 1)
     }
@@ -119,10 +119,10 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper()
         let jsonValue = try! JSONValue(object: jsonObj)
-        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adaptor: adaptor!))
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!))
         
         let user = User.allObjects(in: realm!).firstObject()!
-        let json = try! mapping.mapFromObjectToJSON(user as! User, mapping: UserMapping(adaptor: adaptor!))
+        let json = try! mapping.mapFromObjectToJSON(user as! User, mapping: UserMapping(adapter: adapter!))
         
         //let id_hash = json["id_hash"]?.values() as! Int
         XCTAssertNotNil(json)
