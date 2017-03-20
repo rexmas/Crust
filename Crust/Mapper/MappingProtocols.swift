@@ -35,7 +35,7 @@ public enum Binding<M: Mapping>: Keypath {
     public var collectionUpdatePolicy: CollectionUpdatePolicy<M.MappedObject> {
         switch self {
         case .mapping(_, _):
-            return (.append, true)
+            return (.replace(delete: nil), true)
         case .collectionMapping(_, _, let method):
             return method
         }
