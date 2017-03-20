@@ -2,7 +2,24 @@ import XCTest
 @testable import Crust
 import JSONValueRX
 
+extension Int: AnyMappable { }
+
 class CollectionMappingTests: RealmMappingTest {
+    
+    class IntMapping: AnyMapping {
+        typealias AdapterKind = AnyAdapterImp<Int>
+        typealias MappedObject = Int
+        func mapping(tomap: inout Int, context: MappingContext) { }
+    }
+    
+    func testDefaultInsertionPolicyIsReplaceUnique() {
+        let binding = Binding.mapping("", IntMapping())
+        let policy = binding.collectionUpdatePolicy
+        guard case (.replace(delete: nil), true) = policy else {
+            XCTFail()
+            return
+        }
+    }
     
     func testMappingCollection() {
         let employeeStub = EmployeeStub()
