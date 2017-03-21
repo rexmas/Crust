@@ -25,30 +25,30 @@ class CompanyMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout Company, context: MappingContext) {
+    func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        tomap.employees             <- Binding.mapping("employees", employeeMapping) >*<
-        tomap.founder               <- .mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "data.uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.foundingDate          <- "data.founding_date"  >*<
-        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        toMap.employees             <- Binding.mapping("employees", employeeMapping) >*<
+        toMap.founder               <- .mapping("founder", employeeMapping) >*<
+        toMap.uuid                  <- "data.uuid" >*<
+        toMap.name                  <- "name" >*<
+        toMap.foundingDate          <- "data.founding_date"  >*<
+        toMap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
         context
     }
 }
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(tomap: inout Company, context: MappingContext) {
+    override func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        tomap.employees             <- Binding.collectionMapping("employees", employeeMapping, (.append, true)) >*<
-        tomap.founder               <- .mapping("founder", employeeMapping) >*<
-        tomap.uuid                  <- "data.uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.foundingDate          <- "data.founding_date"  >*<
-        tomap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        toMap.employees             <- Binding.collectionMapping("employees", employeeMapping, (.append, true)) >*<
+        toMap.founder               <- .mapping("founder", employeeMapping) >*<
+        toMap.uuid                  <- "data.uuid" >*<
+        toMap.name                  <- "name" >*<
+        toMap.foundingDate          <- "data.founding_date"  >*<
+        toMap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
         context
     }
 }

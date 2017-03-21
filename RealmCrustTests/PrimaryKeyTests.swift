@@ -14,11 +14,11 @@ class PrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout PrimaryObj1, context: MappingContext) {
+    func mapping(toMap: inout PrimaryObj1, context: MappingContext) {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
-        map(toRLMArray: tomap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
-        tomap.uuid          <- "data.uuid" >*<
+        map(toRLMArray: toMap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
+        toMap.uuid          <- "data.uuid" >*<
         context
     }
 }
@@ -35,7 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout PrimaryObj1, context: MappingContext) { }
+    func mapping(toMap: inout PrimaryObj1, context: MappingContext) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -49,7 +49,7 @@ class PrimaryObj2Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout PrimaryObj2, context: MappingContext) {
+    func mapping(toMap: inout PrimaryObj2, context: MappingContext) {
         // TODO: Including this mapping fails. Need to support making some mappings as optional
         // so when the recursive cycle of json between these two relationships runs out it doesn't error
         // from expecting json.
@@ -59,7 +59,7 @@ class PrimaryObj2Mapping : RealmMapping {
         
         let obj1Mapping = NestedPrimaryObj1Mapping(adapter: self.adapter)
         
-        tomap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
+        toMap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
         context
     }
 }
@@ -75,9 +75,9 @@ public class DatePrimaryObjMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(tomap: inout DatePrimaryObj, context: MappingContext) {
-        tomap.date <- ("date", context)
-        tomap.junk <- ("junk", context)
+    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext) {
+        toMap.date <- ("date", context)
+        toMap.junk <- ("junk", context)
     }
 }
 

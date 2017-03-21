@@ -12,17 +12,17 @@ public class EmployeeMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(tomap: inout Employee, context: MappingContext) {
+    public func mapping(toMap: inout Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
         let key = Binding.mapping("company", companyMapping)
         
-        tomap.employer              <-  key >*<
-        tomap.joinDate              <- ("joinDate", context)
-        tomap.uuid                  <- "uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.salary                <- "data.salary"  >*<
-        tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
+        toMap.employer              <-  key >*<
+        toMap.joinDate              <- ("joinDate", context)
+        toMap.uuid                  <- "uuid" >*<
+        toMap.name                  <- "name" >*<
+        toMap.salary                <- "data.salary"  >*<
+        toMap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
+        toMap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
         context
     }
 }

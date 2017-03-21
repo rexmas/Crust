@@ -28,9 +28,9 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByAppendUnique() {
         class CompanyMappingAppendUnique: CompanyMapping {
-            override func mapping(tomap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: tomap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
+                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
             }
         }
         
@@ -74,9 +74,9 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceUnique() {
         class CompanyMappingReplaceUnique: CompanyMapping {
-            override func mapping(tomap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: tomap.employees,
+                map(toRLMArray: toMap.employees,
                     using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
             }
         }
@@ -115,9 +115,9 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceDeleteUnique() {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
-            override func mapping(tomap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: tomap.employees,
+                map(toRLMArray: toMap.employees,
                     using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
             }
         }

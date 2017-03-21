@@ -85,13 +85,13 @@ class UserMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout User, context: MappingContext) {
+    func mapping(toMap: inout User, context: MappingContext) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
-        tomap.identifier        <- "data.id_hash" >*<
-        tomap.birthDate         <- Binding.mapping("data.birthdate", userBirthdateMapping) >*<
-        tomap.name              <- "data.user_name" >*<
-        tomap.surname           <- "data.user_surname" >*<
+        toMap.identifier        <- "data.id_hash" >*<
+        toMap.birthDate         <- Binding.mapping("data.birthdate", userBirthdateMapping) >*<
+        toMap.name              <- "data.user_name" >*<
+        toMap.surname           <- "data.user_surname" >*<
         context
     }
 }
