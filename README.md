@@ -1,10 +1,10 @@
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/Crust.svg)](https://img.shields.io/cocoapods/v/Crust.svg)
 [![Build Status](https://travis-ci.org/rexmas/Crust.svg)](https://travis-ci.org/rexmas/Crust)
 
-# Crust
+## Crust
 A flexible Swift framework for converting classes and structs to and from JSON with support for storage solutions such as Realm.
 
-# Features 🎸
+## Features 🎸
 - [Structs and Classes](#structs-and-classes)
 - [Separation of Concerns (Mapped Model, Mapping, Storage)](#separation-of-concerns)
 - [Type safe JSON](#jsonvalue-for-type-safe-json)
@@ -17,11 +17,11 @@ A flexible Swift framework for converting classes and structs to and from JSON w
 - [Realm](#realm)
 - Supports Optional Types and Collections.
 
-# Requirements
+## Requirements
 iOS 8.0+
 Swift 3.0+
 
-# Installation
+## Installation
 ### CocoaPods
 ```
 platform :ios, '8.0'
@@ -30,7 +30,7 @@ use_frameworks!
 pod 'Crust'
 ```
 
-# Structs and Classes
+## Structs and Classes
 Can map to/from classes or structs
 ```swift
 class Company {
@@ -52,7 +52,7 @@ struct Person: AnyMappable {
 }
 ```
 
-# Separation of Concerns
+## Separation of Concerns
 
 By design Crust is built with [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns) in mind. It makes no assumptions about how many ways a user would like to map to and from JSON and how many various ways the user would like to store their models.
 
@@ -71,10 +71,10 @@ And 2 additional protocols when no storage `Adapter` is required:
 
 There are no limitations on the number of various `Mapping`s and `Adapter`s one may create per model for different use cases.
 
-# JSONValue for type safe JSON
+## JSONValue for type safe JSON
 Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON encoding and decoding mechanism. It offers many benefits including type safety, subscripting, and extensibility through protocols.
 
-# How To Map
+## How To Map
 
 1. Create your mappings for your model using `Mapping` if with storage or `AnyMapping` if without storage.
 
@@ -258,7 +258,7 @@ let company1 = try! mapper.map(from: json, using: CompanyMapping())
 let company2 = try! mapper.map(from: json, using: CompanyMappingWithNameUUIDReversed())
 ```
 
-# Storage Adapter
+## Storage Adapter
 Follow the `Adapter` protocol to create a storage adapter to Core Data, Realm, etc.
 
 The object conforming to `Adapter` must include two `associatedtype`s:
@@ -270,20 +270,20 @@ The object conforming to `Adapter` must include two `associatedtype`s:
 
 The `Mapping` must then set it's `associatedtype AdapterKind = <Your Adapter>` to use it during mapping.
 
-# Realm
+## Realm
 There are tests included in `./RealmCrustTests` that include examples of how to use Crust with realm-cocoa (Obj-C).
 
 If you wish to use Crust with RealmSwift check out this (slightly outdated) repo for examples.
 https://github.com/rexmas/RealmCrust
 
-# Contributing
+## Contributing
 
 Pull requests are welcome!
 
 - Open an issue if you run into any problems.
 - Fork the project and submit a pull request to contribute. Please include tests for new code.
 
-# License
+## License
 The MIT License (MIT)
 
 Copyright (c) 2015-2017 Rex
