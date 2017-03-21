@@ -26,16 +26,16 @@ class EmployeeMapping: MockMapping {
         self.adapter = adapter
     }
     
-    func mapping(tomap: inout Employee, context: MappingContext) {
+    func mapping(toMap: inout Employee, context: MappingContext) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
-        tomap.employer              <- .mapping("company", companyMapping) >*<
-        tomap.joinDate              <- "joinDate"  >*<
-        tomap.uuid                  <- "uuid" >*<
-        tomap.name                  <- "name" >*<
-        tomap.salary                <- "data.salary"  >*<
-        tomap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        tomap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
+        toMap.employer              <- .mapping("company", companyMapping) >*<
+        toMap.joinDate              <- "joinDate"  >*<
+        toMap.uuid                  <- "uuid" >*<
+        toMap.name                  <- "name" >*<
+        toMap.salary                <- "data.salary"  >*<
+        toMap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
+        toMap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
         context
     }
 }

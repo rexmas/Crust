@@ -31,18 +31,18 @@ public class UserMapping: RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(tomap: inout User, context: MappingContext) {
+    public func mapping(toMap: inout User, context: MappingContext) {
         let birthdateMapping = DateMapping(dateFormatter: DateFormatter.isoFormatter)
         let primaryKeyMapping = PrimaryKeyMapping()
         
-        tomap.birthDate     <- (Binding.mapping("birthdate", birthdateMapping), context)
-        tomap.identifier    <- (Binding.mapping("id_hash", primaryKeyMapping), context)
-        tomap.name          <- ("user_name", context)
-        tomap.surname       <- ("user_surname", context)
-        tomap.height        <- ("height", context)
-        tomap.weight        <- ("weight", context)
-        tomap.sex           <- ("sex", context)
-        tomap.photoPath     <- ("photo_path", context)
+        toMap.birthDate     <- (Binding.mapping("birthdate", birthdateMapping), context)
+        toMap.identifier    <- (Binding.mapping("id_hash", primaryKeyMapping), context)
+        toMap.name          <- ("user_name", context)
+        toMap.surname       <- ("user_surname", context)
+        toMap.height        <- ("height", context)
+        toMap.weight        <- ("weight", context)
+        toMap.sex           <- ("sex", context)
+        toMap.photoPath     <- ("photo_path", context)
     }
 }
 

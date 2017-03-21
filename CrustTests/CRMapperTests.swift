@@ -8,7 +8,7 @@ class MockMap: Mapping, Adapter {
     
     init() { }
     
-    var catchMapping: ((_ tomap: MockMap, _ context: MappingContext) -> ())? = nil
+    var catchMapping: ((_ toMap: MockMap, _ context: MappingContext) -> ())? = nil
     
     var adapter: MockMap {
         return self
@@ -17,8 +17,8 @@ class MockMap: Mapping, Adapter {
         return nil
     }
     
-    func mapping(tomap: inout MockMap, context: MappingContext) {
-        catchMapping!(tomap, context)
+    func mapping(toMap: inout MockMap, context: MappingContext) {
+        catchMapping!(toMap, context)
     }
     
     func mappingBegins() throws { }
@@ -41,7 +41,7 @@ class CRMapperTests: XCTestCase {
         let mapper = Mapper()
         
         var tested = false
-        mockMap.catchMapping = { (tomap, context) in
+        mockMap.catchMapping = { (toMap, context) in
             tested = true
             XCTAssertTrue(context.parent! === parent)
         }
