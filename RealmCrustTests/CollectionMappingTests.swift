@@ -9,7 +9,7 @@ class CollectionMappingTests: RealmMappingTest {
     class IntMapping: AnyMapping {
         typealias AdapterKind = AnyAdapterImp<Int>
         typealias MappedObject = Int
-        func mapping(tomap: inout Int, context: MappingContext) { }
+        func mapping(toMap: inout Int, context: MappingContext) { }
     }
     
     func testDefaultInsertionPolicyIsReplaceUnique() {
