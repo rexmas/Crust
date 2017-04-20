@@ -47,7 +47,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
+                map(toRLMArray: toMap.employees, using: (.collectionMapping("employees", employeeMapping, (.append, true)), context))
             }
         }
         
@@ -94,7 +94,7 @@ class CollectionMappingTests: RealmMappingTest {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
+                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
             }
         }
         
@@ -135,7 +135,7 @@ class CollectionMappingTests: RealmMappingTest {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (Binding.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
+                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
             }
         }
         

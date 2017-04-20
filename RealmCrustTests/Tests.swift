@@ -35,8 +35,8 @@ public class UserMapping: RealmMapping {
         let birthdateMapping = DateMapping(dateFormatter: DateFormatter.isoFormatter)
         let primaryKeyMapping = PrimaryKeyMapping()
         
-        toMap.birthDate     <- (Binding.mapping("birthdate", birthdateMapping), context)
-        toMap.identifier    <- (Binding.mapping("id_hash", primaryKeyMapping), context)
+        toMap.birthDate     <- (.mapping("birthdate", birthdateMapping), context)
+        toMap.identifier    <- (.mapping("id_hash", primaryKeyMapping), context)
         toMap.name          <- ("user_name", context)
         toMap.surname       <- ("user_surname", context)
         toMap.height        <- ("height", context)

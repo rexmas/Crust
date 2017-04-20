@@ -1,7 +1,6 @@
 import Crust
 
-class Employee {
-    
+class Employee: Equatable {
     required init() { }
     
     var employer: Company?
@@ -11,6 +10,10 @@ class Employee {
     var salary: Int = 0
     var isEmployeeOfMonth: Bool = false
     var percentYearlyRaise: Double = 0.0
+    
+    static func ==(lhs: Employee, rhs: Employee) -> Bool {
+        return lhs.uuid == rhs.uuid
+    }
 }
 
 extension Employee: AnyMappable { }

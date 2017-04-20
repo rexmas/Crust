@@ -20,13 +20,23 @@ infix operator <- : AssignmentPrecedence
 // Map with a key path.
 
 @discardableResult
-public func <- <T: JSONable, MC: MappingContext>(field: inout T, keyPath:(key: JSONKeypath, context: MC)) -> MC where T == T.ConversionType {
-    return map(to: &field, via: keyPath)
+public func <- <T: JSONable, MC: MappingContext>(field: inout T, keyPath:(key: String, context: MC)) -> MC where T == T.ConversionType {
+    return map(to: &field, via: (keyPath.key as JSONKeypath, keyPath.context))
 }
 
 @discardableResult
-public func <- <T: JSONable, MC: MappingContext>(field: inout T?, keyPath:(key: JSONKeypath, context: MC)) -> MC where T == T.ConversionType {
-    return map(to: &field, via: keyPath)
+public func <- <T: JSONable, MC: MappingContext>(field: inout T?, keyPath:(key: String, context: MC)) -> MC where T == T.ConversionType {
+    return map(to: &field, via: (keyPath.key as JSONKeypath, keyPath.context))
+}
+
+@discardableResult
+public func <- <T: JSONable, MC: MappingContext>(field: inout T, keyPath:(key: Int, context: MC)) -> MC where T == T.ConversionType {
+    return map(to: &field, via: (keyPath.key as JSONKeypath, keyPath.context))
+}
+
+@discardableResult
+public func <- <T: JSONable, MC: MappingContext>(field: inout T?, keyPath:(key: Int, context: MC)) -> MC where T == T.ConversionType {
+    return map(to: &field, via: (keyPath.key as JSONKeypath, keyPath.context))
 }
 
 // Map with a generic binding.
