@@ -135,7 +135,7 @@ public func map<T, M: Mapping, MC: MappingContext>(to field: inout T, using bind
             // TODO: again, need to allow for `nil` keypaths.
             if let baseJSON: JSONValue = {
                 let key = binding.key
-                let json = binding.context.json[binding.key]
+                let json = binding.context.json[binding.key.keyPath]
                 if json == nil && key.keyPath == "" {
                     return binding.context.json
                 }
@@ -174,7 +174,7 @@ public func map<T, M: Mapping, MC: MappingContext>(to field: inout T?, using bin
             let json = binding.context.json
             try binding.context.json = Crust.map(to: json, from: field, via: key, using: mapping)
         case .fromJSON:
-            if let baseJSON = binding.context.json[binding.key] {
+            if let baseJSON = binding.context.json[binding.key.keyPath] {
                 try map(from: baseJSON, to: &field, using: mapping, context: binding.context)
             }
             else {
@@ -296,7 +296,7 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
         switch binding.context.dir {
         case .toJSON:
             let json = binding.context.json
-            try binding.context.json = Crust.map(to: json, from: field, via: binding.key, using: binding.key.mapping)
+            try binding.context.json = Crust.map(to: json, from: field, via: binding.key.keyPath, using: binding.key.mapping)
             
         case .fromJSON:
             let fieldCopy = field
@@ -353,7 +353,7 @@ private func mapFromJsonToSequence<T, M: Mapping, MC: MappingContext>(
         var newObjects: [T] = []
         
         let json = map.context.json
-        let baseJSON = json[map.key]
+        let baseJSON = json[map.key.keyPath]
         let updatePolicy = map.key.collectionUpdatePolicy
         
         // TODO: Stupid hack for empty string keypaths. Fix by allowing `nil` keyPath.

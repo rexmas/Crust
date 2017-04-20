@@ -98,6 +98,8 @@ public class RealmAdapter: Adapter {
         return type.sanitizeValue(value, fromProperty: property, realm: self.realm)
     }
     
+    // TODO: This should throw and we should check that the primary key's type and value's sanitized type match.
+    // Otherwise we get an exception from Realm here.
     public func fetchObjects(type: RLMObject.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? {
         
         var totalPredicate = [NSPredicate]()
@@ -151,9 +153,9 @@ extension RLMArray {
         }
         return index
     }
-
+    
     public typealias Index = UInt
-
+    
     public func append(_ newElement: RLMObject) {
         self.addObjectNonGeneric(newElement)
     }
@@ -203,12 +205,12 @@ public class RealmSwiftObjectAdapterBridge<T>: Adapter {
     }
     
     public func save(objects: [BaseType]) throws {
-        let rlmObjs = objects.map { unsafeBitCast($0, to: type(of: self.realmObjCAdapter).BaseType.self) }
+        let rlmObjs = objects.map { unsafeDowncast($0 as AnyObject, to: type(of: self.realmObjCAdapter).BaseType.self) }
         try self.realmObjCAdapter.save(objects: rlmObjs)
     }
     
     public func deleteObject(_ obj: BaseType) throws {
-        let rlmObj = unsafeBitCast(obj, to: type(of: self.realmObjCAdapter).BaseType.self)
+        let rlmObj = unsafeDowncast(obj as AnyObject, to: type(of: self.realmObjCAdapter).BaseType.self)
         try self.realmObjCAdapter.deleteObject(rlmObj)
     }
     
