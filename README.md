@@ -177,7 +177,7 @@ func mapping(inout toMap: Company, context: MappingContext) {
   * Uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
   * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
 
-By default using `.mapping` will `(.replace(delete: nil), true)`.
+By default using `.mapping` will `(insert: .replace(delete: nil), unique: true)`.
 
 ```swift
 public enum CollectionInsertionMethod<Container: Sequence> {
