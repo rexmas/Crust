@@ -172,8 +172,9 @@ func mapping(inout toMap: Company, context: MappingContext) {
 `Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper of these directives. They include
 * replace and/or delete objects
 * append objects to the collection
-* unique objects in collection (remove duplicates)
-  * uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
+* unique objects in collection (merge duplicates)
+  * Latest object overwrites existing object on merge.
+  * Uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
   * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
 
 By default using `.mapping` will `(insert: .append, unique: true)`.
