@@ -1,7 +1,6 @@
 import Crust
 
 class Employee {
-    
     required init() { }
     
     var employer: Company?

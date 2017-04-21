@@ -9,7 +9,7 @@ public enum CollectionInsertionMethod<Element> {
 public typealias CollectionUpdatePolicy<Element> =
     (insert: CollectionInsertionMethod<Element>, unique: Bool)
 
-public enum Binding<M: Mapping>: Keypath {
+public enum Binding<M: Mapping> {
     
     case mapping(Keypath, M)
     case collectionMapping(Keypath, M, CollectionUpdatePolicy<M.MappedObject>)

@@ -17,7 +17,7 @@ class PrimaryObj1Mapping : RealmMapping {
     func mapping(toMap: inout PrimaryObj1, context: MappingContext) {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
-        map(toRLMArray: toMap.class2s, using: (Binding.mapping("class2s", obj2Mapping), context))
+        map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), context))
         toMap.uuid          <- "data.uuid" >*<
         context
     }
