@@ -9,10 +9,6 @@ public func >*< <T, U>(left: T, right: U) -> (T, U) {
     return (left, right)
 }
 
-public func >*< <T: JSONKeypath, U>(left: T, right: U) -> (JSONKeypath, U) {
-    return (left, right)
-}
-
 // MARK: - Map value operator definition
 
 infix operator <- : AssignmentPrecedence

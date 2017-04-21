@@ -28,7 +28,7 @@ class CompanyMapping: Mapping {
     func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- Binding.mapping("employees", employeeMapping) >*<
+        toMap.employees             <- .mapping("employees", employeeMapping) >*<
         toMap.founder               <- .mapping("founder", employeeMapping) >*<
         toMap.uuid                  <- "data.uuid" >*<
         toMap.name                  <- "name" >*<
@@ -43,7 +43,7 @@ class CompanyMappingWithDupes: CompanyMapping {
     override func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- Binding.collectionMapping("employees", employeeMapping, (.append, true)) >*<
+        toMap.employees             <- .collectionMapping("employees", employeeMapping, (.append, true)) >*<
         toMap.founder               <- .mapping("founder", employeeMapping) >*<
         toMap.uuid                  <- "data.uuid" >*<
         toMap.name                  <- "name" >*<
