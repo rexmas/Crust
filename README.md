@@ -173,8 +173,8 @@ func mapping(inout toMap: Company, context: MappingContext) {
 * replace and/or delete objects
 * append objects to the collection
 * unique objects in collection (remove duplicates)
-  * uniquing on works if the `Element` of the collection being mapped to follows `Equatable`.
-  * If the `Element` does not follow `Equatable` its is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
+  * uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
+  * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
 
 By default using `.mapping` will `(insert: .append, unique: true)`.
 
