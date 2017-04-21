@@ -282,7 +282,7 @@ public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
 @discardableResult
 public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC, binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject {
     
-    return map(toCollection: &field, using: binding, elementEquality: nil, indexOf: nil, fieldContains: nil)
+    return map(toCollection: &field, using: binding, elementEquality: nil, indexOf: nil, contains: nil)
 }
 
 private func map<T, M: Mapping, S: Sequence>(
@@ -316,7 +316,7 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
             }
         }
         
-        return map(toCollection: &field, using: binding, elementEquality: equality, indexOf: RRC.index(of:), fieldContains: RRC.contains)
+        return map(toCollection: &field, using: binding, elementEquality: equality, indexOf: RRC.index(of:), contains: RRC.contains)
 }
 
 @discardableResult
@@ -325,7 +325,7 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
      using binding:(key: Binding<M>, context: MC),
      elementEquality: ((T) -> (T) -> Bool)?,
      indexOf: ((RRC) -> (T) -> RRC.Index?)?,
-     fieldContains: ((RRC) -> (T) -> Bool)?)
+     contains: ((RRC) -> (T) -> Bool)?)
     -> MC
     where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject {
     
@@ -337,7 +337,7 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
             
         case .fromJSON:
             let fieldCopy = field
-            let contains = fieldContains?(fieldCopy)
+            let contains = contains?(fieldCopy)
             let (newObjects, _) = try mapFromJsonToSequence(
                 map: binding,
                 newObjectsContains: elementEquality ?? { _ in { _ in false } },
@@ -351,9 +351,13 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
                 var orphans: RRC = field
                 
                 if let deletion = deletionBlock {
-                    newObjects.forEach {
-                        if let index = indexOf?(orphans)($0) {
-                            orphans.remove(at: index)
+                    // Check if any of our newly mapped objects previously existed in our collection
+                    // and prune them from orphans, because in which case, we don't want to delete them.
+                    if let indexOfFunc = indexOf?(orphans) {
+                        newObjects.forEach {
+                            if let index = indexOfFunc($0) {
+                                orphans.remove(at: index)
+                            }
                         }
                     }
                     
