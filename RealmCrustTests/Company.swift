@@ -16,7 +16,7 @@ public class CompanyMapping : RealmMapping {
     public func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
-        toMap.employees             <- (.collectionMapping("employees", employeeMapping, (.append, true)), context)
+        toMap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
         toMap.founder               <- .mapping("founder", employeeMapping) >*< context
         toMap.name                  <- "name" >*<
         toMap.foundingDate          <- "data.founding_date"  >*<

@@ -47,7 +47,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: toMap.employees, using: (.collectionMapping("employees", employeeMapping, (.append, true)), context))
+                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
             }
         }
         
