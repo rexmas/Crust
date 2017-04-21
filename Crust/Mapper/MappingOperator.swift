@@ -271,10 +271,18 @@ private func map<T, M: Mapping>(from json: JSONValue, to field: inout T?, using 
 
 // MARK: - RangeReplaceableCollectionType (Array and Realm List follow this protocol).
 
+/// This handles the case where our Collection contains Equatable objects, and thus can be uniqued during insertion and deletion.
 @discardableResult
 public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC, binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
     
     return map(toCollection: &field, using: binding)
+}
+
+/// This is for Collections with non-Equatable objects.
+@discardableResult
+public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC, binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject {
+    
+    return map(toCollection: &field, using: binding, elementEquality: nil, indexOf: nil, fieldContains: nil)
 }
 
 private func map<T, M: Mapping, S: Sequence>(
@@ -296,7 +304,30 @@ private func map<T, M: Mapping, S: Sequence>(
 }
 
 @discardableResult
-public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(toCollection field: inout RRC, using binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
+public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>
+    (toCollection field: inout RRC,
+     using binding:(key: Binding<M>, context: MC))
+    -> MC
+    where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
+        
+        let equality: (T) -> (T) -> Bool = { obj in
+            { compared in
+                obj == compared
+            }
+        }
+        
+        return map(toCollection: &field, using: binding, elementEquality: equality, indexOf: RRC.index(of:), fieldContains: RRC.contains)
+}
+
+@discardableResult
+public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>
+    (toCollection field: inout RRC,
+     using binding:(key: Binding<M>, context: MC),
+     elementEquality: ((T) -> (T) -> Bool)?,
+     indexOf: ((RRC) -> (T) -> RRC.Index?)?,
+     fieldContains: ((RRC) -> (T) -> Bool)?)
+    -> MC
+    where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject {
     
     do {
         switch binding.context.dir {
@@ -306,9 +337,11 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
             
         case .fromJSON:
             let fieldCopy = field
-            let (newObjects, _) = try mapFromJsonToSequence(map: binding) {
-                fieldCopy.contains($0)
-            }
+            let contains = fieldContains?(fieldCopy)
+            let (newObjects, _) = try mapFromJsonToSequence(
+                map: binding,
+                newObjectsContains: elementEquality ?? { _ in { _ in false } },
+                fieldContains: contains ?? { _ in false })
             
             switch binding.key.collectionUpdatePolicy.insert {
             case .append:
@@ -319,7 +352,7 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
                 
                 if let deletion = deletionBlock {
                     newObjects.forEach {
-                        if let index = orphans.index(of: $0) {
+                        if let index = indexOf?(orphans)($0) {
                             orphans.remove(at: index)
                         }
                     }
@@ -347,9 +380,10 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
 // Gets all newly mapped data and returns it in an array, caller can decide to append and what-not.
 private func mapFromJsonToSequence<T, M: Mapping, MC: MappingContext>(
     map:(key: Binding<M>, context: MC),
+    newObjectsContains: @escaping (T) -> (T) -> Bool,
     fieldContains: (T) -> Bool)
     throws -> (newObjects: [T], context: MC)
-    where M.MappedObject == T, T: Equatable {
+    where M.MappedObject == T {
     
         guard map.context.error == nil else {
             throw map.context.error!
@@ -367,6 +401,7 @@ private func mapFromJsonToSequence<T, M: Mapping, MC: MappingContext>(
             newObjects = try generateNewValues(fromJsonArray: json,
                                      with: updatePolicy,
                                      using: mapping,
+                                     newObjectsContains: newObjectsContains,
                                      fieldContains: fieldContains,
                                      context: map.context)
         }
@@ -374,6 +409,7 @@ private func mapFromJsonToSequence<T, M: Mapping, MC: MappingContext>(
             newObjects = try generateNewValues(fromJsonArray: baseJSON,
                                      with: updatePolicy,
                                      using: mapping,
+                                     newObjectsContains: newObjectsContains,
                                      fieldContains: fieldContains,
                                      context: map.context)
         }
@@ -389,10 +425,11 @@ private func generateNewValues<T, M: Mapping>(
     fromJsonArray json: JSONValue,
     with updatePolicy: CollectionUpdatePolicy<M.MappedObject>,
     using mapping: M,
+    newObjectsContains: @escaping (T) -> (T) -> Bool,
     fieldContains: (T) -> Bool,
     context: MappingContext)
     throws -> [T]
-    where M.MappedObject == T, T: Equatable {
+    where M.MappedObject == T {
     
         guard case .array(let jsonArray) = json else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
@@ -404,7 +441,7 @@ private func generateNewValues<T, M: Mapping>(
         var newObjects = [T]()
         
         let isUnique = { (obj: T, newObjects: [T], fieldContains: (T) -> Bool) -> Bool in
-            let newObjectsContainsObj = newObjects.contains(obj)
+            let newObjectsContainsObj = newObjects.contains(where: newObjectsContains(obj))
             
             switch updatePolicy.insert {
             case .replace(_):
