@@ -7,7 +7,7 @@ public enum CollectionInsertionMethod<Element> {
 }
 
 public typealias CollectionUpdatePolicy<Element> =
-    (insert: CollectionInsertionMethod<Element>, unique: Bool)
+    (insert: CollectionInsertionMethod<Element>, unique: Bool, nullable: Bool)
 
 public enum Binding<M: Mapping> {
     
@@ -35,7 +35,7 @@ public enum Binding<M: Mapping> {
     public var collectionUpdatePolicy: CollectionUpdatePolicy<M.MappedObject> {
         switch self {
         case .mapping(_, _):
-            return (.replace(delete: nil), true)
+            return (.replace(delete: nil), true, true)
         case .collectionMapping(_, _, let method):
             return method
         }
