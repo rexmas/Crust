@@ -6,21 +6,6 @@ extension Int: AnyMappable { }
 
 class CollectionMappingTests: RealmMappingTest {
     
-    class IntMapping: AnyMapping {
-        typealias AdapterKind = AnyAdapterImp<Int>
-        typealias MappedObject = Int
-        func mapping(toMap: inout Int, context: MappingContext) { }
-    }
-    
-    func testDefaultInsertionPolicyIsReplaceUnique() {
-        let binding = Binding.mapping("", IntMapping())
-        let policy = binding.collectionUpdatePolicy
-        guard case (.replace(delete: nil), true) = policy else {
-            XCTFail()
-            return
-        }
-    }
-    
     func testMappingCollection() {
         let employeeStub = EmployeeStub()
         let employeeStub2 = EmployeeStub()
@@ -47,7 +32,7 @@ class CollectionMappingTests: RealmMappingTest {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context))
+                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context))
             }
         }
         
@@ -94,7 +79,7 @@ class CollectionMappingTests: RealmMappingTest {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true)), context))
+                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true, false)), context))
             }
         }
         
@@ -135,7 +120,7 @@ class CollectionMappingTests: RealmMappingTest {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true)), context))
+                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, false)), context))
             }
         }
         
@@ -172,9 +157,156 @@ class CollectionMappingTests: RealmMappingTest {
         XCTAssertEqual(original.uuid, company.uuid)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 3)
         XCTAssertEqual(employees.count, 3)
-        print(employees)
         XCTAssertTrue(employeeStub.matches(object: employees[0]))
         XCTAssertTrue(employeeStub2.matches(object: employees[1]))
         XCTAssertTrue(dupEmployeeStub.matches(object: employees[2]))
+    }
+    
+    func testAssigningNullToCollectionWhenReplaceNullableRemovesAllAndDeletes() {
+        class CompanyMappingReplaceNullable: CompanyMapping {
+            override func mapping(toMap: inout Company, context: MappingContext) {
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
+                map(toRLMArray: toMap.employees,
+                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, true)), context))
+            }
+        }
+        
+        let uuid = NSUUID().uuidString
+        let dupEmployeeStub = EmployeeStub()
+        
+        let original = Company()
+        let originalEmployee = Employee()
+        let dupEmployee = Employee()
+        original.uuid = uuid
+        originalEmployee.uuid = uuid
+        dupEmployee.uuid = dupEmployeeStub.uuid
+        original.employees.append(originalEmployee)
+        original.employees.append(dupEmployee)
+        
+        let outsideEmployee = Employee()
+        
+        try! self.adapter!.save(objects: [ original, outsideEmployee ])
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 3)
+        
+        let companyStub = CompanyStub()
+        companyStub.employees = []
+        companyStub.uuid = original.uuid!
+        var jsonObj = companyStub.generateJsonObject()
+        XCTAssertEqual(jsonObj["employees"] as! NSArray, [])    // Sanity check.
+        
+        jsonObj["employees"] = NSNull()
+        XCTAssertEqual(jsonObj["employees"] as! NSNull, NSNull())    // Sanity check.
+        
+        let json = try! JSONValue(object: jsonObj)
+        
+        let mapping = CompanyMappingReplaceNullable(adapter: self.adapter!)
+        let mapper = Mapper()
+        
+        let spec = Binding.mapping("", mapping)
+        let company: Company = try! mapper.map(from: json, using: spec)
+        let employees = company.employees
+        
+        XCTAssertEqual(original.uuid, company.uuid)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(employees.count, 0)
+    }
+    
+    func testAssigningNullToCollectionWhenAppendNullableDoesNothing() {
+        class CompanyMappingAppendNullable: CompanyMapping {
+            override func mapping(toMap: inout Company, context: MappingContext) {
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
+                map(toRLMArray: toMap.employees,
+                    using: (.collectionMapping("employees", employeeMapping, (.append, true, true)), context))
+            }
+        }
+        
+        let uuid = NSUUID().uuidString
+        let dupEmployeeStub = EmployeeStub()
+        
+        let original = Company()
+        let originalEmployee = Employee()
+        let dupEmployee = Employee()
+        original.uuid = uuid
+        originalEmployee.uuid = uuid
+        dupEmployee.uuid = dupEmployeeStub.uuid
+        original.employees.append(originalEmployee)
+        original.employees.append(dupEmployee)
+        
+        try! self.adapter!.save(objects: [ original ])
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
+        
+        let companyStub = CompanyStub()
+        companyStub.employees = []
+        companyStub.uuid = original.uuid!
+        var jsonObj = companyStub.generateJsonObject()
+        XCTAssertEqual(jsonObj["employees"] as! NSArray, [])    // Sanity check.
+        
+        jsonObj["employees"] = NSNull()
+        XCTAssertEqual(jsonObj["employees"] as! NSNull, NSNull())    // Sanity check.
+        
+        let json = try! JSONValue(object: jsonObj)
+        
+        let mapping = CompanyMappingAppendNullable(adapter: self.adapter!)
+        let mapper = Mapper()
+        
+        let spec = Binding.mapping("", mapping)
+        let company: Company = try! mapper.map(from: json, using: spec)
+        let employees = company.employees
+        
+        XCTAssertEqual(employees.count, 2)
+        XCTAssertEqual(original.uuid, company.uuid)
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
+    }
+    
+    func testAssigningNullToCollectionWhenNonNullableThrows() {
+        class CompanyMappingAppendNonNullable: CompanyMapping {
+            override func mapping(toMap: inout Company, context: MappingContext) {
+                let employeeMapping = EmployeeMapping(adapter: self.adapter)
+                map(toRLMArray: toMap.employees,
+                    using: (.collectionMapping("employees", employeeMapping, (.append, true, false)), context))
+            }
+        }
+        
+        let uuid = NSUUID().uuidString
+        let dupEmployeeStub = EmployeeStub()
+        
+        let original = Company()
+        let originalEmployee = Employee()
+        let dupEmployee = Employee()
+        original.uuid = uuid
+        originalEmployee.uuid = uuid
+        dupEmployee.uuid = dupEmployeeStub.uuid
+        original.employees.append(originalEmployee)
+        original.employees.append(dupEmployee)
+        
+        try! self.adapter!.save(objects: [ original ])
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
+        
+        let companyStub = CompanyStub()
+        companyStub.employees = []
+        companyStub.uuid = original.uuid!
+        var jsonObj = companyStub.generateJsonObject()
+        XCTAssertEqual(jsonObj["employees"] as! NSArray, [])    // Sanity check.
+        
+        jsonObj["employees"] = NSNull()
+        XCTAssertEqual(jsonObj["employees"] as! NSNull, NSNull())    // Sanity check.
+        
+        let json = try! JSONValue(object: jsonObj)
+        
+        let mapping = CompanyMappingAppendNonNullable(adapter: self.adapter!)
+        let mapper = Mapper()
+        
+        let spec = Binding.mapping("", mapping)
+        let testFunc = {
+            let _: Company = try mapper.map(from: json, using: spec)
+        }
+        
+        XCTAssertThrowsError(try testFunc())
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
     }
 }

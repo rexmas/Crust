@@ -16,7 +16,7 @@ public class CompanyMapping : RealmMapping {
     public func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
-        toMap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true)), context)
+        toMap.employees             <- (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
         toMap.founder               <- .mapping("founder", employeeMapping) >*< context
         toMap.name                  <- "name" >*<
         toMap.foundingDate          <- "data.founding_date"  >*<
@@ -30,8 +30,8 @@ public class CompanyMappingWithDupes : CompanyMapping {
     public override func mapping(toMap: inout Company, context: MappingContext) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
-        toMap.employees <- (.collectionMapping("employees", employeeMapping, (.append, false)), context)
-        toMap.founder               <- .mapping("founder", employeeMapping) >*<
+        toMap.employees             <- (.collectionMapping("employees", employeeMapping, (.append, false, false)), context)
+        toMap.founder               <- Binding.mapping("founder", employeeMapping) >*<
         toMap.uuid                  <- "data.uuid" >*<
         toMap.name                  <- "name" >*<
         toMap.foundingDate          <- "data.founding_date"  >*<

@@ -10,6 +10,7 @@ A flexible Swift framework for converting classes and structs to and from JSON w
 - [Type safe JSON](#jsonvalue-for-type-safe-json)
 - [How To Map](#how-to-map)
   - [Nested Mappings](#nested-mappings)
+  - [Binding and Collections](#binding-and-collections)
   - [Mapping Context](#mapping-context)
   - [Custom Transformations](#custom-transformations)
   - [Different Mappings for Same Model](#different-mappings-for-same-model)
@@ -167,17 +168,28 @@ func mapping(inout toMap: Company, context: MappingContext) {
 }
 ```
 
-### Binding and collections
+### Binding and Collections
 
 `Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper of these directives. They include
 * replace and/or delete objects
 * append objects to the collection
 * unique objects in collection (merge duplicates)
-  * Latest object overwrites existing object on merge.
-  * Uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
-  * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
+  * The latest mapped properties overwrite the existing object's properties during uniquing. Properties not mapped remain unchanged.
+  * Uniquing works automatically if the `Element`s of the collection being mapped follow `Equatable`.
+  * If the `Element`s do not follow `Equatable` then uniquing is ignored unless `UniquingFunctions` are explicitly provided and the mapping function `map(toCollection field:, using binding:, uniquing:)` is used.
+* Accept "null" values to map from the collection.
 
-By default using `.mapping` will `(insert: .replace(delete: nil), unique: true)`.
+This table provides some examples of how "null" json values are mapped depending on the type of Collection being mapped to and given the value of `nullable` and whether values or "null" are present in the JSON payload.
+
+| append / replace  | nullable  | vals / null | Array     | Array?      | RLMArray  |
+|-------------------|-----------|-------------|-----------|-------------|-----------|
+| append            | yes or no | vals        | append    | append      | append    |
+| append            | yes       | null        | no-op     | no-op       | no-op     |
+| replace           | yes or no | vals        | replace   | replace     | replace   |
+| replace           | yes       | null        | removeAll | assign null | removeAll |
+| append or replace | no        | null        | error     | error       | error     |
+
+By default using `.mapping` will `(insert: .replace(delete: nil), unique: true, nullable: true)`.
 
 ```swift
 public enum CollectionInsertionMethod<Container: Sequence> {
@@ -186,7 +198,7 @@ public enum CollectionInsertionMethod<Container: Sequence> {
 }
 
 public typealias CollectionUpdatePolicy<Container: Sequence> =
-    (insert: CollectionInsertionMethod<Container>, unique: Bool)
+    (insert: CollectionInsertionMethod<Container>, unique: Bool, nullable: Bool)
 
 public enum Binding<M: Mapping>: Keypath {
     case mapping(Keypath, M)
@@ -197,7 +209,7 @@ public enum Binding<M: Mapping>: Keypath {
 Usage:
 ```swift
 let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
-let binding = Binding.collectionMapping("", employeeMapping, (.replace(delete: nil), true))
+let binding = Binding.collectionMapping("", employeeMapping, (.replace(delete: nil), true, true))
 toMap.employees <- (binding, context)
 ```
 Look in ./Mapper/MappingProtocols.swift for more.
