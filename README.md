@@ -172,9 +172,10 @@ func mapping(inout toMap: Company, context: MappingContext) {
 `Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper of these directives. They include
 * replace and/or delete objects
 * append objects to the collection
-* unique objects in collection (remove duplicates)
-  * uniquing on works if the `Element` of the collection being mapped to follows `Equatable`.
-  * If the `Element` does not follow `Equatable` its is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
+* unique objects in collection (merge duplicates)
+  * Latest object overwrites existing object on merge.
+  * Uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
+  * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
 * Accept "null" values to map from the collection.
 
 This table provides some examples of how "null" json values are mapped depending on the type of Collection being mapped to and given the value of `nullable` and whether values or "null" are present in the JSON payload.
@@ -187,7 +188,7 @@ This table provides some examples of how "null" json values are mapped depending
 | replace           | yes       | null        | removeAll | assign null | removeAll |
 | append or replace | no        | null        | error     | error       | error     |
 
-By default using `.mapping` will `(insert: .append, unique: true, nullable: true)`.
+By default using `.mapping` will `(insert: .replace(delete: nil), unique: true, nullable: true)`.
 
 ```swift
 public enum CollectionInsertionMethod<Container: Sequence> {
