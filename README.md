@@ -10,6 +10,7 @@ A flexible Swift framework for converting classes and structs to and from JSON w
 - [Type safe JSON](#jsonvalue-for-type-safe-json)
 - [How To Map](#how-to-map)
   - [Nested Mappings](#nested-mappings)
+  - [Binding and Collections](#binding-and-collections)
   - [Mapping Context](#mapping-context)
   - [Custom Transformations](#custom-transformations)
   - [Different Mappings for Same Model](#different-mappings-for-same-model)
@@ -173,9 +174,9 @@ func mapping(inout toMap: Company, context: MappingContext) {
 * replace and/or delete objects
 * append objects to the collection
 * unique objects in collection (merge duplicates)
-  * Latest object overwrites existing object on merge.
-  * Uniquing only works if the `Element` of the collection being mapped to follows `Equatable`.
-  * If the `Element` does not follow `Equatable` it is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
+  * The latest mapped properties overwrite the existing object's properties during uniquing. Properties not mapped remain unchanged.
+  * Uniquing works automatically if the `Element`s of the collection being mapped follow `Equatable`.
+  * If the `Element`s do not follow `Equatable` then uniquing is ignored unless `UniquingFunctions` are explicitly provided and the mapping function `map(toCollection field:, using binding:, uniquing:)` is used.
 * Accept "null" values to map from the collection.
 
 This table provides some examples of how "null" json values are mapped depending on the type of Collection being mapped to and given the value of `nullable` and whether values or "null" are present in the JSON payload.
