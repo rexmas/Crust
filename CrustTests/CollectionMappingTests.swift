@@ -5,7 +5,7 @@ import JSONValueRX
 // We test the following.
 // | append / replace  | nullable  | vals / null | Array     | Array?      | RLMArray  |
 // |-------------------|-----------|-------------|-----------|-------------|-----------|
-// | append            | yes or no | append      | append    | append      | append    |
+// | append            | yes or no | vals        | append    | append      | append    |
 // | append            | yes       | null        | no-op     | no-op       | no-op     |
 // | replace           | yes or no | vals        | replace   | replace     | replace   |
 // | replace           | yes       | null        | removeAll | assign null | removeAll |
