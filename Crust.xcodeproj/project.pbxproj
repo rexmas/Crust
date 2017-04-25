@@ -45,6 +45,8 @@
 		CD2014201E30135100D16F14 /* CollectionMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD20141F1E30135100D16F14 /* CollectionMappingTests.swift */; };
 		CD57E9561EAEB39800FB4C80 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD57E9551EAEB39800FB4C80 /* Utilities.swift */; };
 		CD57E9581EAEB7F300FB4C80 /* CollectionMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD57E9571EAEB7F300FB4C80 /* CollectionMappingTests.swift */; };
+		CD57E95A1EAFEE8B00FB4C80 /* NestedMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD57E9591EAFEE8B00FB4C80 /* NestedMappingTests.swift */; };
+		CD57E95C1EAFF46300FB4C80 /* NestedMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD57E95B1EAFF46300FB4C80 /* NestedMappingTests.swift */; };
 		CDFA6C8F1E4BE45D00E30982 /* RLMArrayBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFA6C8E1E4BE45D00E30982 /* RLMArrayBridge.swift */; };
 /* End PBXBuildFile section */
 
@@ -118,6 +120,8 @@
 		CD20141F1E30135100D16F14 /* CollectionMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionMappingTests.swift; sourceTree = "<group>"; };
 		CD57E9551EAEB39800FB4C80 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		CD57E9571EAEB7F300FB4C80 /* CollectionMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionMappingTests.swift; sourceTree = "<group>"; };
+		CD57E9591EAFEE8B00FB4C80 /* NestedMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NestedMappingTests.swift; sourceTree = "<group>"; };
+		CD57E95B1EAFF46300FB4C80 /* NestedMappingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NestedMappingTests.swift; sourceTree = "<group>"; };
 		CDFA6C8E1E4BE45D00E30982 /* RLMArrayBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMArrayBridge.swift; sourceTree = "<group>"; };
 		CE09890A415010E6701B39AE /* Pods-Crust-CrustTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Crust-CrustTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests.release.xcconfig"; sourceTree = "<group>"; };
 		DED40EDD9475BB525B3AEE0E /* Pods_Crust_RealmCrustTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Crust_RealmCrustTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -171,6 +175,7 @@
 				1767B7341DF778E700DE693C /* Employee.swift */,
 				1767B7351DF778E700DE693C /* EmployeeMappingTests.swift */,
 				1767B7361DF778E700DE693C /* EmployeeStub.swift */,
+				CD57E95B1EAFF46300FB4C80 /* NestedMappingTests.swift */,
 				1767B7371DF778E700DE693C /* Operators.swift */,
 				1767B7381DF778E700DE693C /* PrimaryKeyTests.swift */,
 				CDFA6C8E1E4BE45D00E30982 /* RLMArrayBridge.swift */,
@@ -252,6 +257,7 @@
 				176675431BD31F3F0013DE5F /* EmployeeMappingTests.swift */,
 				17B983CD1BDC8B6A006BD35C /* EmployeeStub.swift */,
 				175C9A911C38A0A900B0D6E7 /* Mocks.swift */,
+				CD57E9591EAFEE8B00FB4C80 /* NestedMappingTests.swift */,
 				17B983CF1BDC8B95006BD35C /* Operators.swift */,
 				172FBC8B1C15140300CF2C71 /* Person.swift */,
 				172FBC911C152DA500CF2C71 /* StructMappingTests.swift */,
@@ -587,6 +593,7 @@
 				1767B7431DF778E700DE693C /* RealmMappingTest.swift in Sources */,
 				1767B73F1DF778E700DE693C /* EmployeeMappingTests.swift in Sources */,
 				1767B7481DF78F0B00DE693C /* RLMSupport.swift in Sources */,
+				CD57E95C1EAFF46300FB4C80 /* NestedMappingTests.swift in Sources */,
 				1767B73C1DF778E700DE693C /* CompanyMappingTests.swift in Sources */,
 				1767B7501DF7B24400DE693C /* Models.m in Sources */,
 				1767B7401DF778E700DE693C /* EmployeeStub.swift in Sources */,
@@ -614,6 +621,7 @@
 				17B983D41BDC8D7E006BD35C /* CompanyMappingTests.swift in Sources */,
 				17B583561C24B965005DBFA6 /* Company.swift in Sources */,
 				175C9A921C38A0A900B0D6E7 /* Mocks.swift in Sources */,
+				CD57E95A1EAFEE8B00FB4C80 /* NestedMappingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

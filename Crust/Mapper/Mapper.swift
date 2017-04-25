@@ -196,7 +196,7 @@ public extension Mapping {
     internal func start(context: MappingContext) throws {
         try self.checkForAdapterBaseTypeConformance()
         
-        if context.parent == nil {
+        if context.parent == nil || !self.adapter.mappingDidBegin {
             var underlyingError: NSError?
             do {
                 try self.adapter.mappingBegins()
@@ -228,7 +228,12 @@ public extension Mapping {
     }
     
     public func execute(object: inout MappedObject, context: MappingContext) {
-        self.mapping(toMap: &object, context: context)
+        do {
+            try self.mapping(toMap: &object, context: context)
+        }
+        catch let e {
+            context.error = e
+        }
     }
     
     internal func complete(object: inout MappedObject, context: MappingContext) throws {

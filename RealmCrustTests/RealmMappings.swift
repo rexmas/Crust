@@ -26,6 +26,10 @@ public class RealmAdapter: Adapter {
         self.init(realm: RLMRealm.default())
     }
     
+    public var mappingDidBegin: Bool {
+        return self.realm.inWriteTransaction
+    }
+    
     public func mappingBegins() throws {
         self.realm.beginWriteTransaction()
     }
@@ -187,6 +191,10 @@ public class RealmSwiftObjectAdapterBridge<T>: Adapter {
         self.rlmObjectType = rlmObjectType
     }
     
+    public var mappingDidBegin: Bool {
+        return self.realmObjCAdapter.mappingDidBegin
+    }
+    
     public func mappingBegins() throws {
         try self.realmObjCAdapter.mappingBegins()
     }
@@ -236,7 +244,7 @@ public class RLMArrayMappingBridge<T: RLMObject>: Mapping {
     
     public let adapter: RealmSwiftObjectAdapterBridge<MappedObject>
     public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
-    public let rlmObjectMapping: (inout MappedObject, MappingContext) -> Void
+    public let rlmObjectMapping: (inout MappedObject, MappingContext) throws -> Void
     
     public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject, OGMapping.MappedObject == T {
         
@@ -244,14 +252,14 @@ public class RLMArrayMappingBridge<T: RLMObject>: Mapping {
                                                      rlmObjectType: OGMapping.MappedObject.self)
         self.primaryKeys = rlmObjectMapping.primaryKeys
         
-        self.rlmObjectMapping = { (toMap: inout MappedObject, context: MappingContext) -> Void in
+        self.rlmObjectMapping = { (toMap: inout MappedObject, context: MappingContext) throws -> Void in
             var ogObject = unsafeDowncast(toMap, to: OGMapping.MappedObject.self)
-            rlmObjectMapping.mapping(toMap: &ogObject, context: context)
+            try rlmObjectMapping.mapping(toMap: &ogObject, context: context)
         }
     }
     
-    public final func mapping(toMap: inout MappedObject, context: MappingContext) {
-        self.rlmObjectMapping(&toMap, context)
+    public final func mapping(toMap: inout MappedObject, context: MappingContext) throws {
+        try self.rlmObjectMapping(&toMap, context)
     }
 }
 

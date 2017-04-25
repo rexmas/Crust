@@ -21,7 +21,8 @@ class MockMap: Mapping, Adapter {
         catchMapping!(toMap, context)
     }
     
-    func mappingBegins() throws { }
+    var mappingDidBegin: Bool = false
+    func mappingBegins() throws { self.mappingDidBegin = true }
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }
     public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: MockMap.Type) -> CVarArg? { return nil }

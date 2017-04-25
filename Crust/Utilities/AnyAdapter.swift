@@ -38,6 +38,7 @@ public protocol AnyAdapter: Adapter {
 
 public extension AnyAdapter {
     
+    var mappingDidBegin: Bool { return false }
     func mappingBegins() throws { }
     func mappingEnded() throws { }
     func mappingErrored(_ error: Error) { }

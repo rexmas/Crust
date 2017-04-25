@@ -66,7 +66,7 @@ public protocol Mapping {
     var primaryKeys: [PrimaryKeyDescriptor]? { get }
     
     /// Override to perform mappings to properties.
-    func mapping(toMap: inout MappedObject, context: MappingContext)
+    func mapping(toMap: inout MappedObject, context: MappingContext) throws
 }
 
 /// An Adapter to use to write and read objects from a persistance layer.
@@ -76,6 +76,8 @@ public protocol Adapter {
     
     /// The type of returned results after a fetch.
     associatedtype ResultsType: Collection
+    
+    var mappingDidBegin: Bool { get }
     
     /// Called at the beginning of mapping a json blob. Good place to start a write transaction. Will only
     /// be called once at the beginning of a tree of nested objects being mapped.
