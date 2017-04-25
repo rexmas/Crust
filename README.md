@@ -168,7 +168,7 @@ func mapping(inout toMap: Company, context: MappingContext) {
 }
 ```
 
-### Binding and collections
+### Binding and Collections
 
 `Binding` provides specialized directives when mapping collections. Use the `.collectionMapping` case to inform the mapper of these directives. They include
 * replace and/or delete objects
