@@ -175,8 +175,19 @@ func mapping(inout toMap: Company, context: MappingContext) {
 * unique objects in collection (remove duplicates)
   * uniquing on works if the `Element` of the collection being mapped to follows `Equatable`.
   * If the `Element` does not follow `Equatable` its is also possible to use `map(toCollection field:, using binding:, elementEquality:, indexOf:, contains:)` to provide explicit comparison / indexing functions required for uniquing.
+* Accept "null" values to map from the collection.
 
-By default using `.mapping` will `(insert: .append, unique: true)`.
+This table provides some examples of how "null" json values are mapped depending on the type of Collection being mapped to and given the value of `nullable` and whether values or "null" are present in the JSON payload.
+
+| append / replace  | nullable  | vals / null | Array     | Array?      | RLMArray  |
+|-------------------|-----------|-------------|-----------|-------------|-----------|
+| append            | yes or no | append      | append    | append      | append    |
+| append            | yes       | null        | no-op     | no-op       | no-op     |
+| replace           | yes or no | vals        | replace   | replace     | replace   |
+| replace           | yes       | null        | removeAll | assign null | removeAll |
+| append or replace | no        | null        | error     | error       | error     |
+
+By default using `.mapping` will `(insert: .append, unique: true, nullable: true)`.
 
 ```swift
 public enum CollectionInsertionMethod<Container: Sequence> {
@@ -185,7 +196,7 @@ public enum CollectionInsertionMethod<Container: Sequence> {
 }
 
 public typealias CollectionUpdatePolicy<Container: Sequence> =
-    (insert: CollectionInsertionMethod<Container>, unique: Bool)
+    (insert: CollectionInsertionMethod<Container>, unique: Bool, nullable: Bool)
 
 public enum Binding<M: Mapping>: Keypath {
     case mapping(Keypath, M)
@@ -196,7 +207,7 @@ public enum Binding<M: Mapping>: Keypath {
 Usage:
 ```swift
 let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
-let binding = Binding.collectionMapping("", employeeMapping, (.replace(delete: nil), true))
+let binding = Binding.collectionMapping("", employeeMapping, (.replace(delete: nil), true, true))
 toMap.employees <- (binding, context)
 ```
 Look in ./Mapper/MappingProtocols.swift for more.

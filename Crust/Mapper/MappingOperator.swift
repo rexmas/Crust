@@ -290,21 +290,19 @@ public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
 }
 
 //// Optional types.
-//
-//@discardableResult
-//public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC?, binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
-//    
-//    return map(toCollection: &field, using: binding)
-//}
-//
-///// This is for Collections with non-Equatable objects.
-//@discardableResult
-//public func <- <M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC?, binding:(key: Binding<M>, context: MC)) -> MC where RRC.Iterator.Element == M.MappedObject {
-//    
-//    let uniquingFunctions: UniquingFunctions<M.MappedObject, RRC> = ({ _ in { _ in false }}, { _ in { _ in nil }}, { _ in { _ in false }})
-//    
-//    return map(toCollection: &field, using: binding, uniquing: uniquingFunctions)
-//}
+
+@discardableResult
+public func <- <T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC?, binding:(key: Binding<M>, context: MC)) -> MC where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
+    
+    return map(toCollection: &field, using: binding, uniquing: RRC.defaultUniquingFunctions())
+}
+
+/// This is for Collections with non-Equatable objects.
+@discardableResult
+public func <- <M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>(field: inout RRC?, binding:(key: Binding<M>, context: MC)) -> MC where RRC.Iterator.Element == M.MappedObject {
+    
+    return map(toCollection: &field, using: binding, uniquing: nil)
+}
 
 /// Map into a `RangeReplaceableCollection` with `Equatable` `Element`.
 @discardableResult
@@ -314,21 +312,13 @@ public func map<T, M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollecti
     -> MC
     where M.MappedObject == T, RRC.Iterator.Element == M.MappedObject, T: Equatable {
         
-        let equality: (T) -> (T) -> Bool = { obj in
-            { compared in
-                obj == compared
-            }
-        }
-        
-        let uniquingFunctions = (equality, RRC.index(of:), RRC.contains)
-        
-        return map(toCollection: &field, using: binding, uniquing: uniquingFunctions)
+        return map(toCollection: &field, using: binding, uniquing: RRC.defaultUniquingFunctions())
 }
 
-/// General function to mapping JSON into a `RangeReplaceableCollection`.
+/// General function for mapping JSON into a `RangeReplaceableCollection`.
 ///
 /// Providing uniqing functions for equality comparison, fetching by index, and checking existence of elements allows
-/// for uniquing (merging/eliminating duplicates).
+/// for uniquing during insertion (merging/eliminating duplicates).
 @discardableResult
 public func map<M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>
     (toCollection field: inout RRC,
@@ -352,6 +342,47 @@ public func map<M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>
     }
     
     return binding.context
+}
+
+@discardableResult
+public func map<M: Mapping, MC: MappingContext, RRC: RangeReplaceableCollection>
+    (toCollection field: inout RRC?,
+     using binding:(key: Binding<M>, context: MC),
+     uniquing: UniquingFunctions<M.MappedObject, RRC>?)
+    -> MC
+    where RRC.Iterator.Element == M.MappedObject {
+        
+        do {
+            let json = binding.context.json
+            let baseJSON = try baseJSONForCollection(json: json, keyPath: binding.key.keyPath)
+            
+            switch binding.context.dir {
+            case .toJSON:
+                switch field {
+                case .some(_):
+                    try binding.context.json = Crust.map(to: json, from: field!, via: binding.key.keyPath, using: binding.key.mapping)
+                case .none:
+                    binding.context.json = .null()
+                }
+                
+            case .fromJSON:
+                if field == nil {
+                    field = RRC()
+                }
+                // Have to use `!` here or we'll be writing to a copy of `field`. Also, must go through mapping
+                // even in "null" case to handle deletes.
+                try mapFromJSON(toCollection: &field!, using: binding, uniquing: uniquing)
+                
+                if case .null() = baseJSON {
+                    field = nil
+                }
+            }
+        }
+        catch let error as NSError {
+            binding.context.error = error
+        }
+        
+        return binding.context
 }
 
 /// Our top level mapping function for mapping from a sequence/collection to JSON.
@@ -453,6 +484,23 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
         }
 }
 
+private func baseJSONForCollection(json: JSONValue, keyPath: Keypath) throws -> JSONValue {
+    let baseJSON = json[keyPath]
+    
+    // Walked an empty keypath, return the whole json payload if it's an empty array since subscripting on a json array calls `map`.
+    // TODO: May be simpler to support `nil` keyPaths.
+    if case .some(.array(let arr)) = baseJSON, keyPath.keyPath == "", arr.count == 0 {
+        return json
+    }
+    else if let baseJSON = baseJSON {
+        return baseJSON
+    }
+    else {
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(keyPath) does not exist to map from" ]
+        throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
+    }
+}
+
 /// Gets all newly mapped data and returns it in an array.
 ///
 /// - returns: The array of mapped values, `nil` if JSON at keypath is "null".
@@ -467,24 +515,7 @@ private func mapFromJsonToSequenceOfNewValues<M: Mapping, MC: MappingContext>(
         }
         
         let mapping = map.key.mapping
-        let baseJSON: JSONValue = try {
-            let json = map.context.json
-            let baseJSON = json[map.key.keyPath]
-            
-            // Walked an empty keypath, return the whole json payload if it's an empty array since subscripting on a json array calls `map`.
-            // TODO: May be simpler to support `nil` keyPaths.
-            if case .some(.array(let arr)) = baseJSON, map.key.keyPath == "", arr.count == 0 {
-                return json
-            }
-            else if let baseJSON = baseJSON {
-                return baseJSON
-            }
-            else {
-                let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(map.key) does not exist to map from" ]
-                throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
-            }
-        }()
-        
+        let baseJSON = try baseJSONForCollection(json: map.context.json, keyPath: map.key.keyPath)
         let updatePolicy = map.key.collectionUpdatePolicy
         
         let newValues = try generateNewValues(fromJsonArray: baseJSON,

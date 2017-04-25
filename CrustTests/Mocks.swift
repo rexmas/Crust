@@ -1,6 +1,8 @@
 import Crust
 
 class MockAdapter<T: AnyMappable>: Adapter {
+    var deletedObjects = [T]()
+    
     typealias BaseType = T
     typealias ResultsType = [T]
     
@@ -10,7 +12,7 @@ class MockAdapter<T: AnyMappable>: Adapter {
     public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: T.Type) -> CVarArg? { return nil }
     func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return [] }
     func createObject(type: BaseType.Type) throws -> BaseType { return type.init() }
-    func deleteObject(_ obj: BaseType) throws { }
+    func deleteObject(_ obj: BaseType) throws { deletedObjects.append(obj) }
     func save(objects: [ BaseType ]) throws { }
 }
 

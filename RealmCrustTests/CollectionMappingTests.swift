@@ -6,21 +6,6 @@ extension Int: AnyMappable { }
 
 class CollectionMappingTests: RealmMappingTest {
     
-    class IntMapping: AnyMapping {
-        typealias AdapterKind = AnyAdapterImp<Int>
-        typealias MappedObject = Int
-        func mapping(toMap: inout Int, context: MappingContext) { }
-    }
-    
-    func testDefaultInsertionPolicyIsReplaceUniqueNullable() {
-        let binding = Binding.mapping("", IntMapping())
-        let policy = binding.collectionUpdatePolicy
-        guard case (.replace(delete: nil), true, true) = policy else {
-            XCTFail()
-            return
-        }
-    }
-    
     func testMappingCollection() {
         let employeeStub = EmployeeStub()
         let employeeStub2 = EmployeeStub()

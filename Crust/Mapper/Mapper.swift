@@ -45,6 +45,19 @@ public struct Mapper {
         return collection
     }
     
+    public func map<M: Mapping, C: RangeReplaceableCollection>(from json: JSONValue, using binding: Binding<M>) throws -> C
+        where M.MappedObject == C.Iterator.Element {
+            
+            var collection = C()
+            let context = MappingContext(withObject: collection, json: json, direction: MappingDirection.fromJSON)
+            
+            try binding.mapping.start(context: context)
+            collection <- (binding, context)
+            try binding.mapping.completeMapping(collection: collection, context: context)
+            
+            return collection
+    }
+    
     public func map<M: Mapping>(from json: JSONValue, using binding: Binding<M>, parentContext: MappingContext? = nil) throws -> M.MappedObject {
         
         // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
