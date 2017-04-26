@@ -48,4 +48,26 @@ class NestedMappingTests: RealmMappingTest {
         XCTAssertEqual(Company.allObjects(in: self.realm).count, 2)
         XCTAssertEqual(Employee.allObjects(in: self.realm).count, 3)
     }
+    
+    func testTransactionCorrectlyClosedForNestedMapping() {
+        let companyStub1 = CompanyStub()
+        let companyStub2 = CompanyStub()
+        let employeeStub = EmployeeStub()
+        companyStub1.employees.append(employeeStub)
+        
+        let jsonObject: [String : Any] = [
+            "uuid" : NSUUID().uuidString,
+            "companies" : [
+                companyStub1.generateJsonObject(),
+                companyStub2.generateJsonObject()
+            ]
+        ]
+        
+        let json = try! JSONValue(dict: jsonObject)
+        let mapper = Mapper()
+        let mapping = ParentMapping()
+        _ = try! mapper.map(from: json, using: mapping)
+        
+        XCTAssertFalse(self.realm.inWriteTransaction)
+    }
 }

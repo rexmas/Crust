@@ -48,7 +48,7 @@ class ChildMapping: Mapping {
 
 class NestedMappingTests: XCTestCase {
     
-    func testMappingBeginsCalledOnlyOnceWhenNestedMappingOfSameAdapter() {
+    func testMappingWillBeginCalledOnlyOnceWhenNestedMappingOfSameAdapter() {
         let jsonObject: [String : Any] = [
             "uuid" : NSUUID().uuidString,
             "children" : [
@@ -68,7 +68,7 @@ class NestedMappingTests: XCTestCase {
         
         XCTAssertEqual(parent.uuid, jsonObject["uuid"] as! String)
         XCTAssertEqual(parent.children!.map { $0.uuid }, (jsonObject["children"] as! [[String : String]]).map { $0["uuid"]! })
-        XCTAssertEqual(adapter.numberOfCallsToMappingBegins, 1)
+        XCTAssertEqual(adapter.numberOfCallsToMappingWillBegin, 1)
     }
     
     func testMappingBeginCalledWhenNestedMappingOfDifferentAdapter() {
@@ -103,7 +103,7 @@ class NestedMappingTests: XCTestCase {
         
         XCTAssertEqual(parent.uuid, jsonObject["uuid"] as! String)
         XCTAssertEqual(parent.children!.map { $0.uuid }, (jsonObject["children"] as! [[String : String]]).map { $0["uuid"]! })
-        XCTAssertEqual(adapter.numberOfCallsToMappingBegins, 1)
-        XCTAssertEqual(mapping.childAdapter.numberOfCallsToMappingBegins, 1)
+        XCTAssertEqual(adapter.numberOfCallsToMappingWillBegin, 1)
+        XCTAssertEqual(mapping.childAdapter.numberOfCallsToMappingWillBegin, 1)
     }
 }

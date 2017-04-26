@@ -15,6 +15,7 @@ public class RealmAdapter: Adapter {
     
     private var cache: Set<BaseType>
     public let realm: RLMRealm
+    public let dataBaseTag: String = DefaultDatabaseTag.realm.rawValue
     public var requiresPrimaryKeys = false
     
     public init(realm: RLMRealm) {
@@ -26,15 +27,15 @@ public class RealmAdapter: Adapter {
         self.init(realm: RLMRealm.default())
     }
     
-    public var mappingDidBegin: Bool {
+    public var isInTransaction: Bool {
         return self.realm.inWriteTransaction
     }
     
-    public func mappingBegins() throws {
+    public func mappingWillBegin() throws {
         self.realm.beginWriteTransaction()
     }
     
-    public func mappingEnded() throws {
+    public func mappingDidEnd() throws {
         try self.realm.commitWriteTransaction()
         self.cache.removeAll()
     }
@@ -185,22 +186,23 @@ public class RealmSwiftObjectAdapterBridge<T>: Adapter {
     
     public let realmObjCAdapter: RealmAdapter
     public let rlmObjectType: RLMObject.Type
+    public let dataBaseTag: String = DefaultDatabaseTag.realm.rawValue
     
     public init(realmObjCAdapter: RealmAdapter, rlmObjectType: RLMObject.Type) {
         self.realmObjCAdapter = realmObjCAdapter
         self.rlmObjectType = rlmObjectType
     }
     
-    public var mappingDidBegin: Bool {
-        return self.realmObjCAdapter.mappingDidBegin
+    public var isInTransaction: Bool {
+        return self.realmObjCAdapter.isInTransaction
     }
     
-    public func mappingBegins() throws {
-        try self.realmObjCAdapter.mappingBegins()
+    public func mappingWillBegin() throws {
+        try self.realmObjCAdapter.mappingWillBegin()
     }
     
-    public func mappingEnded() throws {
-        try self.realmObjCAdapter.mappingEnded()
+    public func mappingDidEnd() throws {
+        try self.realmObjCAdapter.mappingDidEnd()
     }
     
     public func mappingErrored(_ error: Error) {

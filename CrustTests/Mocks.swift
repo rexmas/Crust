@@ -2,17 +2,18 @@ import Crust
 
 class MockAdapter<T: AnyMappable>: Adapter {
     var deletedObjects = [T]()
-    var numberOfCallsToMappingBegins: Int = 0
+    var numberOfCallsToMappingWillBegin: Int = 0
     
     typealias BaseType = T
     typealias ResultsType = [T]
     
-    var mappingDidBegin: Bool = false
-    func mappingBegins() throws {
-        self.numberOfCallsToMappingBegins += 1
-        self.mappingDidBegin = true
+    var dataBaseTag: String = "none"
+    var isInTransaction: Bool = false
+    func mappingWillBegin() throws {
+        self.numberOfCallsToMappingWillBegin += 1
+        self.isInTransaction = true
     }
-    func mappingEnded() throws { }
+    func mappingDidEnd() throws { }
     func mappingErrored(_ error: Error) { }
     func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: T.Type) -> CVarArg? { return nil }
     func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return [] }

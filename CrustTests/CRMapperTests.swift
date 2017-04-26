@@ -21,9 +21,10 @@ class MockMap: Mapping, Adapter {
         catchMapping!(toMap, context)
     }
     
-    var mappingDidBegin: Bool = false
-    func mappingBegins() throws { self.mappingDidBegin = true }
-    func mappingEnded() throws { }
+    var dataBaseTag: String = "none"
+    var isInTransaction: Bool = false
+    func mappingWillBegin() throws { self.isInTransaction = true }
+    func mappingDidEnd() throws { }
     func mappingErrored(_ error: Error) { }
     public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: MockMap.Type) -> CVarArg? { return nil }
     func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return nil }
@@ -38,7 +39,7 @@ class CRMapperTests: XCTestCase {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [:])
-        let parent = MappingContext(withObject: mockMap, json: json, direction: MappingDirection.fromJSON)
+        let parent = MappingContext(withObject: mockMap, json: json, adapterType: "derp", direction: MappingDirection.fromJSON)
         let mapper = Mapper()
         
         var tested = false
