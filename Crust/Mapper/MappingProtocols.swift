@@ -91,7 +91,7 @@ public protocol Adapter {
     /// and if `false` will call `mappingWillBegin`, even in nested object mappings.
     var isInTransaction: Bool { get }
     
-    /// Used to designate the database type being written too by this adapter. This is checked before calls to `mappingWillBegin` and
+    /// Used to designate the database type being written to by this adapter. This is checked before calls to `mappingWillBegin` and
     /// `mappingDidEnd`. If the same `dataBaseTag` is used for a nested mapping as a parent mapping, then `mappingWillBegin` and
     /// `mappingDidEnd` will not be called for the nested mapping. This prevents illegal recursive transactions from being started during mapping.
     /// `DefaultDatabaseTag` provides some defaults to use for often use iOS databases, or none at all.
