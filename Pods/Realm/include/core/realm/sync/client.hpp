@@ -125,8 +125,17 @@ public:
         /// The default changeset cooker to be used by new sessions. Can be
         /// overridden by Session::Config::changeset_cooker.
         ///
-        /// \sa make_sync_history(), TrivialChangesetCooker.
-        SyncHistory::ChangesetCooker* changeset_cooker = nullptr;
+        /// \sa make_client_history(), TrivialChangesetCooker.
+        std::shared_ptr<ClientHistory::ChangesetCooker> changeset_cooker;
+
+        /// The number of ms between periodic keep-alive pings.
+        uint_fast64_t ping_keepalive_period_ms = 600000;
+
+        /// The number of ms to wait for keep-alive pongs.
+        uint_fast64_t pong_keepalive_timeout_ms = 300000;
+
+        /// The number of ms to wait for urgent pongs.
+        uint_fast64_t pong_urgent_timeout_ms = 5000;
     };
 
     /// \throw util::EventLoop::Implementation::NotAvailable if no event loop
@@ -217,7 +226,8 @@ public:
     using ProgressHandler = void(std::uint_fast64_t downloaded_bytes,
                                  std::uint_fast64_t downloadable_bytes,
                                  std::uint_fast64_t uploaded_bytes,
-                                 std::uint_fast64_t uploadable_bytes);
+                                 std::uint_fast64_t uploadable_bytes,
+                                 std::uint_fast64_t progress_version);
     using WaitOperCompletionHandler = std::function<void(std::error_code)>;
 
     class Config {
@@ -227,17 +237,24 @@ public:
         /// If not null, overrides whatever is specified by
         /// Client::Config::changeset_cooker.
         ///
-        /// CAUTION: The ChangesetCooker::cook_changeset() may be called on the
-        /// specified object before the call to bind() returns, and it may be
+        /// The shared ownership over the cooker will be relinquished shortly
+        /// after the destruction of the session object as long as the event
+        /// loop of the client is being executed (Client::run()).
+        ///
+        /// CAUTION: ChangesetCooker::cook_changeset() of the specified cooker
+        /// may get called before the call to bind() returns, and it may get
         /// called (or continue to execute) after the session object is
         /// destroyed. The application must specify an object for which that
-        /// function can be safely be called, and continue to execute from the
+        /// function can safely be called, and continue to execute from the
         /// point in time where bind() starts executing, and up until the point
-        /// in time where the last invocation of `clint.run()` returns. Here,
+        /// in time where the last invocation of `client.run()` returns. Here,
         /// `client` refers to the associated Client object.
         ///
-        /// \sa make_sync_history(), TrivialChangesetCooker.
-        SyncHistory::ChangesetCooker* changeset_cooker = nullptr;
+        /// \sa make_client_history(), TrivialChangesetCooker.
+        std::shared_ptr<ClientHistory::ChangesetCooker> changeset_cooker;
+
+        /// The encryption key the SharedGroup will be opened with.
+        Optional<std::array<char, 64>> encryption_key;
     };
 
     /// \brief Start a new session for the specified client-side Realm.
@@ -289,7 +306,8 @@ public:
     /// The handler must have signature
     ///
     ///     void(uint_fast64_t downloaded_bytes, uint_fast64_t downloadable_bytes,
-    ///          uint_fast64_t uploaded_bytes, uint_fast64_t uploadable_bytes);
+    ///          uint_fast64_t uploaded_bytes, uint_fast64_t uploadable_bytes,
+    ///          uint_fast64_t progress_version);
     ///
     /// downloaded_bytes is the size in bytes of all downloaded changesets.
     /// downloadable_bytes is the size in bytes of the part of the server
@@ -334,6 +352,15 @@ public:
     ///        (downloaded_bytes - initial_downloaded_bytes)
     ///       -----------------------------------------------
     ///       (downloadable_bytes - initial_downloaded_bytes)
+    ///
+    /// progress_version is 0 at the start of a session. When at least one
+    /// DOWNLOAD message has been received from the server, progress_version is
+    /// positive. progress_version can be used to ensure that the reported
+    /// progress contains information obtained from the server in the current
+    /// session. The server will send a message as soon as possible, and the
+    /// progress handler will eventually be called with a positive progress_version
+    /// unless the session is interrupted before a message from the server has
+    /// been received.
     ///
     /// The handler is called on the event loop thread.
     /// The handler is called after or during set_progress_handler(),
@@ -642,6 +669,7 @@ enum class Client::Error {
     bad_request_ident           = 113, ///< Bad request identifier (MARK)
     bad_error_code              = 114, ///< Bad error code (ERROR),
     bad_compression             = 115, ///< Bad compression (DOWNLOAD)
+    bad_client_version          = 116, ///< Bad last integrated client version in changeset header (DOWNLOAD)
 };
 
 const std::error_category& client_error_category() noexcept;

@@ -18,28 +18,45 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMSyncPermission.h"
 #import "RLMSyncPermissionChange.h"
 #import "RLMSyncPermissionOffer.h"
 #import "RLMSyncPermissionOfferResponse.h"
 
-@implementation RLMRealmConfiguration (RealmSync)
-+ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
+#import "shared_realm.hpp"
+
+#import "sync/sync_user.hpp"
+
+static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *user, NSString *realmName) {
     NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
     if ([components.scheme isEqualToString:@"https"]) {
         components.scheme = @"realms";
     } else {
         components.scheme = @"realm";
     }
-    components.path = @"/~/__management";
-    NSURL *managementRealmURL = components.URL;
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:managementRealmURL];
+    components.path = [NSString stringWithFormat:@"/~/%@", realmName];
+    NSURL *realmURL = components.URL;
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.syncConfiguration = syncConfig;
+    return config;
+}
+
+@implementation RLMRealmConfiguration (RealmSync)
++ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
+    RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__management");
     config.objectClasses = @[RLMSyncPermissionChange.class, RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class];
+    return config;
+}
+
++ (instancetype)permissionConfigurationForUser:(RLMSyncUser *)user {
+    RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__permission");
+    config.objectClasses = @[RLMSyncPermission.class];
     return config;
 }
 @end
@@ -81,6 +98,18 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
     }
     REALM_UNREACHABLE();
+}
+
+std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
+{
+    Realm::Config realmConfig = realm.configuration.config;
+    if (auto config = realmConfig.sync_config) {
+        std::shared_ptr<SyncUser> user = config->user;
+        if (user && user->state() != SyncUser::State::Error) {
+            return user->session_for_on_disk_path(realmConfig.path);
+        }
+    }
+    return nullptr;
 }
 
 }
