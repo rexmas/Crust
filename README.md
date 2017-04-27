@@ -93,7 +93,7 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
             self.adapter = adapter
         }
     
-        func mapping(toMap: inout Employee, context: MappingContext) {
+        func mapping(inout toMap: inout Employee, context: MappingContext) throws {
             // Company must be transformed into something Core Data can use in this case.
             let companyMapping = CompanyTransformableMapping()
             
@@ -109,7 +109,7 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
     class CompanyMapping: AnyMapping {
         // associatedtype MappedObject = Company is inferred by `toMap`
     
-        func mapping(toMap: inout Company, context: MappingContext) {
+        func mapping(inout toMap: inout Company, context: MappingContext) throws {
             let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
         
             toMap.employees             <- .mapping("employees", employeeMapping) >*<
@@ -160,7 +160,7 @@ NOTE:
 Crust supports nested mappings for nested models
 E.g. from above
 ```swift
-func mapping(inout toMap: Company, context: MappingContext) {
+func mapping(inout toMap: Company, context: MappingContext) throws {
     let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
     
     toMap.employees <- Binding.mapping("employees", employeeMapping) >*<
@@ -222,7 +222,7 @@ There are two ways to include the context during mapping:
 1. Include it as a tuple.
 
    ```swift
-   func mapping(inout toMap: Company, context: MappingContext) {
+   func mapping(inout toMap: Company, context: MappingContext) throws {
        toMap.uuid <- ("uuid", context)
        toMap.name <- ("name", context)
    }
@@ -230,7 +230,7 @@ There are two ways to include the context during mapping:
 2. Use a specially included operator `>*<` which merges the result of the right expression with the left expression into a tuple. This may be chained in succession.
 
    ```swift
-   func mapping(inout toMap: Company, context: MappingContext) {
+   func mapping(inout toMap: Company, context: MappingContext) throws {
        toMap.uuid <- "uuid" >*<
        toMap.name <- "name" >*<
        context
@@ -251,7 +251,7 @@ and use it like any other `Mapping`.
 Multiple `Mapping`s are allowed for the same model.
 ```swift
 class CompanyMapping: AnyMapping {
-    func mapping(inout toMap: Company, context: MappingContext) {
+    func mapping(inout toMap: Company, context: MappingContext) throws {
         toMap.uuid <- "uuid" >*<
         toMap.name <- "name" >*<
         context
@@ -259,7 +259,7 @@ class CompanyMapping: AnyMapping {
 }
 
 class CompanyMappingWithNameUUIDReversed: AnyMapping {
-	func mapping(inout toMap: Company, context: MappingContext) {
+	func mapping(inout toMap: Company, context: MappingContext) throws {
         toMap.uuid <- "name" >*<
         toMap.name <- "uuid" >*<
         context
