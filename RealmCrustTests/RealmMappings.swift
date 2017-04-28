@@ -18,7 +18,7 @@ public class RealmAdapter: Adapter {
     public let dataBaseTag: String = DefaultDatabaseTag.realm.rawValue
     public var requiresPrimaryKeys = false
     
-    public init(realm: RLMRealm) {
+    public required init(realm: RLMRealm) {
         self.realm = realm
         self.cache = []
     }
