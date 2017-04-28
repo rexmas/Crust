@@ -413,6 +413,11 @@ private func mapFromJSON<M: Mapping, MC: MappingContext, RRC: RangeReplaceableCo
         
         let mapping = binding.key.mapping
         let parentContext = binding.context
+        
+        guard parentContext.error == nil else {
+            throw parentContext.error!
+        }
+        
         let context = MappingContext(withObject: parentContext.object, json: parentContext.json, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         context.parent = parentContext
         let nestedBinding = (binding.key, context)
