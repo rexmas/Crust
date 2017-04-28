@@ -410,7 +410,6 @@ private func mapFromJSON<M: Mapping, MC: MappingContext, RRC: RangeReplaceableCo
      using binding:(key: Binding<M>, context: MC),
      uniquing: UniquingFunctions<M.MappedObject, RRC>?) throws
     where RRC.Iterator.Element == M.MappedObject {
-        // TODO: here lets initialize a new context from our mapping
         
         let mapping = binding.key.mapping
         let parentContext = binding.context
