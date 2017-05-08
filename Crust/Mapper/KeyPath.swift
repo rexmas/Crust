@@ -14,7 +14,7 @@ enum CrustError: LocalizedError {
 
 // TODO: Change to CodingKey
 public protocol Keypath: JSONKeypath, Hashable {
-    func nestedCodingKey<K: Keypath>(for codingKey: Self) throws -> Set<K>
+    func nestedCodingKey<K: Keypath>() throws -> Set<K>
 }
 
 public extension Keypath {
@@ -26,7 +26,7 @@ public extension Keypath {
         return lhs.keyPath == rhs.keyPath
     }
     
-    public func nestedCodingKey<K>(for codingKey: Self) throws -> Set<K> where K : Keypath {
+    public func nestedCodingKey<K: Keypath>() throws -> Set<K>  {
         throw CrustError.nestedCodingKeyError(type: Self.self, keyPath: self.keyPath)
     }
 }
@@ -51,9 +51,9 @@ internal struct NestedCodingKey<RootKey: Keypath, NestedKey: Keypath>: Keypath {
         self.nestedKeys = nestedKeys
     }
     
-    func nestedCodingKey<K>(for codingKey: NestedCodingKey<RootKey, NestedKey>) throws -> Set<K> where K : Keypath {
-        guard codingKey == self, self.nestedKeys is Set<K> else {
-            throw CrustError.nestedCodingKeyError(type: type(of: codingKey), keyPath: rootKey.keyPath)
+    func nestedCodingKey<K: Keypath>() throws -> Set<K> {
+        guard self.nestedKeys is Set<K> else {
+            throw CrustError.nestedCodingKeyError(type: NestedCodingKey<RootKey, NestedKey>.self, keyPath: rootKey.keyPath)
         }
         return self.nestedKeys as! Set<K>
     }
@@ -84,4 +84,25 @@ public struct AnyKeyPath: Keypath {
 public struct KeyedBinding<K: Keypath, M: Mapping> {
     public let binding: Binding<K, M>
     public let codingKeys: Set<M.CodingKeys>
+    
+    public init(binding: Binding<K, M>, codingKeys: Set<M.CodingKeys>) {
+        self.binding = binding
+        self.codingKeys = codingKeys
+    }
+    
+    public init?(binding: Binding<K, M>, context: MappingContext<K>) throws {
+        guard context.keys.contains(binding.key) else {
+            return nil
+        }
+        
+        let codingKeys: Set<M.CodingKeys> = try {
+            if M.CodingKeys.self is RootKeyPath.Type {
+                return Set([RootKeyPath()]) as! Set<M.CodingKeys>
+            }
+            
+            return try binding.key.nestedCodingKey()
+        }()
+        
+        self.init(binding: binding, codingKeys: codingKeys)
+    }
 }
