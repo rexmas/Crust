@@ -33,6 +33,7 @@ public extension Keypath {
 
 public struct RootKeyPath: Keypath {
     public let keyPath: String = ""
+    public init() { }
 }
 
 extension String: Keypath { }
