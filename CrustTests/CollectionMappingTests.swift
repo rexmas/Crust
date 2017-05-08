@@ -1,5 +1,5 @@
 import XCTest
-import Crust
+@testable import Crust
 import JSONValueRX
 
 // We test the following.
@@ -404,5 +404,46 @@ class CollectionMappingTests: XCTestCase {
         
         XCTAssertThrowsError(try testFunc())
         XCTAssertEqual(original.employees!.map { $0.uuid }, [originalEmployee.uuid, originalEmployee2.uuid])
+    }
+    
+    struct EquatableThing: AnyMappable, Equatable {
+        var uuid: String = NSUUID().uuidString
+        
+        static func ==(lhs: EquatableThing, rhs: EquatableThing) -> Bool {
+            return lhs.uuid == rhs.uuid
+        }
+    }
+    
+    func testMappingEquatableCollectionByReplaceDeleteUnique() {
+        class EquatableThingMapping: Mapping {
+            var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+                return [ ("uuid", "uuid", nil) ]
+            }
+            
+            let adapter = MockAdapter<EquatableThing>()
+            
+            func mapping(toMap: inout EquatableThing, context: MappingContext) {
+                toMap.uuid <- ("uuid", context)
+            }
+        }
+        
+        let orphanedEquatable1 = EquatableThing()
+        let orphanedEquatable2 = EquatableThing()
+        let orphanedEquatable3 = EquatableThing()
+        let remainingEquatable1 = EquatableThing()
+        let remainingEquatable2 = EquatableThing()
+        let newUUID = NSUUID().uuidString
+        var equatableThings = [orphanedEquatable1, orphanedEquatable2, orphanedEquatable3, remainingEquatable1, remainingEquatable2]
+        
+        let json = try! JSONValue(object: ["equatables" : [
+            ["uuid" : remainingEquatable1.uuid],
+            ["uuid" : remainingEquatable2.uuid],
+            ["uuid" : newUUID]
+        ]])
+        let binding = Binding.collectionMapping("equatables", EquatableThingMapping(), (.replace(delete: { $0 }), true, false))
+        let context = MappingContext(withObject: equatableThings, json: json, adapterType: "derp", direction: .fromJSON)
+        equatableThings <- (binding, context)
+        
+        XCTAssertEqual(equatableThings.map { $0.uuid }, [remainingEquatable1.uuid, remainingEquatable2.uuid, newUUID])
     }
 }
