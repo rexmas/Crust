@@ -56,7 +56,7 @@ class CollectionMappingTests: XCTestCase {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(toMap: inout Company, context: MappingContext) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
+                //toMap.employees <- (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
             }
         }
         

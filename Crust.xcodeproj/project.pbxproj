@@ -39,6 +39,7 @@
 		17B983D41BDC8D7E006BD35C /* CompanyMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983D31BDC8D7E006BD35C /* CompanyMappingTests.swift */; };
 		17B983D61BDC8DB1006BD35C /* CompanyStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B983D51BDC8DB1006BD35C /* CompanyStub.swift */; };
 		17C7A7651BF9665500B0D5F5 /* CRMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */; };
+		17FEBDDC1EB8404400F1257B /* KeyPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FEBDDB1EB8404400F1257B /* KeyPath.swift */; };
 		29DE497B2A9E4FA2A31192FF /* Pods_Crust_RealmCrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DED40EDD9475BB525B3AEE0E /* Pods_Crust_RealmCrustTests.framework */; };
 		3C1EAD7F3E1C53F7D78345FD /* Pods_Crust.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28F442A36FBC57DF1CD33439 /* Pods_Crust.framework */; };
 		97101AED7BD14AF79D49A8FA /* Pods_Crust_CrustTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9343FCC42E1A2DE8316C0D87 /* Pods_Crust_CrustTests.framework */; };
@@ -106,6 +107,7 @@
 		17C7A7641BF9665500B0D5F5 /* CRMapperTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CRMapperTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		17F95FFD1BCB39C400CC6D4A /* Mapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Mapper.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = MappingOperator.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		17FEBDDB1EB8404400F1257B /* KeyPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyPath.swift; sourceTree = "<group>"; };
 		26951C231AFB401A007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		26951C341AFB401B007B0E07 /* CrustTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CrustTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		26951C391AFB401B007B0E07 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 		17F95FFC1BCB39C400CC6D4A /* Mapper */ = {
 			isa = PBXGroup;
 			children = (
+				17FEBDDB1EB8404400F1257B /* KeyPath.swift */,
 				17F95FFD1BCB39C400CC6D4A /* Mapper.swift */,
 				17F95FFE1BCB39C400CC6D4A /* MappingOperator.swift */,
 				17B583521C24B0B7005DBFA6 /* MappingProtocols.swift */,
@@ -572,6 +575,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17FEBDDC1EB8404400F1257B /* KeyPath.swift in Sources */,
 				175C9A431C311DB200B0D6E7 /* Mapper.swift in Sources */,
 				175C9A441C311DB200B0D6E7 /* MappingOperator.swift in Sources */,
 				175C9A451C311DB200B0D6E7 /* MappingProtocols.swift in Sources */,
