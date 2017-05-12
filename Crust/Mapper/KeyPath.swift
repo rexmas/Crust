@@ -14,7 +14,12 @@ enum CrustError: LocalizedError {
 
 // TODO: Change to CodingKey
 public protocol Keypath: JSONKeypath, Hashable {
-    func nestedCodingKey<K: Keypath>() throws -> Set<K>
+    /// Return the coding keys for a nested set of JSON. A non-nil value is required for every key
+    /// that is used to key into JSON passed to a nested `Mapping`, otherwise the mapping operation
+    /// for that nested type will fail and throw an error.
+    ///
+    /// Default implementation returns `nil`.
+    func nestedCodingKey<K: Keypath>() -> Set<K>?
 }
 
 public extension Keypath {
@@ -26,8 +31,15 @@ public extension Keypath {
         return lhs.keyPath == rhs.keyPath
     }
     
-    public func nestedCodingKey<K: Keypath>() throws -> Set<K>  {
-        throw CrustError.nestedCodingKeyError(type: Self.self, keyPath: self.keyPath)
+    public func nestedCodingKey<K: Keypath>() -> Set<K>? {
+        return nil
+    }
+    
+    public func nestedCodingKey<K: Keypath>() throws -> Set<K> {
+        guard let nested = (self.nestedCodingKey() as Set<K>?) else {
+            throw CrustError.nestedCodingKeyError(type: Self.self, keyPath: self.keyPath)
+        }
+        return nested
     }
 }
 

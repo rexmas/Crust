@@ -12,6 +12,25 @@ class Employee {
     var percentYearlyRaise: Double = 0.0
 }
 
+enum EmployeeCodingKey: Keypath {
+    case employer(Set<CompanyCodingKey>)
+    case uuid
+    case name
+    case joinDate
+    case salary
+    case isEmployeeOfMonth
+    case percentYearlyRaise
+    
+    public func nestedCodingKey<K: Keypath>() -> Set<K>?  {
+        switch self {
+        case .employer(let companyKeys) where companyKeys is Set<K>:
+            return companyKeys as! Set<K>
+        default:
+            return nil
+        }
+    }
+}
+
 extension Employee: AnyMappable { }
 
 class EmployeeMapping: MockMapping {
@@ -25,7 +44,7 @@ class EmployeeMapping: MockMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Employee, context: MappingContext) {
+    func mapping(toMap: inout Employee, context: MappingContext<EmployeeCodingKey>) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
         toMap.employer              <- .mapping("company", companyMapping) >*<
