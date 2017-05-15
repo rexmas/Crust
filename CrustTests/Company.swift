@@ -14,6 +14,34 @@ class Company {
 
 extension Company: AnyMappable { }
 
+enum CompanyCodingKey: Keypath {
+    case uuid
+    case employees(Set<EmployeeCodingKey>)
+    case founder
+    case name
+    case foundingDate
+    case pendingLawsuits
+    
+    static var AllKeys: Set<CompanyCodingKey> = [ .uuid, .employees(EmployeeCodingKey.AllKeys) ]
+    
+    var keyPath: String {
+        switch self {
+        case uuid:
+            return "data.uuid"
+        case employees(_):
+            return "employees"
+        case founder:
+            return "founder"
+        case name:
+            return "name"
+        case foundingDate:
+            return "data.found_date"
+        case .pendingLawsuits:
+            return "data.lawsuits.pending"
+        }
+    }
+}
+
 class CompanyMapping: Mapping {
     
     var adapter: MockAdapter<Company>
@@ -25,7 +53,7 @@ class CompanyMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Company, context: MappingContext) {
+    func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .mapping("employees", employeeMapping) >*<
@@ -40,7 +68,7 @@ class CompanyMapping: Mapping {
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(toMap: inout Company, context: MappingContext) {
+    override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .collectionMapping("employees", employeeMapping, (.append, true, true)) >*<
@@ -78,7 +106,7 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext) {
+    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees         <- .mapping("employees", employeeMapping) >*<

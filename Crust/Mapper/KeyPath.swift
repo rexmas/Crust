@@ -43,6 +43,12 @@ public extension Keypath {
     }
 }
 
+public extension RawRepresentable where Self: Keypath, RawValue == String {
+    public var keyPath: String {
+        return self.rawValue
+    }
+}
+
 public struct RootKeyPath: Keypath {
     public let keyPath: String = ""
     public init() { }
@@ -50,6 +56,86 @@ public struct RootKeyPath: Keypath {
 
 extension String: Keypath { }
 extension Int: Keypath { }
+
+// TODO: Change this to associated type. Make context use AnyKeyProvider.
+public protocol KeyProvider {
+    associatedtype CodingKeyType: Keypath
+    func containsKey(_ key: CodingKeyType) -> Bool
+}
+
+public struct AnyKeyProvider<K: Keypath>: KeyProvider {
+//    private let _containsKey: (Any) -> Bool
+    private let _containsKey: (K) -> Bool
+    public let codingKeyType: Any.Type
+    
+    init<P: KeyProvider>(keyProvider: P) where P.CodingKeyType == K {
+        self.codingKeyType = K.self
+        self._containsKey = { key in
+//            guard case let key as K = key else {
+//                return false
+//            }
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public func containsKey(_ key: K) -> Bool {
+        return self._containsKey(key)
+    }
+    
+//    public func containsKey<K: Keypath>(_ key: K) -> Bool {
+//        return self._containsKey(key)
+//    }
+}
+
+public struct AnyKeyPathKeyProvider: KeyProvider {
+    private let _containsKey: (Any) -> Bool
+    public let codingKeyType: Any.Type
+    
+    init<P: KeyProvider>(keyProvider: P) {
+        self.codingKeyType = P.CodingKeyType.self
+        self._containsKey = { key in
+            guard case let key as P.CodingKeyType = key else {
+                return false
+            }
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public func containsKey(_ key: AnyKeyPath) -> Bool {
+        return self._containsKey(key)
+    }
+    
+    public func containsKey<K: Keypath>(_ key: K) -> Bool {
+        return self._containsKey(key)
+    }
+}
+
+public struct AllKeysProvider<K: Keypath>: KeyProvider {
+    public func containsKey(_ key: K) -> Bool {
+        return true
+    }
+}
+
+// TODO: Can make Set follow protocol once conditional conformances are available in Swift 4.
+public struct SetKeyProvider<K: Keypath>: KeyProvider, ExpressibleByArrayLiteral {
+    public let keys: Set<K>
+    
+    public init(_ keys: Set<K>) {
+        self.keys = keys
+    }
+    
+    public init(arrayLiteral elements: K...) {
+        self.keys = Set(elements)
+    }
+    
+    public init(array: [K]) {
+        self.keys = Set(array)
+    }
+    
+    public func containsKey(_ key: K) -> Bool {
+        return self.keys.contains(key)
+    }
+}
 
 internal struct NestedCodingKey<RootKey: Keypath, NestedKey: Keypath>: Keypath {
     let rootKey: RootKey
@@ -104,7 +190,7 @@ public struct KeyedBinding<K: Keypath, M: Mapping> {
     }
     
     public init?(binding: Binding<K, M>, context: MappingContext<K>) throws {
-        guard context.keys.contains(binding.key) else {
+        guard context.keys.containsKey(binding.key) else {
             return nil
         }
         

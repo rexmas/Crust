@@ -47,11 +47,18 @@ class HairColorMapping: Transform {
     }
 }
 
+enum PersonCodingKey: String, Keypath {
+    case bankAccounts = "bank_accounts"
+    case attitude = "traits.attitude"
+    case hairColor = "traits.bodily.hair_color"
+    case ownsCat = "owns_cat"
+}
+
 class PersonMapping: AnyMapping {
     
     typealias MappedObject = Person
     
-    func mapping(toMap: inout Person, context: MappingContext) {
+    func mapping(toMap: inout Person, context: MappingContext<PersonCodingKey>) {
         toMap.bankAccounts  <- "bank_accounts" >*<
         toMap.attitude      <- "traits.attitude" >*<
         toMap.hairColor     <- .mapping("traits.bodily.hair_color", HairColorMapping()) >*<

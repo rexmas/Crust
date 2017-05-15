@@ -27,11 +27,11 @@ public func <- <T: JSONable, K: Keypath, MC: MappingContext<K>>(field: inout T?,
 
 // MARK: - To JSON
 
-private func shouldMapToJSON<K: Keypath>(via keyPath: K, ifIn keys: Set<K>) -> Bool {
-    return keys.contains(keyPath) || (keyPath is RootKeyPath)
+private func shouldMapToJSON<K: KeyProvider>(via keyPath: K.CodingKeyType, ifIn keys: K) -> Bool {
+    return keys.containsKey(keyPath) || (keyPath is RootKeyPath)
 }
 
-private func map<T: JSONable, K: Keypath>(to json: JSONValue, from field: T?, via key: K, ifIn keys: Set<K>) -> JSONValue where T == T.ConversionType {
+private func map<T: JSONable, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K) -> JSONValue where T == T.ConversionType {
     var json = json
     
     guard shouldMapToJSON(via: key, ifIn: keys) else {
@@ -101,14 +101,13 @@ public func <- <T: JSONable, TF: Transform, K: Keypath, MC: MappingContext<K>>(f
 // MARK: - Mapping.
 
 /// - returns: The json to be used from mapping keyed by `keyPath`, or `nil` if `keyPath` is not in `keys`, or throws and error.
-internal func baseJSON<K: Keypath>(from json: JSONValue, via keyPath: K, ifIn keys: Set<K>) throws -> JSONValue? {
-    
-    guard keys.contains(keyPath) else {
-        return nil
-    }
-    
+internal func baseJSON<K: KeyProvider>(from json: JSONValue, via keyPath: K.CodingKeyType, ifIn keys: K) throws -> JSONValue? {
     guard !(keyPath is RootKeyPath) else {
         return json
+    }
+    
+    guard keys.containsKey(keyPath) else {
+        return nil
     }
     
     let baseJSON = json[keyPath]
@@ -266,7 +265,7 @@ public func map<T, M: Mapping, K: Keypath, MC: MappingContext<K>>(to field: inou
 
 // MARK: - To JSON
 
-private func map<T, M: Mapping, K: Keypath>(to json: JSONValue, from field: T?, via key: K, ifIn keys: Set<K>, using mapping: M, keyedBy nestedKeys: Set<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
+private func map<T, M: Mapping, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K, using mapping: M, keyedBy nestedKeys: Set<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
     var json = json
     
     guard shouldMapToJSON(via: key, ifIn: keys) else {
@@ -444,12 +443,12 @@ public func map<M: Mapping, K: Keypath, MC: MappingContext<K>, RRC: RangeReplace
 }
 
 /// Our top level mapping function for mapping from a sequence/collection to JSON.
-private func map<T, M: Mapping, K: Keypath, S: Sequence>(
+private func map<T, M: Mapping, K: KeyProvider, S: Sequence>(
     to json: JSONValue,
     from field: S,
-    via key: K,
+    via key: K.CodingKeyType,
     using mapping: M,
-    ifIn parentKeys: Set<K>,
+    ifIn parentKeys: K,
     keyedBy nestedKeys: Set<M.CodingKeys>)
     throws -> JSONValue
     where M.MappedObject == T, S.Iterator.Element == T {
@@ -488,7 +487,7 @@ private func mapFromJSON<M: Mapping, K: Keypath, MC: MappingContext<K>, RRC: Ran
         }
         
         // Generate an extra sub-context so that we batch our array operations to the Adapter.
-        let context = MappingContext(withObject: parentContext.object, json: parentContext.json, keys: parentContext.keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+        let context = MappingContext<K>(withObject: parentContext.object, json: parentContext.json, keys: parentContext.keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         context.parent = parentContext.typeErased()
         
         try mapping.start(context: context)
@@ -573,13 +572,13 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
         }
 }
 
-private func baseJSONForCollection<K: Keypath>(json: JSONValue, via keyPath: K, ifIn keys: Set<K>) throws -> JSONValue? {
-    guard keys.contains(keyPath) else {
-        return nil
-    }
-    
+private func baseJSONForCollection<K: KeyProvider>(json: JSONValue, via keyPath: K.CodingKeyType, ifIn keys: K) throws -> JSONValue? {
     guard !(keyPath is RootKeyPath) else {
         return json
+    }
+    
+    guard keys.containsKey(keyPath) else {
+        return nil
     }
     
     let baseJSON = json[keyPath]

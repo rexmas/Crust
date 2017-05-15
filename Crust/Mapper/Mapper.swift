@@ -10,23 +10,27 @@ internal let CrustMappingDomain = "CrustMappingDomain"
 
 open class MappingContext<K: Keypath> {
     open internal(set) var json: JSONValue
-    open internal(set) var keys: Set<K>
+    open internal(set) var keys: AnyKeyProvider<K>
     open internal(set) var object: Any
     open internal(set) var error: Error?
     open internal(set) var parent: MappingContext<AnyKeyPath>? = nil
     open internal(set) var adapterType: String
     open fileprivate(set) var dir: MappingDirection
     
-    init(withObject object: Any, json: JSONValue, keys: Set<K>, adapterType: String, direction: MappingDirection) {
+    convenience init(withObject object: Any, json: JSONValue, keys: Set<K>, adapterType: String, direction: MappingDirection) {
+        self.init(withObject: object, json: json, keys: SetKeyProvider(keys), adapterType: adapterType, direction: direction)
+    }
+    
+    init<P: KeyProvider>(withObject object: Any, json: JSONValue, keys: P, adapterType: String, direction: MappingDirection) where P.CodingKeyType == K {
         self.object = object
         self.json = json
-        self.keys = keys
+        self.keys = AnyKeyProvider(keyProvider: keys)
         self.adapterType = adapterType
         self.dir = direction
     }
     
     internal func typeErased() -> MappingContext<AnyKeyPath> {
-        let keys = Set(self.keys.map { AnyKeyPath($0) })
+        let keys = AnyKeyPathKeyProvider(keyProvider: self.keys)
         let parent = MappingContext<AnyKeyPath>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
         parent.error = self.error
         parent.parent = self.parent
@@ -89,7 +93,7 @@ public struct Mapper {
     public func map<M: Mapping, K: Keypath, KP: Keypath>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: Set<M.CodingKeys>, parentContext: MappingContext<KP>?) throws -> M.MappedObject {
         
         // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
-        let baseJson = try baseJSON(from: json, via: binding.keyPath, ifIn: [binding.keyPath]) ?? json
+        let baseJson = try baseJSON(from: json, via: binding.keyPath, ifIn: SetKeyProvider([binding.keyPath])) ?? json
         
         var object = try binding.mapping.fetchOrCreateObject(from: baseJson)
         let codingKey = NestedCodingKey(rootKey: binding.key, nestedKeys: keys)
