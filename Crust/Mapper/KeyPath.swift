@@ -57,7 +57,7 @@ public struct RootKeyPath: Keypath {
 extension String: Keypath { }
 extension Int: Keypath { }
 
-// TODO: Change this to associated type. Make context use AnyKeyProvider.
+// TODO: Change this to KeyContainer maybe.
 public protocol KeyProvider {
     associatedtype CodingKeyType: Keypath
     func containsKey(_ key: CodingKeyType) -> Bool
