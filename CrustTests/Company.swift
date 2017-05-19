@@ -22,19 +22,17 @@ enum CompanyCodingKey: Keypath {
     case foundingDate
     case pendingLawsuits
     
-    static var AllKeys: Set<CompanyCodingKey> = [ .uuid, .employees(EmployeeCodingKey.AllKeys) ]
-    
     var keyPath: String {
         switch self {
-        case uuid:
+        case .uuid:
             return "data.uuid"
-        case employees(_):
+        case .employees(_):
             return "employees"
-        case founder:
+        case .founder:
             return "founder"
-        case name:
+        case .name:
             return "name"
-        case foundingDate:
+        case .foundingDate:
             return "data.found_date"
         case .pendingLawsuits:
             return "data.lawsuits.pending"

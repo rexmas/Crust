@@ -12,14 +12,14 @@ enum CrustError: LocalizedError {
     }
 }
 
-// TODO: Change to CodingKey
+// TODO: Change to MappingKey
 public protocol Keypath: JSONKeypath, Hashable {
     /// Return the coding keys for a nested set of JSON. A non-nil value is required for every key
     /// that is used to key into JSON passed to a nested `Mapping`, otherwise the mapping operation
     /// for that nested type will fail and throw an error.
     ///
     /// Default implementation returns `nil`.
-    func nestedCodingKey<K: Keypath>() -> Set<K>?
+    func nestedCodingKey<P: KeyProvider>() -> P?
 }
 
 public extension Keypath {
@@ -31,12 +31,12 @@ public extension Keypath {
         return lhs.keyPath == rhs.keyPath
     }
     
-    public func nestedCodingKey<K: Keypath>() -> Set<K>? {
+    func nestedCodingKey<P: KeyProvider>() -> P? {
         return nil
     }
     
-    public func nestedCodingKey<K: Keypath>() throws -> Set<K> {
-        guard let nested = (self.nestedCodingKey() as Set<K>?) else {
+    public func nestedCodingKey<P: KeyProvider>() throws -> P {
+        guard let nested = (self.nestedCodingKey() as P?) else {
             throw CrustError.nestedCodingKeyError(type: Self.self, keyPath: self.keyPath)
         }
         return nested
@@ -58,22 +58,35 @@ extension String: Keypath { }
 extension Int: Keypath { }
 
 // TODO: Change this to KeyContainer maybe.
-public protocol KeyProvider {
+public protocol KeyProvider: ExpressibleByArrayLiteral {
     associatedtype CodingKeyType: Keypath
     func containsKey(_ key: CodingKeyType) -> Bool
+    init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == CodingKeyType
 }
 
 public struct AnyKeyProvider<K: Keypath>: KeyProvider {
-//    private let _containsKey: (Any) -> Bool
     private let _containsKey: (K) -> Bool
     public let codingKeyType: Any.Type
     
-    init<P: KeyProvider>(keyProvider: P) where P.CodingKeyType == K {
+    public init<P: KeyProvider>(keyProvider: P) where P.CodingKeyType == K {
         self.codingKeyType = K.self
         self._containsKey = { key in
-//            guard case let key as K = key else {
-//                return false
-//            }
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) {
+        let keyProvider = SetKeyProvider(Set(sequence))
+        self.codingKeyType = K.self
+        self._containsKey = { key in
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public init(arrayLiteral elements: K...) {
+        let keyProvider = SetKeyProvider(Set(elements))
+        self.codingKeyType = K.self
+        self._containsKey = { key in
             return keyProvider.containsKey(key)
         }
     }
@@ -81,20 +94,38 @@ public struct AnyKeyProvider<K: Keypath>: KeyProvider {
     public func containsKey(_ key: K) -> Bool {
         return self._containsKey(key)
     }
-    
-//    public func containsKey<K: Keypath>(_ key: K) -> Bool {
-//        return self._containsKey(key)
-//    }
 }
 
 public struct AnyKeyPathKeyProvider: KeyProvider {
     private let _containsKey: (Any) -> Bool
     public let codingKeyType: Any.Type
     
-    init<P: KeyProvider>(keyProvider: P) {
+    public init<P: KeyProvider>(keyProvider: P) {
         self.codingKeyType = P.CodingKeyType.self
         self._containsKey = { key in
             guard case let key as P.CodingKeyType = key else {
+                return false
+            }
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (AnyKeyPath) {
+        let keyProvider = SetKeyProvider(Set(sequence))
+        self.codingKeyType = SetKeyProvider<AnyKeyPath>.self
+        self._containsKey = { key in
+            guard case let key as AnyKeyPath = key else {
+                return false
+            }
+            return keyProvider.containsKey(key)
+        }
+    }
+    
+    public init(arrayLiteral elements: AnyKeyPath...) {
+        let keyProvider = SetKeyProvider(Set(elements))
+        self.codingKeyType = SetKeyProvider<AnyKeyPath>.self
+        self._containsKey = { key in
+            guard case let key as AnyKeyPath = key else {
                 return false
             }
             return keyProvider.containsKey(key)
@@ -114,14 +145,22 @@ public struct AllKeysProvider<K: Keypath>: KeyProvider {
     public func containsKey(_ key: K) -> Bool {
         return true
     }
+    
+    public init() {}
+    public init(arrayLiteral elements: K...) { }
+    public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) { }
 }
 
 // TODO: Can make Set follow protocol once conditional conformances are available in Swift 4.
-public struct SetKeyProvider<K: Keypath>: KeyProvider, ExpressibleByArrayLiteral {
+public struct SetKeyProvider<K: Keypath>: KeyProvider {
     public let keys: Set<K>
     
     public init(_ keys: Set<K>) {
         self.keys = keys
+    }
+    
+    public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) {
+        self.keys = Set(sequence)
     }
     
     public init(arrayLiteral elements: K...) {
@@ -137,24 +176,21 @@ public struct SetKeyProvider<K: Keypath>: KeyProvider, ExpressibleByArrayLiteral
     }
 }
 
-internal struct NestedCodingKey<RootKey: Keypath, NestedKey: Keypath>: Keypath {
+internal struct NestedCodingKey<RootKey: Keypath, NestedProvider: KeyProvider>: Keypath {
     let rootKey: RootKey
-    let nestedKeys: Set<NestedKey>
+    let nestedKeys: NestedProvider
     
     var keyPath: String {
         return self.rootKey.keyPath
     }
     
-    init(rootKey: RootKey, nestedKeys: Set<NestedKey>) {
+    init(rootKey: RootKey, nestedKeys: NestedProvider) {
         self.rootKey = rootKey
         self.nestedKeys = nestedKeys
     }
     
-    func nestedCodingKey<K: Keypath>() throws -> Set<K> {
-        guard self.nestedKeys is Set<K> else {
-            throw CrustError.nestedCodingKeyError(type: NestedCodingKey<RootKey, NestedKey>.self, keyPath: rootKey.keyPath)
-        }
-        return self.nestedKeys as! Set<K>
+    func nestedCodingKey<P: KeyProvider>() -> P? {
+        return self.nestedKeys as? P
     }
 }
 
@@ -182,11 +218,11 @@ public struct AnyKeyPath: Keypath {
 
 public struct KeyedBinding<K: Keypath, M: Mapping> {
     public let binding: Binding<K, M>
-    public let codingKeys: Set<M.CodingKeys>
+    public let codingKeys: AnyKeyProvider<M.CodingKeys>
     
-    public init(binding: Binding<K, M>, codingKeys: Set<M.CodingKeys>) {
+    public init<P: KeyProvider>(binding: Binding<K, M>, codingKeys: P) where P.CodingKeyType == M.CodingKeys {
         self.binding = binding
-        self.codingKeys = codingKeys
+        self.codingKeys = AnyKeyProvider(keyProvider: codingKeys)
     }
     
     public init?(binding: Binding<K, M>, context: MappingContext<K>) throws {
@@ -194,9 +230,9 @@ public struct KeyedBinding<K: Keypath, M: Mapping> {
             return nil
         }
         
-        let codingKeys: Set<M.CodingKeys> = try {
+        let codingKeys: AnyKeyProvider<M.CodingKeys> = try {
             if M.CodingKeys.self is RootKeyPath.Type {
-                return Set([RootKeyPath()]) as! Set<M.CodingKeys>
+                return AnyKeyProvider([RootKeyPath() as! M.CodingKeys])
             }
             
             return try binding.key.nestedCodingKey()

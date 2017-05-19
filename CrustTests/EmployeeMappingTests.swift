@@ -9,7 +9,7 @@ class EmployeeMappingTests: XCTestCase {
         let stub = EmployeeStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: EmployeeMapping(adapter: MockAdapter<Employee>()), keyedBy)
+        let object = try! mapper.map(from: json, using: EmployeeMapping(adapter: MockAdapter<Employee>()), keyedBy: AllKeysProvider())
         
         XCTAssertTrue(stub.matches(object))
     }

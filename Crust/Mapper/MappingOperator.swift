@@ -265,7 +265,7 @@ public func map<T, M: Mapping, K: Keypath, MC: MappingContext<K>>(to field: inou
 
 // MARK: - To JSON
 
-private func map<T, M: Mapping, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K, using mapping: M, keyedBy nestedKeys: Set<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
+private func map<T, M: Mapping, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K, using mapping: M, keyedBy nestedKeys: AnyKeyProvider<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
     var json = json
     
     guard shouldMapToJSON(via: key, ifIn: keys) else {
@@ -283,13 +283,13 @@ private func map<T, M: Mapping, K: KeyProvider>(to json: JSONValue, from field: 
 
 // MARK: - From JSON
 
-private func map<T, M: Mapping, K: Keypath>(from json: JSONValue, to field: inout T, using mapping: M, keyedBy keys: Set<M.CodingKeys>, context: MappingContext<K>) throws where M.MappedObject == T {
+private func map<T, M: Mapping, K: Keypath>(from json: JSONValue, to field: inout T, using mapping: M, keyedBy keys: AnyKeyProvider<M.CodingKeys>, context: MappingContext<K>) throws where M.MappedObject == T {
     
     let mapper = Mapper()
     field = try mapper.map(from: json, using: mapping, keyedBy: keys, parentContext: context)
 }
 
-private func map<T, M: Mapping, K: Keypath>(from json: JSONValue, to field: inout T?, using mapping: M, keyedBy keys: Set<M.CodingKeys>, context: MappingContext<K>) throws where M.MappedObject == T {
+private func map<T, M: Mapping, K: Keypath>(from json: JSONValue, to field: inout T?, using mapping: M, keyedBy keys: AnyKeyProvider<M.CodingKeys>, context: MappingContext<K>) throws where M.MappedObject == T {
     
     if case .null = json {
         field = nil
@@ -449,7 +449,7 @@ private func map<T, M: Mapping, K: KeyProvider, S: Sequence>(
     via key: K.CodingKeyType,
     using mapping: M,
     ifIn parentKeys: K,
-    keyedBy nestedKeys: Set<M.CodingKeys>)
+    keyedBy nestedKeys: AnyKeyProvider<M.CodingKeys>)
     throws -> JSONValue
     where M.MappedObject == T, S.Iterator.Element == T {
         
@@ -605,7 +605,7 @@ private func generateNewValues<T, M: Mapping, K: Keypath>(
     fromJsonArray json: JSONValue,
     with updatePolicy: CollectionUpdatePolicy<M.MappedObject>,
     using mapping: M,
-    codingKeys: Set<M.CodingKeys>,
+    codingKeys: AnyKeyProvider<M.CodingKeys>,
     newValuesContains: @escaping (T) -> (T) -> Bool,
     fieldContains: (T) -> Bool,
     context: MappingContext<K>)
