@@ -21,8 +21,6 @@ enum EmployeeCodingKey: Keypath {
     case isEmployeeOfMonth
     case percentYearlyRaise
     
-    static var AllKeys = Set([ .employer(CompanyCodingKey.AllKeys) ])
-    
     var keyPath: String {
         switch self {
         case .employer(_):
@@ -68,13 +66,13 @@ class EmployeeMapping: MockMapping {
     func mapping(toMap: inout Employee, context: MappingContext<EmployeeCodingKey>) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
-        toMap.employer              <- .mapping("company", companyMapping) >*<
-        toMap.joinDate              <- "joinDate"  >*<
-        toMap.uuid                  <- "uuid" >*<
-        toMap.name                  <- "name" >*<
-        toMap.salary                <- "data.salary"  >*<
-        toMap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        toMap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
+        toMap.employer              <- .mapping(.employer([]), companyMapping) >*<
+        toMap.joinDate              <- .joinDate  >*<
+        toMap.uuid                  <- .uuid >*<
+        toMap.name                  <- .name >*<
+        toMap.salary                <- .salary  >*<
+        toMap.isEmployeeOfMonth     <- .isEmployeeOfMonth  >*<
+        toMap.percentYearlyRaise    <- .percentYearlyRaise >*<
         context
     }
 }

@@ -80,13 +80,6 @@ enum UserCodingKey: String, Keypath {
     case name = "data.user_name"
     case surname = "data.user_surname"
     
-    static var AllCases: Set<UserCodingKey> = [
-        .identifier,
-        .birthDate,
-        .name,
-        .surname
-    ]
-    
     var keyPath: String {
         return self.rawValue
     }
@@ -120,7 +113,7 @@ class TransformTests: XCTestCase {
     func testMappingFromJSON() {
         let json = try! JSONValue(object: 1)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: TransformableMapping(), keyedBy: Set([RootKeyPath()]))
+        let object = try! mapper.map(from: json, using: TransformableMapping(), keyedBy: SetKeyProvider([RootKeyPath()]))
         
         XCTAssertEqual(object.value, "1.0")
     }
@@ -129,7 +122,7 @@ class TransformTests: XCTestCase {
         var object = Transformable()
         object.value = "derp"
         let mapper = Mapper()
-        let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping())
+        let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping(), keyedBy: SetKeyProvider([RootKeyPath()]))
         
         XCTAssertEqual(json, JSONValue.number(Double(object.value.hash)))
     }
@@ -138,7 +131,7 @@ class TransformTests: XCTestCase {
         let jsonObject: [AnyHashable : Any] = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
         let json = try! JSONValue(object: jsonObject)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: UserMapping(adapter: MockAdapter<User>()), keyedBy: UserCodingKey.AllCases)
+        let object = try! mapper.map(from: json, using: UserMapping(adapter: MockAdapter<User>()), keyedBy: AllKeysProvider())
         
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         

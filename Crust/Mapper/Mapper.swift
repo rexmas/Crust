@@ -24,7 +24,7 @@ open class MappingContext<K: Keypath> {
     init<P: KeyProvider>(withObject object: Any, json: JSONValue, keys: P, adapterType: String, direction: MappingDirection) where P.CodingKeyType == K {
         self.object = object
         self.json = json
-        self.keys = AnyKeyProvider(keyProvider: keys)
+        self.keys = AnyKeyProvider(keys)
         self.adapterType = adapterType
         self.dir = direction
     }
@@ -103,6 +103,10 @@ public struct Mapper {
     public func map<M: Mapping, KP: Keypath, P: KeyProvider>(from json: JSONValue, using mapping: M, keyedBy keys: P, parentContext: MappingContext<KP>?) throws -> M.MappedObject where P.CodingKeyType == M.CodingKeys {
         let object = try mapping.fetchOrCreateObject(from: json)
         return try self.map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: parentContext)
+    }
+    
+    public func map<M: Mapping, P: KeyProvider>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: P) throws -> M.MappedObject where P.CodingKeyType == M.CodingKeys {
+        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
     }
     
     public func map<M: Mapping, KP: Keypath, P: KeyProvider>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: P, parentContext: MappingContext<KP>?) throws -> M.MappedObject where P.CodingKeyType == M.CodingKeys {

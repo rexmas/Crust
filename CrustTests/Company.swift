@@ -54,12 +54,12 @@ class CompanyMapping: Mapping {
     func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- .mapping("employees", employeeMapping) >*<
-        toMap.founder               <- .mapping("founder", employeeMapping) >*<
-        toMap.uuid                  <- "data.uuid" >*<
-        toMap.name                  <- "name" >*<
-        toMap.foundingDate          <- "data.founding_date"  >*<
-        toMap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
+        toMap.founder               <- .mapping(.founder, employeeMapping) >*<
+        toMap.uuid                  <- .uuid >*<
+        toMap.name                  <- .name >*<
+        toMap.foundingDate          <- .foundingDate  >*<
+        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
         context
     }
 }
@@ -69,12 +69,12 @@ class CompanyMappingWithDupes: CompanyMapping {
     override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- .collectionMapping("employees", employeeMapping, (.append, true, true)) >*<
-        toMap.founder               <- .mapping("founder", employeeMapping) >*<
-        toMap.uuid                  <- "data.uuid" >*<
-        toMap.name                  <- "name" >*<
-        toMap.foundingDate          <- "data.founding_date"  >*<
-        toMap.pendingLawsuits       <- "data.lawsuits.pending"  >*<
+        toMap.employees             <- .collectionMapping(.employees([]), employeeMapping, (.append, true, true)) >*<
+        toMap.founder               <- .mapping(.founder, employeeMapping) >*<
+        toMap.uuid                  <- .uuid >*<
+        toMap.name                  <- .name >*<
+        toMap.foundingDate          <- .foundingDate  >*<
+        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
         context
     }
 }
@@ -107,12 +107,12 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
     func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees         <- .mapping("employees", employeeMapping) >*<
-        toMap.founder           <- .mapping("founder", employeeMapping) >*<
-        toMap.uuid              <- "data.uuid" >*<
-        toMap.name              <- "name" >*<
-        toMap.foundingDate      <- "data.founding_date"  >*<
-        toMap.pendingLawsuits   <- "data.lawsuits.pending"  >*<
+        toMap.employees         <- .mapping(.employees([]), employeeMapping) >*<
+        toMap.founder           <- .mapping(.founder, employeeMapping) >*<
+        toMap.uuid              <- .uuid >*<
+        toMap.name              <- .name >*<
+        toMap.foundingDate      <- .foundingDate  >*<
+        toMap.pendingLawsuits   <- .pendingLawsuits  >*<
         context
     }
 }

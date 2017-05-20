@@ -31,7 +31,7 @@ public class UserMapping: RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout User, context: MappingContext) {
+    public func mapping(toMap: inout User, context: MappingContext<<#K: Keypath#>>) {
         let birthdateMapping = DateMapping(dateFormatter: DateFormatter.isoFormatter)
         let primaryKeyMapping = PrimaryKeyMapping()
         

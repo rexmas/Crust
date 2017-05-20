@@ -14,7 +14,7 @@ class PrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingContext) {
+    func mapping(toMap: inout PrimaryObj1, context: MappingContext<AnyKeyPath>) {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
         map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), context))
@@ -35,7 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingContext) { }
+    func mapping(toMap: inout PrimaryObj1, context: MappingContext<AnyKeyPath>) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -49,7 +49,7 @@ class PrimaryObj2Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj2, context: MappingContext) {
+    func mapping(toMap: inout PrimaryObj2, context: MappingContext<AnyKeyPath>) {
         // TODO: Including this mapping fails. Need to support making some mappings as optional
         // so when the recursive cycle of json between these two relationships runs out it doesn't error
         // from expecting json.
@@ -75,7 +75,7 @@ public class DatePrimaryObjMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext) {
+    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext<AnyKeyPath>) {
         toMap.date <- ("date", context)
         toMap.junk <- ("junk", context)
     }
@@ -96,7 +96,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json1Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(PrimaryObj1.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 2)
@@ -119,7 +119,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
@@ -148,7 +148,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertTrue(json["remoteId"]!.values() is Double)
         
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
         XCTAssertEqual(object.remoteId!, 1)
@@ -171,7 +171,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
         let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
-        let object = try! mapper.map(from: json, using: mapping)
+        let object = try! mapper.map(from: json, using: mapping, keyedBy: AnyKeyProvider())
         
         XCTAssertTrue(mapping.called)
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
@@ -195,7 +195,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let mapper = Mapper()
         let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
         do {
-            _ = try mapper.map(from: json, using: mapping)
+            _ = try mapper.map(from: json, using: mapping, keyedBy: AnyKeyProvider())
         }
         catch let e {
             XCTAssertTrue(e is Garbage)

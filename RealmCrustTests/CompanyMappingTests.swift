@@ -11,7 +11,7 @@ class CompanyMappingTests: RealmMappingTest {
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         try! self.adapter!.save(objects: [ object ])
         
@@ -43,7 +43,7 @@ class CompanyMappingTests: RealmMappingTest {
         
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!), keyedBy: AnyKeyProvider())
                 
         XCTAssertEqual(original, object)
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
@@ -62,7 +62,7 @@ class CompanyMappingTests: RealmMappingTest {
         stub.founder = employeeStub.copy()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 1)
@@ -80,7 +80,7 @@ class CompanyMappingTests: RealmMappingTest {
         stub.founder = employeeStub.copy()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMappingWithDupes(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMappingWithDupes(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(object.employees.count, 3)
         XCTAssertEqual(object.employees[0], object.employees[1])
@@ -96,7 +96,7 @@ class CompanyMappingTests: RealmMappingTest {
         stub.founder = employeeStub.copy()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!), keyedBy: AnyKeyProvider())
         
         XCTAssertEqual(Employee.allObjects().count, 1)
         XCTAssertEqual(object.employees.count, 1)
