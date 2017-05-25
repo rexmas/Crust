@@ -47,7 +47,7 @@ class HairColorMapping: Transform {
     }
 }
 
-enum PersonCodingKey: String, Keypath {
+enum PersonCodingKey: String, RawMappingKey {
     case bankAccounts = "bank_accounts"
     case attitude = "traits.attitude"
     case hairColor = "traits.bodily.hair_color"

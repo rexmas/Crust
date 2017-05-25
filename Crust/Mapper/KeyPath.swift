@@ -58,6 +58,14 @@ public extension Keypath {
     }
 }
 
+// Use in place of `MappingKey` if the keys have no nested values.
+public protocol RawMappingKey: Keypath { }
+extension RawMappingKey {
+    public func nestedCodingKey<Key: Keypath>() -> AnyKeyProvider<Key>? {
+        return nil
+    }
+}
+
 public extension RawRepresentable where Self: Keypath, RawValue == String {
     public var keyPath: String {
         return self.rawValue

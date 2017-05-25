@@ -74,7 +74,7 @@ class User {
 
 extension User: AnyMappable { }
 
-enum UserCodingKey: String, Keypath {
+enum UserCodingKey: String, RawMappingKey {
     case identifier = "data.id_hash"
     case birthDate = "data.birthdate"
     case name = "data.user_name"

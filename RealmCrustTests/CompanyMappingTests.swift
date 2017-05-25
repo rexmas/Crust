@@ -117,7 +117,7 @@ class CompanyMappingTests: RealmMappingTest {
         stub.founder = nil;
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: adapter!), keyedBy: AllKeysProvider())
         
         XCTAssertTrue(stub.matches(object: object))
         XCTAssertNil(object.founder)

@@ -28,6 +28,8 @@ public enum CompanyKey: RawRepresentable, Keypath {
             self = .foundingDate
         case "pendingLawsuits":
             self = .pendingLawsuits
+        default:
+            fatalError()
         }
     }
     

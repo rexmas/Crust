@@ -1,7 +1,7 @@
 import Crust
 import Realm
 
-enum EmployeeCodingKey: Keypath {
+public enum EmployeeKey: Keypath {
     case employer(Set<CompanyKey>)
     case uuid
     case name
@@ -10,7 +10,7 @@ enum EmployeeCodingKey: Keypath {
     case isEmployeeOfMonth
     case percentYearlyRaise
     
-    var keyPath: String {
+    public var keyPath: String {
         switch self {
         case .employer(_):
             return "company"
@@ -52,15 +52,14 @@ public class EmployeeMapping : RealmMapping {
     
     public func mapping(toMap: inout Employee, context: MappingContext<EmployeeKey>) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
-        let key = Binding.mapping("company", companyMapping)
+        let key = Binding<EmployeeKey, CompanyMapping>.mapping(.employer([]), companyMapping)
         
-        toMap.employer              <-  key >*<
-        toMap.joinDate              <- ("joinDate", context)
-        toMap.uuid                  <- "uuid" >*<
-        toMap.name                  <- "name" >*<
-        toMap.salary                <- "data.salary"  >*<
-        toMap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        toMap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
-        context
+        toMap.employer              <- (key, context)
+        toMap.joinDate              <- (.joinDate, context)
+        toMap.uuid                  <- (.uuid, context)
+        toMap.name                  <- (.name, context)
+        toMap.salary                <- (.salary, context)
+        toMap.isEmployeeOfMonth     <- (.isEmployeeOfMonth, context)
+        toMap.percentYearlyRaise    <- (.percentYearlyRaise, context)
     }
 }

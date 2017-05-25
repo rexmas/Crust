@@ -40,10 +40,10 @@ enum EmployeeCodingKey: Keypath {
         }
     }
     
-    public func nestedCodingKey<K: Keypath>() -> Set<K>?  {
+    public func nestedCodingKey<Key: Keypath>() -> AnyKeyProvider<Key>? {
         switch self {
         case .employer(let companyKeys):
-            return companyKeys as? Set<K>
+            return AnyKeyProvider.wrapAs(companyKeys)
         default:
             return nil
         }

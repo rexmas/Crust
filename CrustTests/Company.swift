@@ -38,6 +38,15 @@ enum CompanyCodingKey: Keypath {
             return "data.lawsuits.pending"
         }
     }
+    
+    func nestedCodingKey<Key>() -> AnyKeyProvider<Key>? where Key : Keypath {
+        switch self {
+        case .employees(let employeeKeys):
+            return AnyKeyProvider.wrapAs(employeeKeys)
+        default:
+            return nil
+        }
+    }
 }
 
 class CompanyMapping: Mapping {
