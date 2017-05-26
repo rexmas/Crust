@@ -37,15 +37,23 @@ public enum CompanyKey: RawRepresentable, Keypath {
         switch self {
         case .uuid:
             return "uuid"
-        default:
-            return ""
+        case .employees(_):
+            return "employees"
+        case .founder:
+            return "founder"
+        case .name:
+            return "name"
+        case .foundingDate:
+            return "foundingDate"
+        case .pendingLawsuits:
+            return "pendingLawsuits"
         }
     }
     
-    public func nestedCodingKey<P>() -> P? where P : KeyProvider {
+    public func nestedCodingKey<K: Keypath>() -> AnyKeyProvider<K>? {
         switch self {
         case .employees(let keys):
-            return keys as? P
+            return AnyKeyProvider.wrapAs(keys)
         default:
             return nil
         }
