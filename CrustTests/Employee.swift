@@ -23,20 +23,13 @@ enum EmployeeCodingKey: Keypath {
     
     var keyPath: String {
         switch self {
-        case .employer(_):
-            return "company"
-        case .uuid:
-            return "uuid"
-        case .name:
-            return "name"
-        case .joinDate:
-            return "joinDate"
-        case .salary:
-            return "data.salary"
-        case .isEmployeeOfMonth:
-            return "data.is_employee_of_month"
-        case .percentYearlyRaise:
-            return "data.percent_yearly_raise"
+        case .employer(_):          return "company"
+        case .uuid:                 return "uuid"
+        case .name:                 return "name"
+        case .joinDate:             return "joinDate"
+        case .salary:               return "data.salary"
+        case .isEmployeeOfMonth:    return "data.is_employee_of_month"
+        case .percentYearlyRaise:   return "data.percent_yearly_raise"
         }
     }
     

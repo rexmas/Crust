@@ -30,7 +30,7 @@ open class MappingContext<K: Keypath> {
     }
     
     internal func typeErased() -> MappingContext<AnyKeyPath> {
-        let keys = AnyKeyPathKeyProvider(keyProvider: self.keys)
+        let keys = AnyKeyPathKeyProvider(self.keys)
         let parent = MappingContext<AnyKeyPath>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
         parent.error = self.error
         parent.parent = self.parent
@@ -79,8 +79,7 @@ public struct Mapper {
     
     public func map<M: Mapping, K: Keypath, KP: Keypath, P: KeyProvider>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: P, parentContext: MappingContext<KP>?) throws -> M.MappedObject where P.CodingKeyType == M.CodingKeys {
         
-        // TODO: Figure out better ways to represent `nil` keyPaths than `""`.
-        let baseJson = try baseJSON(from: json, via: binding.keyPath, ifIn: SetKeyProvider([binding.keyPath])) ?? json
+        let baseJson = try baseJSON(from: json, via: binding.key, ifIn: SetKeyProvider([binding.key])) ?? json
         
         var object = try binding.mapping.fetchOrCreateObject(from: baseJson)
         let codingKey = NestedCodingKey(rootKey: binding.key, nestedKeys: keys)

@@ -39,7 +39,7 @@ class CRMapperTests: XCTestCase {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [:])
-        let parent = MappingContext<String>(withObject: mockMap, json: json, keys: AnyKeyProvider(), adapterType: "derp", direction: MappingDirection.fromJSON)
+        let parent = MappingContext<String>(withObject: mockMap, json: json, keys: AllKeysProvider(), adapterType: "derp", direction: MappingDirection.fromJSON)
         let mapper = Mapper()
         
         var tested = false
@@ -47,7 +47,7 @@ class CRMapperTests: XCTestCase {
             tested = true
             XCTAssertTrue(context.parent! === parent)
         }
-        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AnyKeyProvider(), parentContext: parent)
+        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeysProvider(), parentContext: parent)
         
         XCTAssertTrue(tested)
     }

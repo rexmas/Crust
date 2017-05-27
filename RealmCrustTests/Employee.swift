@@ -12,27 +12,20 @@ public enum EmployeeKey: Keypath {
     
     public var keyPath: String {
         switch self {
-        case .employer(_):
-            return "company"
-        case .uuid:
-            return "uuid"
-        case .name:
-            return "name"
-        case .joinDate:
-            return "joinDate"
-        case .salary:
-            return "data.salary"
-        case .isEmployeeOfMonth:
-            return "data.is_employee_of_month"
-        case .percentYearlyRaise:
-            return "data.percent_yearly_raise"
+        case .employer(_):          return "company"
+        case .uuid:                 return "uuid"
+        case .name:                 return "name"
+        case .joinDate:             return "joinDate"
+        case .salary:               return "data.salary"
+        case .isEmployeeOfMonth:    return "data.is_employee_of_month"
+        case .percentYearlyRaise:   return "data.percent_yearly_raise"
         }
     }
     
-    public func nestedCodingKey<P: KeyProvider>() -> P?  {
+    public func nestedCodingKey<K: Keypath>() -> AnyKeyProvider<K>? {
         switch self {
         case .employer(let companyKeys):
-            return companyKeys as? P
+            return AnyKeyProvider.wrapAs(companyKeys)
         default:
             return nil
         }

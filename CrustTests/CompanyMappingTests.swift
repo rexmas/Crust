@@ -8,7 +8,7 @@ class CompanyMappingTests: XCTestCase {
         let stub = CompanyStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: MockAdapter<Company>()), keyedBy: AnyKeyProvider())
+        let object = try! mapper.map(from: json, using: CompanyMapping(adapter: MockAdapter<Company>()), keyedBy: AllKeysProvider())
         
         XCTAssertTrue(stub.matches(object))
     }
@@ -19,7 +19,7 @@ class CompanyMappingTests: XCTestCase {
         let json = try! JSONValue(object: jsonObj)
         let mapper = Mapper()
         let binding = Binding.mapping("data.company", CompanyMapping(adapter: MockAdapter<Company>()))
-        let object = try! mapper.map(from: json, using: binding, keyedBy: AnyKeyProvider())
+        let object = try! mapper.map(from: json, using: binding, keyedBy: AllKeysProvider())
         
         XCTAssertTrue(stub.matches(object))
     }

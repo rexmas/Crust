@@ -24,18 +24,12 @@ enum CompanyCodingKey: Keypath {
     
     var keyPath: String {
         switch self {
-        case .uuid:
-            return "data.uuid"
-        case .employees(_):
-            return "employees"
-        case .founder:
-            return "founder"
-        case .name:
-            return "name"
-        case .foundingDate:
-            return "data.found_date"
-        case .pendingLawsuits:
-            return "data.lawsuits.pending"
+        case .uuid:             return "data.uuid"
+        case .employees(_):     return "employees"
+        case .founder:          return "founder"
+        case .name:             return "name"
+        case .foundingDate:     return "data.found_date"
+        case .pendingLawsuits:  return "data.lawsuits.pending"
         }
     }
     
