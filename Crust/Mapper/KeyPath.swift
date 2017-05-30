@@ -39,10 +39,6 @@ public protocol DynamicMappingKey {
 // Use in place of `MappingKey` if the keys have no nested values.
 public protocol RawMappingKey: Keypath { }
 extension RawMappingKey {
-    public func nestedKeyCollection() -> AnyKeyPathKeyCollection? {
-        return nil
-    }
-    
     public func nestedMappingKeys<K: Keypath>() -> AnyKeyCollection<K>? {
         return nil
     }
@@ -57,10 +53,6 @@ public extension RawRepresentable where Self: Keypath, RawValue == String {
 public struct RootKeyPath: Keypath {
     public let keyPath: String = ""
     public init() { }
-    
-    public func nestedKeyCollection() -> AnyKeyPathKeyCollection? {
-        return AnyKeyPathKeyCollection(AnyKeyCollection([self]))
-    }
     
     public func nestedMappingKeys<K: Keypath>() -> AnyKeyCollection<K>? {
         return AnyKeyCollection.wrapAs([self])
