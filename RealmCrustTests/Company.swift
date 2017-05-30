@@ -38,10 +38,10 @@ public enum CompanyKey: RawRepresentable, Keypath {
         }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
+    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let keys):
-            return AnyKeyProvider.wrapAs(keys)
+            return AnyKeyCollection.wrapAs(keys)
         default:
             return nil
         }

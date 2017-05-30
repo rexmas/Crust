@@ -33,10 +33,10 @@ enum CompanyCodingKey: Keypath {
         }
     }
     
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
+    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let employeeKeys):
-            return AnyKeyProvider.wrapAs(employeeKeys)
+            return AnyKeyCollection.wrapAs(employeeKeys)
         default:
             return nil
         }
