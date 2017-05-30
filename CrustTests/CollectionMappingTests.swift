@@ -427,6 +427,14 @@ class CollectionMappingTests: XCTestCase {
             }
         }
         
+        enum EquatableKeys: String, Keypath {
+            case equatables
+            
+            func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
+                return AnyKeyProvider.wrapAs(SetKeyProvider(["uuid"]))
+            }
+        }
+        
         let orphanedEquatable1 = EquatableThing()
         let orphanedEquatable2 = EquatableThing()
         let orphanedEquatable3 = EquatableThing()
@@ -440,8 +448,8 @@ class CollectionMappingTests: XCTestCase {
             ["uuid" : remainingEquatable2.uuid],
             ["uuid" : newUUID]
         ]])
-        let binding = Binding.collectionMapping("equatables", EquatableThingMapping(), (.replace(delete: { $0 }), true, false))
-        let context = MappingContext(withObject: equatableThings, json: json, keys: ["uuid"], adapterType: "derp", direction: .fromJSON)
+        let binding = Binding.collectionMapping(EquatableKeys.equatables, EquatableThingMapping(), (.replace(delete: { $0 }), true, false))
+        let context = MappingContext(withObject: equatableThings, json: json, keys: [EquatableKeys.equatables], adapterType: "derp", direction: .fromJSON)
         equatableThings <- (binding, context)
         
         XCTAssertEqual(equatableThings.map { $0.uuid }, [remainingEquatable1.uuid, remainingEquatable2.uuid, newUUID])

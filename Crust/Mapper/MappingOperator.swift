@@ -22,7 +22,6 @@ public func <- <T: JSONable, K: Keypath, MC: MappingContext<K>>(field: inout T, 
 
 @discardableResult
 public func <- <T: JSONable, K: Keypath, MC: MappingContext<K>>(field: inout T?, keyPath:(key: K, context: MC)) -> MC where T == T.ConversionType {
-    print("keypath \(keyPath)")
     return map(to: &field, via: keyPath)
 }
 
@@ -103,7 +102,6 @@ public func <- <T: JSONable, TF: Transform, K: Keypath, MC: MappingContext<K>>(f
 
 /// - returns: The json to be used from mapping keyed by `keyPath`, or `nil` if `keyPath` is not in `keys`, or throws and error.
 internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    print("baseJSON \(keyPath)")
     guard !(keyPath is RootKeyPath) else {
         return json
     }
@@ -484,7 +482,6 @@ private func mapFromJSON<M: Mapping, K: Keypath, MC: MappingContext<K>, RRC: Ran
             throw parentContext.error!
         }
         
-        print(keyedBinding)
         guard let baseJSON = try baseJSONForCollection(json: parentContext.json, via: keyedBinding.binding.key, ifIn: parentContext.keys) else {
             return
         }
@@ -576,7 +573,6 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
 }
 
 private func baseJSONForCollection<KC: KeyCollection>(json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    print(keyPath)
     guard !(keyPath is RootKeyPath) else {
         return json
     }
@@ -622,7 +618,6 @@ private func generateNewValues<T, M: Mapping, K: Keypath>(
     
         guard case .array(let jsonArray) = json else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
-            print(userInfo)
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
         
