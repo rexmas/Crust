@@ -107,7 +107,7 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper()
         let jsonValue = try! JSONValue(object: json)
-        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!), keyedBy: AllKeys())
         
         XCTAssertEqual(User.allObjects(in: realm!).count, 1)
     }
@@ -119,10 +119,10 @@ class Tests: RealmMappingTest {
         
         let mapping = Mapper()
         let jsonValue = try! JSONValue(object: jsonObj)
-        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        _ = try! mapping.map(from: jsonValue["data"]!, using: UserMapping(adapter: adapter!), keyedBy: AllKeys())
         
         let user = User.allObjects(in: realm!).firstObject()!
-        let json = try! mapping.mapFromObjectToJSON(user as! User, mapping: UserMapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        let json = try! mapping.mapFromObjectToJSON(user as! User, mapping: UserMapping(adapter: adapter!), keyedBy: AllKeys())
         
         //let id_hash = json["id_hash"]?.values() as! Int
         XCTAssertNotNil(json)

@@ -96,7 +96,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json1Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        let object = try! mapper.map(from: json, using: PrimaryObj1Mapping(adapter: adapter!), keyedBy: AllKeys())
         
         XCTAssertEqual(PrimaryObj1.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 2)
@@ -119,7 +119,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        let object = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!), keyedBy: AllKeys())
         
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
         XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
@@ -148,7 +148,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertTrue(json["remoteId"]!.values() is Double)
         
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!), keyedBy: AllKeysProvider())
+        let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!), keyedBy: AllKeys())
         
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
         XCTAssertEqual(object.remoteId!, 1)
@@ -171,7 +171,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let json = try! JSONValue(object: json2Dict)
         let mapper = Mapper()
         let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
-        let object = try! mapper.map(from: json, using: mapping, keyedBy: AllKeysProvider())
+        let object = try! mapper.map(from: json, using: mapping, keyedBy: AllKeys())
         
         XCTAssertTrue(mapping.called)
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
@@ -195,7 +195,7 @@ class PrimaryKeyTests: RealmMappingTest {
         let mapper = Mapper()
         let mapping = DatePrimaryObjMappingWithTransform(adapter: adapter!)
         do {
-            _ = try mapper.map(from: json, using: mapping, keyedBy: AllKeysProvider())
+            _ = try mapper.map(from: json, using: mapping, keyedBy: AllKeys())
         }
         catch let e {
             XCTAssertTrue(e is Garbage)

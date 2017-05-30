@@ -19,7 +19,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec, keyedBy: AllKeysProvider())
+        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec, keyedBy: AllKeys())
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(collection.count, 2)
@@ -62,7 +62,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping(RootKeyPath(), mapping)
-        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -105,7 +105,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -151,7 +151,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -204,7 +204,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -252,7 +252,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(employees.count, 2)
@@ -302,7 +302,7 @@ class CollectionMappingTests: RealmMappingTest {
         
         let spec = Binding.mapping("", mapping)
         let testFunc = {
-            let _: Company = try mapper.map(from: json, using: spec, keyedBy: AllKeysProvider())
+            let _: Company = try mapper.map(from: json, using: spec, keyedBy: AllKeys())
         }
         
         XCTAssertThrowsError(try testFunc())

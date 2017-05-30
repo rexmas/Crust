@@ -131,7 +131,7 @@ class TransformTests: XCTestCase {
         let jsonObject: [AnyHashable : Any] = ["data": ["id_hash": 170, "user_name": "Jorge", "user_surname": "Revuelta", "birthdate": "1991-03-31", "height": 175, "weight": 60, "sex": 2]]
         let json = try! JSONValue(object: jsonObject)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: UserMapping(adapter: MockAdapter<User>()), keyedBy: AllKeysProvider())
+        let object = try! mapper.map(from: json, using: UserMapping(adapter: MockAdapter<User>()), keyedBy: AllKeys())
         
         let targetDate: Date = DateFormatter.birthdateFormatter().date(from: "1991-03-31")!
         

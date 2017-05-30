@@ -267,7 +267,7 @@ public struct AnyKeyPathKeyProvider: KeyCollection {
     }
 }
 
-public struct AllKeysProvider<K: Keypath>: KeyCollection {
+public struct AllKeys<K: Keypath>: KeyCollection {
     public init() {}
     public init(arrayLiteral elements: K...) { }
     public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) { }
@@ -277,7 +277,7 @@ public struct AllKeysProvider<K: Keypath>: KeyCollection {
     }
     
     public func nestedKeyCollection<Key: Keypath>(for key: K) -> AnyKeyProvider<Key>? {
-        return AnyKeyProvider(AllKeysProvider<Key>())
+        return AnyKeyProvider(AllKeys<Key>())
     }
 }
 

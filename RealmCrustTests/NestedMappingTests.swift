@@ -53,7 +53,7 @@ class NestedMappingTests: RealmMappingTest {
         
         let json = try! JSONValue(dict: jsonObject)
         let mapper = Mapper()
-        let parent = try! mapper.map(from: json, using: ParentMapping(), keyedBy: AllKeysProvider())
+        let parent = try! mapper.map(from: json, using: ParentMapping(), keyedBy: AllKeys())
         
         XCTAssertEqual(parent.uuid, jsonObject["uuid"] as! String)
         XCTAssertTrue(companyStub1.matches(object: parent.companies![0]))
@@ -79,7 +79,7 @@ class NestedMappingTests: RealmMappingTest {
         let json = try! JSONValue(dict: jsonObject)
         let mapper = Mapper()
         let mapping = ParentMapping()
-        _ = try! mapper.map(from: json, using: mapping, keyedBy: AllKeysProvider())
+        _ = try! mapper.map(from: json, using: mapping, keyedBy: AllKeys())
         
         XCTAssertEqual(mapping.numberOfCallsToMappingWillBegin, 1)
     }
@@ -103,10 +103,10 @@ class NestedMappingTests: RealmMappingTest {
         let mapping = ParentMapping()
         
         // We do this twice because these functions have slightly different paths at the beginning.
-        _ = try! mapper.map(from: json, using: mapping, keyedBy: AllKeysProvider())
+        _ = try! mapper.map(from: json, using: mapping, keyedBy: AllKeys())
         XCTAssertFalse(self.realm.inWriteTransaction)
         
-        _ = try! mapper.map(from: json, using: Binding.mapping("", mapping), keyedBy: AllKeysProvider())
+        _ = try! mapper.map(from: json, using: Binding.mapping("", mapping), keyedBy: AllKeys())
         XCTAssertFalse(self.realm.inWriteTransaction)
     }
 }

@@ -63,7 +63,7 @@ class NestedMappingTests: XCTestCase {
         let json = try! JSONValue(dict: jsonObject)
         let mapper = Mapper()
         let adapter = MockAdapter<Node>()
-        let parent = try! mapper.map(from: json, using: ParentMapping(adapter: adapter), keyedBy: AllKeysProvider())
+        let parent = try! mapper.map(from: json, using: ParentMapping(adapter: adapter), keyedBy: AllKeys())
         
         XCTAssertEqual(parent.uuid, jsonObject["uuid"] as! String)
         XCTAssertEqual(parent.children!.map { $0.uuid }, (jsonObject["children"] as! [[String : String]]).map { $0["uuid"]! })
@@ -98,7 +98,7 @@ class NestedMappingTests: XCTestCase {
         let mapper = Mapper()
         let adapter = MockAdapter<Node>()
         let mapping = ParentMappingWithDifferentChildAdapter(adapter: adapter)
-        let parent = try! mapper.map(from: json, using: mapping, keyedBy: AllKeysProvider())
+        let parent = try! mapper.map(from: json, using: mapping, keyedBy: AllKeys())
         
         XCTAssertEqual(parent.uuid, jsonObject["uuid"] as! String)
         XCTAssertEqual(parent.children!.map { $0.uuid }, (jsonObject["children"] as! [[String : String]]).map { $0["uuid"]! })
