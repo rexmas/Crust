@@ -22,7 +22,7 @@ public enum EmployeeKey: Keypath {
         }
     }
     
-    public func nestedCodingKey<K: Keypath>() -> AnyKeyProvider<K>? {
+    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
         switch self {
         case .employer(let companyKeys):
             return AnyKeyProvider.wrapAs(companyKeys)

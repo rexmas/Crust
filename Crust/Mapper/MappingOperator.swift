@@ -22,16 +22,17 @@ public func <- <T: JSONable, K: Keypath, MC: MappingContext<K>>(field: inout T, 
 
 @discardableResult
 public func <- <T: JSONable, K: Keypath, MC: MappingContext<K>>(field: inout T?, keyPath:(key: K, context: MC)) -> MC where T == T.ConversionType {
+    print("keypath \(keyPath)")
     return map(to: &field, via: keyPath)
 }
 
 // MARK: - To JSON
 
-private func shouldMapToJSON<K: KeyProvider>(via keyPath: K.CodingKeyType, ifIn keys: K) -> Bool {
+private func shouldMapToJSON<KC: KeyCollection>(via keyPath: KC.MappingKeyType, ifIn keys: KC) -> Bool {
     return keys.containsKey(keyPath) || (keyPath is RootKeyPath)
 }
 
-private func map<T: JSONable, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K) -> JSONValue where T == T.ConversionType {
+private func map<T: JSONable, KC: KeyCollection>(to json: JSONValue, from field: T?, via key: KC.MappingKeyType, ifIn keys: KC) -> JSONValue where T == T.ConversionType {
     var json = json
     
     guard shouldMapToJSON(via: key, ifIn: keys) else {
@@ -101,7 +102,8 @@ public func <- <T: JSONable, TF: Transform, K: Keypath, MC: MappingContext<K>>(f
 // MARK: - Mapping.
 
 /// - returns: The json to be used from mapping keyed by `keyPath`, or `nil` if `keyPath` is not in `keys`, or throws and error.
-internal func baseJSON<K: KeyProvider>(from json: JSONValue, via keyPath: K.CodingKeyType, ifIn keys: K) throws -> JSONValue? {
+internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
+    print("baseJSON \(keyPath)")
     guard !(keyPath is RootKeyPath) else {
         return json
     }
@@ -265,7 +267,7 @@ public func map<T, M: Mapping, K: Keypath, MC: MappingContext<K>>(to field: inou
 
 // MARK: - To JSON
 
-private func map<T, M: Mapping, K: KeyProvider>(to json: JSONValue, from field: T?, via key: K.CodingKeyType, ifIn keys: K, using mapping: M, keyedBy nestedKeys: AnyKeyProvider<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
+private func map<T, M: Mapping, KC: KeyCollection>(to json: JSONValue, from field: T?, via key: KC.MappingKeyType, ifIn keys: KC, using mapping: M, keyedBy nestedKeys: AnyKeyProvider<M.CodingKeys>) throws -> JSONValue where M.MappedObject == T {
     var json = json
     
     guard shouldMapToJSON(via: key, ifIn: keys) else {
@@ -443,12 +445,12 @@ public func map<M: Mapping, K: Keypath, MC: MappingContext<K>, RRC: RangeReplace
 }
 
 /// Our top level mapping function for mapping from a sequence/collection to JSON.
-private func map<T, M: Mapping, K: KeyProvider, S: Sequence>(
+private func map<T, M: Mapping, KC: KeyCollection, S: Sequence>(
     to json: JSONValue,
     from field: S,
-    via key: K.CodingKeyType,
+    via key: KC.MappingKeyType,
     using mapping: M,
-    ifIn parentKeys: K,
+    ifIn parentKeys: KC,
     keyedBy nestedKeys: AnyKeyProvider<M.CodingKeys>)
     throws -> JSONValue
     where M.MappedObject == T, S.Iterator.Element == T {
@@ -482,6 +484,7 @@ private func mapFromJSON<M: Mapping, K: Keypath, MC: MappingContext<K>, RRC: Ran
             throw parentContext.error!
         }
         
+        print(keyedBinding)
         guard let baseJSON = try baseJSONForCollection(json: parentContext.json, via: keyedBinding.binding.key, ifIn: parentContext.keys) else {
             return
         }
@@ -572,7 +575,8 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
         }
 }
 
-private func baseJSONForCollection<K: KeyProvider>(json: JSONValue, via keyPath: K.CodingKeyType, ifIn keys: K) throws -> JSONValue? {
+private func baseJSONForCollection<KC: KeyCollection>(json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
+    print(keyPath)
     guard !(keyPath is RootKeyPath) else {
         return json
     }
@@ -618,6 +622,7 @@ private func generateNewValues<T, M: Mapping, K: Keypath>(
     
         guard case .array(let jsonArray) = json else {
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
+            print(userInfo)
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
         

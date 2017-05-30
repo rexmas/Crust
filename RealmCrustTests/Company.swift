@@ -16,18 +16,12 @@ public enum CompanyKey: RawRepresentable, Keypath {
     
     public init?(rawValue: String) {
         switch rawValue {
-        case "uuid":
-            self = .uuid
-        case "employees":
-            self = .employees([])
-        case "founder":
-            self = .founder
-        case "name":
-            self = .name
-        case "foundingDate":
-            self = .foundingDate
-        case "pendingLawsuits":
-            self = .pendingLawsuits
+        case "data.uuid":               self = .uuid
+        case "employees":               self = .employees([])
+        case "founder":                 self = .founder
+        case "name":                    self = .name
+        case "data.founding_date":         self = .foundingDate
+        case "data.lawsuits.pending":   self = .pendingLawsuits
         default:
             fatalError()
         }
@@ -35,22 +29,16 @@ public enum CompanyKey: RawRepresentable, Keypath {
     
     public var rawValue: String {
         switch self {
-        case .uuid:
-            return "uuid"
-        case .employees(_):
-            return "employees"
-        case .founder:
-            return "founder"
-        case .name:
-            return "name"
-        case .foundingDate:
-            return "foundingDate"
-        case .pendingLawsuits:
-            return "pendingLawsuits"
+        case .uuid:             return "data.uuid"
+        case .employees(_):     return "employees"
+        case .founder:          return "founder"
+        case .name:             return "name"
+        case .foundingDate:     return "data.founding_date"
+        case .pendingLawsuits:  return "data.lawsuits.pending"
         }
     }
     
-    public func nestedCodingKey<K: Keypath>() -> AnyKeyProvider<K>? {
+    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
         switch self {
         case .employees(let keys):
             return AnyKeyProvider.wrapAs(keys)

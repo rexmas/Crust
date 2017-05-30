@@ -50,15 +50,13 @@ public enum Binding<K: Keypath, M: Mapping> {
         }
     }
     
-    internal func nestedBinding<NestedProvider: KeyProvider>(`for` nestedKeys: NestedProvider)
-        -> Binding<NestedCodingKey<K, NestedProvider>, M> {
+    internal func nestedBinding(`for` nestedKeys: M.CodingKeys)
+        -> Binding<M.CodingKeys, M> {
             switch self {
-            case .mapping(let key, let mapping):
-                let nested = NestedCodingKey(rootKey: key, nestedKeys: nestedKeys)
-                return .mapping(nested, mapping)
-            case .collectionMapping(let key, let mapping, let method):
-                let nested = NestedCodingKey(rootKey: key, nestedKeys: nestedKeys)
-                return .collectionMapping(nested, mapping, method)
+            case .mapping(_, let mapping):
+                return .mapping(nestedKeys, mapping)
+            case .collectionMapping(_, let mapping, let method):
+                return .collectionMapping(nestedKeys, mapping, method)
             }
     }
 }

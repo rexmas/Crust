@@ -28,12 +28,12 @@ enum CompanyCodingKey: Keypath {
         case .employees(_):     return "employees"
         case .founder:          return "founder"
         case .name:             return "name"
-        case .foundingDate:     return "data.found_date"
+        case .foundingDate:     return "data.founding_date"
         case .pendingLawsuits:  return "data.lawsuits.pending"
         }
     }
     
-    func nestedCodingKey<Key>() -> AnyKeyProvider<Key>? where Key : Keypath {
+    func nestedMappingKeys<Key: Keypath>() -> AnyKeyProvider<Key>? {
         switch self {
         case .employees(let employeeKeys):
             return AnyKeyProvider.wrapAs(employeeKeys)
