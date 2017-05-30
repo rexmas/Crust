@@ -112,7 +112,6 @@ internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via keyPath: KC.
     
     let baseJSON = json[keyPath]
     
-    // TODO: Test to get rid of this now that we have `RootKeyPath`.
     if baseJSON == nil && keyPath.keyPath == "" {
         return json
     }
