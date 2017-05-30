@@ -20,7 +20,7 @@ public enum CompanyKey: RawRepresentable, Keypath {
         case "employees":               self = .employees([])
         case "founder":                 self = .founder
         case "name":                    self = .name
-        case "data.founding_date":         self = .foundingDate
+        case "data.founding_date":      self = .foundingDate
         case "data.lawsuits.pending":   self = .pendingLawsuits
         default:
             fatalError()
