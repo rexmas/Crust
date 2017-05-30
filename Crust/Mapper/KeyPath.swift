@@ -112,7 +112,6 @@ public struct AnyKeyPath: Keypath, ExpressibleByStringLiteral {
     }
 }
 
-// TODO: Change this to KeyContainer maybe.
 public protocol KeyCollection: DynamicKeyCollection {
     associatedtype MappingKeyType: Keypath
     
@@ -146,17 +145,17 @@ public protocol DynamicKeyCollection {
 
 public struct AnyKeyCollection<K: Keypath>: KeyCollection {
     public let mappingKeyType: K.Type
-    public let keyProviderType: Any.Type
+    public let keyCollectionType: Any.Type
     private let _containsKey: (K) -> Bool
     private let dynamicKeyCollection: DynamicKeyCollection
     
     /// This function is really dumb. `AnyKeyCollection<K> as? AnyKeyCollection<K2>` always fails (though `Set<K> as? Set<K2>` doesn't)
     /// so we check and force cast here. This should be fixed in Swift 4.
-    public static func wrapAs<P: KeyCollection, K2: Keypath>(_ keyProvider: P) -> AnyKeyCollection<K2>? where P.MappingKeyType == K {
+    public static func wrapAs<P: KeyCollection, K2: Keypath>(_ keyCollection: P) -> AnyKeyCollection<K2>? where P.MappingKeyType == K {
         guard K.self is K2.Type else {
             return nil
         }
-        let provider = AnyKeyCollection(keyProvider)
+        let provider = AnyKeyCollection(keyCollection)
         return unsafeBitCast(provider, to: AnyKeyCollection<K2>.self)
     }
     
@@ -173,7 +172,7 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
             return nil
         }
         
-        self.keyProviderType = anyKeyPathKeyCollection.keyProviderType
+        self.keyCollectionType = anyKeyPathKeyCollection.keyCollectionType
         self.mappingKeyType = mappingKeyType
         self._containsKey = { key in
             return anyKeyPathKeyCollection.containsKey(key)
@@ -181,33 +180,33 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
         self.dynamicKeyCollection = anyKeyPathKeyCollection
     }
     
-    public init<P: KeyCollection>(_ keyProvider: P) where P.MappingKeyType == K {
-        self.keyProviderType = P.self
+    public init<P: KeyCollection>(_ keyCollection: P) where P.MappingKeyType == K {
+        self.keyCollectionType = P.self
         self.mappingKeyType = K.self
         self._containsKey = { key in
-            return keyProvider.containsKey(key)
+            return keyCollection.containsKey(key)
         }
-        self.dynamicKeyCollection = keyProvider
+        self.dynamicKeyCollection = keyCollection
     }
     
     public init(arrayLiteral elements: K...) {
-        let keyProvider = SetKeyCollection(Set(elements))
-        self.keyProviderType = type(of: keyProvider).self
+        let keyCollection = SetKeyCollection(Set(elements))
+        self.keyCollectionType = type(of: keyCollection).self
         self.mappingKeyType = K.self
         self._containsKey = { key in
-            return keyProvider.containsKey(key)
+            return keyCollection.containsKey(key)
         }
-        self.dynamicKeyCollection = keyProvider
+        self.dynamicKeyCollection = keyCollection
     }
     
     public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) {
-        let keyProvider = SetKeyCollection(Set(sequence))
-        self.keyProviderType = type(of: keyProvider).self
+        let keyCollection = SetKeyCollection(Set(sequence))
+        self.keyCollectionType = type(of: keyCollection).self
         self.mappingKeyType = K.self
         self._containsKey = { key in
-            return keyProvider.containsKey(key)
+            return keyCollection.containsKey(key)
         }
-        self.dynamicKeyCollection = keyProvider
+        self.dynamicKeyCollection = keyCollection
     }
     
     public func containsKey(_ key: K) -> Bool {
@@ -221,20 +220,20 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
 
 public struct AnyKeyPathKeyCollection: KeyCollection {
     public let mappingKeyType: Any.Type
-    public let keyProviderType: Any.Type
+    public let keyCollectionType: Any.Type
     private let _containsKey: (Any) -> Bool
     private let dynamicKeyCollection: DynamicKeyCollection
     
-    public init<P: KeyCollection>(_ keyProvider: P) {
+    public init<P: KeyCollection>(_ keyCollection: P) {
         self.mappingKeyType = P.MappingKeyType.self
         self._containsKey = { key in
             guard case let key as P.MappingKeyType = key else {
                 return false
             }
-            return keyProvider.containsKey(key)
+            return keyCollection.containsKey(key)
         }
-        self.keyProviderType = P.self
-        self.dynamicKeyCollection = keyProvider
+        self.keyCollectionType = P.self
+        self.dynamicKeyCollection = keyCollection
     }
     
     public init(_ anyKeyPathKeyCollection: AnyKeyPathKeyCollection) {
@@ -242,16 +241,16 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
     }
     
     public init<Source, KeyType: Keypath>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (KeyType) {
-        let keyProvider = SetKeyCollection(Set(sequence))
+        let keyCollection = SetKeyCollection(Set(sequence))
         self.mappingKeyType = KeyType.self
         self._containsKey = { key in
             guard case let key as KeyType = key else {
                 return false
             }
-            return keyProvider.containsKey(key)
+            return keyCollection.containsKey(key)
         }
-        self.keyProviderType = SetKeyCollection<KeyType>.self
-        self.dynamicKeyCollection = keyProvider
+        self.keyCollectionType = SetKeyCollection<KeyType>.self
+        self.dynamicKeyCollection = keyCollection
     }
     
     public func containsKey(_ key: AnyKeyPath) -> Bool {
@@ -281,7 +280,9 @@ public struct AllKeys<K: Keypath>: KeyCollection {
     }
 }
 
-// TODO: Can make Set follow protocol once conditional conformances are available in Swift 4.
+/// A `Set` of `MappingKey`s.
+///
+/// TODO: Can make Set follow `KeyCollection` protocol once conditional conformances are available in Swift 4.
 public struct SetKeyCollection<K: Keypath>: KeyCollection, ExpressibleByArrayLiteral {
     public let keys: Set<K>
     
