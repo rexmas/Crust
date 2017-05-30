@@ -50,8 +50,8 @@ public enum Binding<K: Keypath, M: Mapping> {
         }
     }
     
-    internal func nestedBinding(`for` nestedKeys: M.CodingKeys)
-        -> Binding<M.CodingKeys, M> {
+    internal func nestedBinding(`for` nestedKeys: M.MappingKeyType)
+        -> Binding<M.MappingKeyType, M> {
             switch self {
             case .mapping(_, let mapping):
                 return .mapping(nestedKeys, mapping)
@@ -68,7 +68,7 @@ public protocol Mapping {
     /// The DB adapter type.
     associatedtype AdapterKind: Adapter
     
-    associatedtype CodingKeys: Keypath
+    associatedtype MappingKeyType: Keypath
     
     var adapter: AdapterKind { get }
     
@@ -87,7 +87,7 @@ public protocol Mapping {
     var primaryKeys: [PrimaryKeyDescriptor]? { get }
     
     /// Override to perform mappings to properties.
-    func mapping(toMap: inout MappedObject, context: MappingContext<CodingKeys>) throws
+    func mapping(toMap: inout MappedObject, context: MappingContext<MappingKeyType>) throws
 }
 
 public enum DefaultDatabaseTag: String {
@@ -165,7 +165,7 @@ public protocol Adapter {
 }
 
 public protocol Transform: AnyMapping {
-    associatedtype CodingKeys = RootKeyPath
+    associatedtype MappingKeyType = RootKeyPath
     
     func fromJSON(_ json: JSONValue) throws -> MappedObject
     func toJSON(_ obj: MappedObject) -> JSONValue

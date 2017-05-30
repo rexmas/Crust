@@ -44,7 +44,7 @@ public struct Mapper {
     public init() { }
     
     public func map<M: Mapping, C: RangeReplaceableCollection, K: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> C
-    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, KC.MappingKeyType == M.CodingKeys {
+    where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, KC.MappingKeyType == M.MappingKeyType {
         
         var collection = C()
         let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
@@ -58,7 +58,7 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, C: RangeReplaceableCollection, K: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> C
-        where M.MappedObject == C.Iterator.Element, KC.MappingKeyType == M.CodingKeys {
+        where M.MappedObject == C.Iterator.Element, KC.MappingKeyType == M.MappingKeyType {
             
             var collection = C()
             let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
@@ -71,11 +71,11 @@ public struct Mapper {
             return collection
     }
     
-    public func map<M: Mapping, K: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, K: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
     }
     
-    public func map<M: Mapping, K: Keypath, KP: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, K: Keypath, KP: Keypath, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         
         let baseJson = try baseJSON(from: json, via: binding.key, ifIn: SetKeyCollection([binding.key])) ?? json
         
@@ -92,20 +92,20 @@ public struct Mapper {
         return object
     }
     
-    public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
     }
     
-    public func map<M: Mapping, KP: Keypath, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, KP: Keypath, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         let object = try mapping.fetchOrCreateObject(from: json)
         return try self.map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: parentContext)
     }
     
-    public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
     }
     
-    public func map<M: Mapping, KP: Keypath, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.CodingKeys {
+    public func map<M: Mapping, KP: Keypath, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         var object = object
         let context = MappingContext(withObject: object, json: json, keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         context.parent = parentContext?.typeErased()
@@ -113,14 +113,14 @@ public struct Mapper {
         return object
     }
     
-    public func mapFromObjectToJSON<M: Mapping, KC: KeyCollection>(_ object: M.MappedObject, mapping: M, keyedBy keys: KC) throws -> JSONValue where KC.MappingKeyType == M.CodingKeys {
+    public func mapFromObjectToJSON<M: Mapping, KC: KeyCollection>(_ object: M.MappedObject, mapping: M, keyedBy keys: KC) throws -> JSONValue where KC.MappingKeyType == M.MappingKeyType {
         var object = object
         let context = MappingContext(withObject: object, json: JSONValue.object([:]), keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.toJSON)
         try self.perform(mapping, on: &object, with: context)
         return context.json
     }
     
-    internal func perform<M: Mapping>(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext<M.CodingKeys>) throws {
+    internal func perform<M: Mapping>(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext<M.MappingKeyType>) throws {
         try mapping.start(context: context)
         mapping.execute(object: &object, context: context)
         try mapping.complete(object: &object, context: context)
@@ -266,7 +266,7 @@ public extension Mapping {
         }
     }
     
-    public func execute(object: inout MappedObject, context: MappingContext<CodingKeys>) {
+    public func execute(object: inout MappedObject, context: MappingContext<MappingKeyType>) {
         do {
             try self.mapping(toMap: &object, context: context)
         }

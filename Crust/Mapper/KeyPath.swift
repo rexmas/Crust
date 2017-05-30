@@ -347,14 +347,14 @@ internal struct NestedMappingKey<RootKey: Keypath, NestedCollection: KeyCollecti
 
 public struct KeyedBinding<K: Keypath, M: Mapping> {
     public let binding: Binding<K, M>
-    public let codingKeys: AnyKeyCollection<M.CodingKeys>
+    public let codingKeys: AnyKeyCollection<M.MappingKeyType>
     
-    public init<KC: KeyCollection>(binding: Binding<K, M>, codingKeys: KC) where KC.MappingKeyType == M.CodingKeys {
+    public init<KC: KeyCollection>(binding: Binding<K, M>, codingKeys: KC) where KC.MappingKeyType == M.MappingKeyType {
         self.binding = binding
         self.codingKeys = AnyKeyCollection(codingKeys)
     }
     
-    public init(binding: Binding<K, M>, codingKeys: AnyKeyCollection<M.CodingKeys>) {
+    public init(binding: Binding<K, M>, codingKeys: AnyKeyCollection<M.MappingKeyType>) {
         self.binding = binding
         self.codingKeys = codingKeys
     }
@@ -364,9 +364,9 @@ public struct KeyedBinding<K: Keypath, M: Mapping> {
             return nil
         }
         
-        let codingKeys: AnyKeyCollection<M.CodingKeys> = try {
-            if M.CodingKeys.self is RootKeyPath.Type {
-                return AnyKeyCollection([RootKeyPath() as! M.CodingKeys])
+        let codingKeys: AnyKeyCollection<M.MappingKeyType> = try {
+            if M.MappingKeyType.self is RootKeyPath.Type {
+                return AnyKeyCollection([RootKeyPath() as! M.MappingKeyType])
             }
             
             return try context.keys.nestedKeyCollection(for: binding.key)

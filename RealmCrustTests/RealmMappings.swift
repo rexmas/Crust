@@ -248,7 +248,7 @@ public class RLMArrayMappingBridge<T: RLMObject, K: Keypath>: Mapping {
     public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
     public let rlmObjectMapping: (inout MappedObject, MappingContext<K>) throws -> Void
     
-    public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject, OGMapping.MappedObject == T, OGMapping.CodingKeys == K {
+    public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject, OGMapping.MappedObject == T, OGMapping.MappingKeyType == K {
         
         self.adapter = RealmSwiftObjectAdapterBridge(realmObjCAdapter: rlmObjectMapping.adapter as! RealmAdapter,
                                                      rlmObjectType: OGMapping.MappedObject.self)
@@ -267,7 +267,7 @@ public class RLMArrayMappingBridge<T: RLMObject, K: Keypath>: Mapping {
 
 public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
     
-    func generateRLMArrayMappingBridge() -> Binding<K, RLMArrayMappingBridge<M.MappedObject, M.CodingKeys>> {
+    func generateRLMArrayMappingBridge() -> Binding<K, RLMArrayMappingBridge<M.MappedObject, M.MappingKeyType>> {
         
         switch self {
         case .mapping(let keyPath, let mapping):
@@ -275,7 +275,7 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
             return .mapping(keyPath, bridge)
             
         case .collectionMapping(let keyPath, let mapping, let updatePolicy):
-            let bridge = RLMArrayMappingBridge<M.MappedObject, M.CodingKeys>(rlmObjectMapping: mapping)
+            let bridge = RLMArrayMappingBridge<M.MappedObject, M.MappingKeyType>(rlmObjectMapping: mapping)
             return .collectionMapping(keyPath, bridge, updatePolicy)
         }
     }
