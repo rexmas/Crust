@@ -19,7 +19,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec)
+        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec, keyedBy: AllKeys())
         
         XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
         XCTAssertEqual(collection.count, 2)
@@ -30,9 +30,9 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByAppendUnique() {
         class CompanyMappingAppendUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context))
+                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context))
             }
         }
         
@@ -61,8 +61,8 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = CompanyMappingAppendUnique(adapter: self.adapter!)
         let mapper = Mapper()
         
-        let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec)
+        let spec = Binding.mapping(RootKeyPath(), mapping)
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -76,10 +76,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceUnique() {
         class CompanyMappingReplaceUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: nil), true, false)), context))
             }
         }
         
@@ -105,7 +105,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -117,10 +117,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceDeleteUnique() {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, false)), context))
             }
         }
         
@@ -151,7 +151,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -164,10 +164,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenReplaceNullableRemovesAllAndDeletes() {
         class CompanyMappingReplaceNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, true)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, true)), context))
             }
         }
         
@@ -204,7 +204,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -214,10 +214,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenAppendNullableDoesNothing() {
         class CompanyMappingAppendNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.append, true, true)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, true)), context))
             }
         }
         
@@ -252,7 +252,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let company: Company = try! mapper.map(from: json, using: spec)
+        let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(employees.count, 2)
@@ -263,10 +263,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenNonNullableThrows() {
         class CompanyMappingAppendNonNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping("employees", employeeMapping, (.append, true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context))
             }
         }
         
@@ -302,7 +302,7 @@ class CollectionMappingTests: RealmMappingTest {
         
         let spec = Binding.mapping("", mapping)
         let testFunc = {
-            let _: Company = try mapper.map(from: json, using: spec)
+            let _: Company = try mapper.map(from: json, using: spec, keyedBy: AllKeys())
         }
         
         XCTAssertThrowsError(try testFunc())

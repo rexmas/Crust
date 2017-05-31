@@ -11,7 +11,7 @@ class EmployeeMappingTests: RealmMappingTest {
         let stub = EmployeeStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: EmployeeMapping(adapter: adapter!))
+        let object = try! mapper.map(from: json, using: EmployeeMapping(adapter: adapter!), keyedBy: AllKeys())
         
         try! self.adapter!.save(objects: [ object ])
         

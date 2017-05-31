@@ -8,7 +8,7 @@ class MockMap: Mapping, Adapter {
     
     init() { }
     
-    var catchMapping: ((_ toMap: MockMap, _ context: MappingContext) -> ())? = nil
+    var catchMapping: ((_ toMap: MockMap, _ context: MappingContext<String>) -> ())? = nil
     
     var adapter: MockMap {
         return self
@@ -17,7 +17,7 @@ class MockMap: Mapping, Adapter {
         return nil
     }
     
-    func mapping(toMap: inout MockMap, context: MappingContext) {
+    func mapping(toMap: inout MockMap, context: MappingContext<String>) {
         catchMapping!(toMap, context)
     }
     
@@ -38,16 +38,20 @@ class CRMapperTests: XCTestCase {
     func testMapFromJSONUsesParentContext() {
         let mockMap = MockMap()
         
-        let json = try! JSONValue(object: [:])
-        let parent = MappingContext(withObject: mockMap, json: json, adapterType: "derp", direction: MappingDirection.fromJSON)
+        let json = try! JSONValue(object: [ "cool" : "json" ])
+        let parent = MappingContext<String>(withObject: mockMap, json: json, keys: AllKeys(), adapterType: "derp", direction: MappingDirection.fromJSON)
         let mapper = Mapper()
         
         var tested = false
         mockMap.catchMapping = { (toMap, context) in
             tested = true
-            XCTAssertTrue(context.parent! === parent)
+            let resultParent = context.parent!
+            XCTAssertEqual(resultParent.adapterType, parent.adapterType)
+            XCTAssertTrue((resultParent.object as! MockMap) === (parent.object as! MockMap))
+            XCTAssertEqual(resultParent.json, parent.json)
+            XCTAssertEqual(resultParent.dir, parent.dir)
         }
-        let _ = try! mapper.map(from: json, using: mockMap, parentContext: parent)
+        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeys(), parentContext: parent)
         
         XCTAssertTrue(tested)
     }

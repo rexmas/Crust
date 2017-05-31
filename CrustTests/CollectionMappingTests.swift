@@ -18,7 +18,7 @@ class CollectionMappingTests: XCTestCase {
     class IntMapping: AnyMapping {
         typealias AdapterKind = AnyAdapterImp<Int>
         typealias MappedObject = Int
-        func mapping(toMap: inout Int, context: MappingContext) { }
+        func mapping(toMap: inout Int, context: MappingContext<String>) { }
     }
     
     func testDefaultInsertionPolicyIsReplaceUniqueNullable() {
@@ -41,7 +41,7 @@ class CollectionMappingTests: XCTestCase {
         let mapper = Mapper()
         
         let spec = Binding.mapping("", mapping)
-        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec)
+        let collection: [Employee] = try! mapper.map(from: employeesJSON, using: spec, keyedBy: AllKeys())
         
         XCTAssertEqual(collection.count, 2)
         XCTAssertNotEqual(collection[0].uuid, collection[1].uuid)
@@ -54,9 +54,9 @@ class CollectionMappingTests: XCTestCase {
     // | append            | yes or no | append      | append    |
     func testMappingCollectionByAppend() {
         class CompanyMappingAppendUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (Binding.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
+                toMap.employees <- (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context)
             }
         }
         
@@ -81,7 +81,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingAppendUnique(adapter: MockAdapter<Company>())
         let mapper = Mapper()
         
-        let company: Company = try! mapper.map(from: json, to: original, using: mapping)
+        let company: Company = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -96,9 +96,9 @@ class CollectionMappingTests: XCTestCase {
     // | replace           | yes or no | vals        | replace   |
     func testMappingCollectionByReplace() {
         class CompanyMappingReplaceUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.replace(delete: nil), true, false)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: nil), true, false)), context)
             }
         }
         
@@ -120,7 +120,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingReplaceUnique(adapter: MockAdapter<Company>())
         let mapper = Mapper()
         
-        let company: Company = try! mapper.map(from: json, to: original, using: mapping)
+        let company: Company = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -135,9 +135,9 @@ class CollectionMappingTests: XCTestCase {
     func testMappingCollectionByReplaceDelete() {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
             let employeeAdapter = MockAdapter<Employee>()
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: employeeAdapter)
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, false)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, false)), context)
             }
         }
         
@@ -163,7 +163,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingReplaceDeleteUnique(adapter: MockAdapter<Company>())
         let mapper = Mapper()
         
-        let company: Company = try! mapper.map(from: json, to: original, using: mapping)
+        let company: Company = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(original.uuid, company.uuid)
@@ -181,9 +181,9 @@ class CollectionMappingTests: XCTestCase {
     func testAssigningNullToCollectionWhenReplaceNullableRemovesAllAndDeletes() {
         class CompanyMappingReplaceNullable: CompanyMapping {
             let employeeAdapter = MockAdapter<Employee>()
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: employeeAdapter)
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, true)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, true)), context)
             }
         }
         
@@ -213,7 +213,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingReplaceNullable(adapter: MockAdapter<Company>())
         let mapper = Mapper()
         
-        let company: Company = try! mapper.map(from: json, to: original, using: mapping)
+        let company: Company = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(mapping.employeeAdapter.deletedObjects.map { $0.uuid }, [originalEmployee.uuid, originalEmployee2.uuid])
@@ -226,9 +226,9 @@ class CollectionMappingTests: XCTestCase {
     // | append            | yes       | null        | no-op     |
     func testAssigningNullToCollectionWhenAppendNullableDoesNothing() {
         class CompanyMappingAppendNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.append, true, true)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.append, true, true)), context)
             }
         }
         
@@ -258,7 +258,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingAppendNullable(adapter: MockAdapter<Company>())
         let mapper = Mapper()
         
-        let company: Company = try! mapper.map(from: json, to: original, using: mapping)
+        let company: Company = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(employees.count, 2)
@@ -270,9 +270,9 @@ class CollectionMappingTests: XCTestCase {
     // | append or replace | no        | null        | error     |
     func testAssigningNullToCollectionWhenNonNullableThrows() {
         class CompanyMappingAppendNonNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingContext) {
+            override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context)
             }
         }
         
@@ -304,7 +304,7 @@ class CollectionMappingTests: XCTestCase {
         
         let spec = Binding.mapping("", mapping)
         let testFunc = {
-            let _: Company = try mapper.map(from: json, using: spec)
+            let _: Company = try mapper.map(from: json, using: spec, keyedBy: AllKeys())
         }
         
         XCTAssertThrowsError(try testFunc())
@@ -318,9 +318,9 @@ class CollectionMappingTests: XCTestCase {
     func testAssigningNullToOptionalCollectionWhenReplaceNullableAssignsNullAndDeletes() {
         class CompanyMappingReplaceNullable: CompanyWithOptionalEmployeesMapping {
             let employeeAdapter = MockAdapter<Employee>()
-            override func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext) {
+            override func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: employeeAdapter)
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.replace(delete: { $0 }), true, true)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, true)), context)
             }
         }
         
@@ -351,7 +351,7 @@ class CollectionMappingTests: XCTestCase {
         let mapping = CompanyMappingReplaceNullable(adapter: MockAdapter<CompanyWithOptionalEmployees>())
         let mapper = Mapper()
         
-        let company: CompanyWithOptionalEmployees = try! mapper.map(from: json, to: original, using: mapping)
+        let company: CompanyWithOptionalEmployees = try! mapper.map(from: json, to: original, using: mapping, keyedBy: AllKeys())
         let employees = company.employees
         
         XCTAssertEqual(mapping.employeeAdapter.deletedObjects.map { $0.uuid }, [originalEmployee.uuid, originalEmployee2.uuid])
@@ -364,9 +364,9 @@ class CollectionMappingTests: XCTestCase {
     // | append or replace | no        | null        | error       |
     func testAssigningNullToOptionalCollectionWhenNonNullableThrows() {
         class CompanyMappingAppendNonNullable: CompanyWithOptionalEmployeesMapping {
-            override func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext) {
+            override func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
                 let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
-                toMap.employees <- (.collectionMapping("employees", employeeMapping, (.append, true, false)), context)
+                toMap.employees <- (.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context)
             }
         }
         
@@ -399,7 +399,7 @@ class CollectionMappingTests: XCTestCase {
         
         let spec = Binding.mapping("", mapping)
         let testFunc = {
-            let _: CompanyWithOptionalEmployees = try mapper.map(from: json, using: spec)
+            let _: CompanyWithOptionalEmployees = try mapper.map(from: json, using: spec, keyedBy: AllKeys())
         }
         
         XCTAssertThrowsError(try testFunc())
@@ -422,8 +422,16 @@ class CollectionMappingTests: XCTestCase {
             
             let adapter = MockAdapter<EquatableThing>()
             
-            func mapping(toMap: inout EquatableThing, context: MappingContext) {
+            func mapping(toMap: inout EquatableThing, context: MappingContext<String>) {
                 toMap.uuid <- ("uuid", context)
+            }
+        }
+        
+        enum EquatableKeys: String, Keypath {
+            case equatables
+            
+            func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+                return AnyKeyCollection.wrapAs(SetKeyCollection(["uuid"]))
             }
         }
         
@@ -440,8 +448,8 @@ class CollectionMappingTests: XCTestCase {
             ["uuid" : remainingEquatable2.uuid],
             ["uuid" : newUUID]
         ]])
-        let binding = Binding.collectionMapping("equatables", EquatableThingMapping(), (.replace(delete: { $0 }), true, false))
-        let context = MappingContext(withObject: equatableThings, json: json, adapterType: "derp", direction: .fromJSON)
+        let binding = Binding.collectionMapping(EquatableKeys.equatables, EquatableThingMapping(), (.replace(delete: { $0 }), true, false))
+        let context = MappingContext(withObject: equatableThings, json: json, keys: [EquatableKeys.equatables], adapterType: "derp", direction: .fromJSON)
         equatableThings <- (binding, context)
         
         XCTAssertEqual(equatableThings.map { $0.uuid }, [remainingEquatable1.uuid, remainingEquatable2.uuid, newUUID])

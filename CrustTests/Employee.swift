@@ -12,6 +12,37 @@ class Employee {
     var percentYearlyRaise: Double = 0.0
 }
 
+enum EmployeeCodingKey: Keypath {
+    case employer(Set<CompanyCodingKey>)
+    case uuid
+    case name
+    case joinDate
+    case salary
+    case isEmployeeOfMonth
+    case percentYearlyRaise
+    
+    var keyPath: String {
+        switch self {
+        case .employer(_):          return "company"
+        case .uuid:                 return "uuid"
+        case .name:                 return "name"
+        case .joinDate:             return "joinDate"
+        case .salary:               return "data.salary"
+        case .isEmployeeOfMonth:    return "data.is_employee_of_month"
+        case .percentYearlyRaise:   return "data.percent_yearly_raise"
+        }
+    }
+    
+    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+        switch self {
+        case .employer(let companyKeys):
+            return AnyKeyCollection.wrapAs(companyKeys)
+        default:
+            return nil
+        }
+    }
+}
+
 extension Employee: AnyMappable { }
 
 class EmployeeMapping: MockMapping {
@@ -25,16 +56,16 @@ class EmployeeMapping: MockMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Employee, context: MappingContext) {
+    func mapping(toMap: inout Employee, context: MappingContext<EmployeeCodingKey>) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
-        toMap.employer              <- .mapping("company", companyMapping) >*<
-        toMap.joinDate              <- "joinDate"  >*<
-        toMap.uuid                  <- "uuid" >*<
-        toMap.name                  <- "name" >*<
-        toMap.salary                <- "data.salary"  >*<
-        toMap.isEmployeeOfMonth     <- "data.is_employee_of_month"  >*<
-        toMap.percentYearlyRaise    <- "data.percent_yearly_raise" >*<
+        toMap.employer              <- .mapping(.employer([]), companyMapping) >*<
+        toMap.joinDate              <- .joinDate  >*<
+        toMap.uuid                  <- .uuid >*<
+        toMap.name                  <- .name >*<
+        toMap.salary                <- .salary  >*<
+        toMap.isEmployeeOfMonth     <- .isEmployeeOfMonth  >*<
+        toMap.percentYearlyRaise    <- .percentYearlyRaise >*<
         context
     }
 }
