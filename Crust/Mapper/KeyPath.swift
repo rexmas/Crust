@@ -50,7 +50,7 @@ public extension RawRepresentable where Self: MappingKey, RawValue == String {
     }
 }
 
-public struct RootKeyPath: MappingKey {
+public struct RootKey: MappingKey {
     public let keyPath: String = ""
     public init() { }
     
@@ -358,8 +358,8 @@ public struct KeyedBinding<K: MappingKey, M: Mapping> {
         }
         
         let codingKeys: AnyKeyCollection<M.MappingKeyType> = try {
-            if M.MappingKeyType.self is RootKeyPath.Type {
-                return AnyKeyCollection([RootKeyPath() as! M.MappingKeyType])
+            if M.MappingKeyType.self is RootKey.Type {
+                return AnyKeyCollection([RootKey() as! M.MappingKeyType])
             }
             
             return try context.keys.nestedKeyCollection(for: binding.key)

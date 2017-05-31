@@ -72,7 +72,7 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
+        return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
     }
     
     public func map<M: Mapping, K: MappingKey, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
@@ -93,7 +93,7 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
+        return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
     }
     
     public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
@@ -102,7 +102,7 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKeyPath>>.none)
+        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
     }
     
     public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {

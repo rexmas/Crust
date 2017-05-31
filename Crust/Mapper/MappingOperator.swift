@@ -28,7 +28,7 @@ public func <- <T: JSONable, K: MappingKey, MC: MappingContext<K>>(field: inout 
 // MARK: - To JSON
 
 private func shouldMapToJSON<KC: KeyCollection>(via keyPath: KC.MappingKeyType, ifIn keys: KC) -> Bool {
-    return keys.containsKey(keyPath) || (keyPath is RootKeyPath)
+    return keys.containsKey(keyPath) || (keyPath is RootKey)
 }
 
 private func map<T: JSONable, KC: KeyCollection>(to json: JSONValue, from field: T?, via key: KC.MappingKeyType, ifIn keys: KC) -> JSONValue where T == T.ConversionType {
@@ -102,7 +102,7 @@ public func <- <T: JSONable, TF: Transform, K: MappingKey, MC: MappingContext<K>
 
 /// - returns: The json to be used from mapping keyed by `keyPath`, or `nil` if `keyPath` is not in `keys`, or throws and error.
 internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    guard !(keyPath is RootKeyPath) else {
+    guard !(keyPath is RootKey) else {
         return json
     }
     
@@ -572,7 +572,7 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
 }
 
 private func baseJSONForCollection<KC: KeyCollection>(json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    guard !(keyPath is RootKeyPath) else {
+    guard !(keyPath is RootKey) else {
         return json
     }
     

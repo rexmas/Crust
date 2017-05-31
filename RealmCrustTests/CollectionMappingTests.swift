@@ -61,7 +61,7 @@ class CollectionMappingTests: RealmMappingTest {
         let mapping = CompanyMappingAppendUnique(adapter: self.adapter!)
         let mapper = Mapper()
         
-        let spec = Binding.mapping(RootKeyPath(), mapping)
+        let spec = Binding.mapping(RootKey(), mapping)
         let company: Company = try! mapper.map(from: json, using: spec, keyedBy: AllKeys())
         let employees = company.employees
         

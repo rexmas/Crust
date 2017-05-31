@@ -165,14 +165,14 @@ public protocol Adapter {
 }
 
 public protocol Transform: AnyMapping {
-    associatedtype MappingKeyType = RootKeyPath
+    associatedtype MappingKeyType = RootKey
     
     func fromJSON(_ json: JSONValue) throws -> MappedObject
     func toJSON(_ obj: MappedObject) -> JSONValue
 }
 
 public extension Transform {
-    func mapping(toMap: inout MappedObject, context: MappingContext<RootKeyPath>) {
+    func mapping(toMap: inout MappedObject, context: MappingContext<RootKey>) {
         switch context.dir {
         case .fromJSON:
             do {
