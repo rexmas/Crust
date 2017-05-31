@@ -96,14 +96,14 @@ class UserMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout User, context: MappingPayload<UserCodingKey>) {
+    func mapping(toMap: inout User, payload: MappingPayload<UserCodingKey>) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
         toMap.identifier        <- .identifier >*<
         toMap.birthDate         <- Binding.mapping(.birthDate, userBirthdateMapping) >*<
         toMap.name              <- .name >*<
         toMap.surname           <- .surname >*<
-        context
+        payload
     }
 }
 

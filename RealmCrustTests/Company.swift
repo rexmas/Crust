@@ -59,29 +59,29 @@ public class CompanyMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+    public func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
-        toMap.employees             <- (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context)
-        toMap.founder               <- .mapping(.founder, employeeMapping) >*< context
+        toMap.employees             <- (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), payload)
+        toMap.founder               <- .mapping(.founder, employeeMapping) >*< payload
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }
 
 public class CompanyMappingWithDupes : CompanyMapping {
     
-    public override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+    public override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
-        toMap.employees             <- (.collectionMapping(.employees([]), employeeMapping, (.append, false, false)), context)
+        toMap.employees             <- (.collectionMapping(.employees([]), employeeMapping, (.append, false, false)), payload)
         toMap.founder               <- Binding.mapping(.founder, employeeMapping) >*<
         toMap.uuid                  <- .uuid >*<
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }

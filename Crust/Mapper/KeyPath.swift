@@ -352,8 +352,8 @@ public struct KeyedBinding<K: MappingKey, M: Mapping> {
         self.codingKeys = codingKeys
     }
     
-    public init?(binding: Binding<K, M>, context: MappingPayload<K>) throws {
-        guard context.keys.containsKey(binding.key) else {
+    public init?(binding: Binding<K, M>, payload: MappingPayload<K>) throws {
+        guard payload.keys.containsKey(binding.key) else {
             return nil
         }
         
@@ -362,7 +362,7 @@ public struct KeyedBinding<K: MappingKey, M: Mapping> {
                 return AnyKeyCollection([RootKey() as! M.MappingKeyType])
             }
             
-            return try context.keys.nestedKeyCollection(for: binding.key)
+            return try payload.keys.nestedKeyCollection(for: binding.key)
         }()
         
         self.init(binding: binding, codingKeys: codingKeys)

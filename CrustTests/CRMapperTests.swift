@@ -8,7 +8,7 @@ class MockMap: Mapping, Adapter {
     
     init() { }
     
-    var catchMapping: ((_ toMap: MockMap, _ context: MappingPayload<String>) -> ())? = nil
+    var catchMapping: ((_ toMap: MockMap, _ payload: MappingPayload<String>) -> ())? = nil
     
     var adapter: MockMap {
         return self
@@ -17,8 +17,8 @@ class MockMap: Mapping, Adapter {
         return nil
     }
     
-    func mapping(toMap: inout MockMap, context: MappingPayload<String>) {
-        catchMapping!(toMap, context)
+    func mapping(toMap: inout MockMap, payload: MappingPayload<String>) {
+        catchMapping!(toMap, payload)
     }
     
     var dataBaseTag: String = "none"
@@ -43,9 +43,9 @@ class CRMapperTests: XCTestCase {
         let mapper = Mapper()
         
         var tested = false
-        mockMap.catchMapping = { (toMap, context) in
+        mockMap.catchMapping = { (toMap, payload) in
             tested = true
-            let resultParent = context.parent!
+            let resultParent = payload.parent!
             XCTAssertEqual(resultParent.adapterType, parent.adapterType)
             XCTAssertTrue((resultParent.object as! MockMap) === (parent.object as! MockMap))
             XCTAssertEqual(resultParent.json, parent.json)

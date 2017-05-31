@@ -83,11 +83,11 @@ public protocol Mapping {
     typealias PrimaryKeyDescriptor = (property: String, keyPath: String?, transform: ((JSONValue) throws -> CVarArg?)?)
     
     /// The primaryKeys on `MappedObject`. Primary keys are mapped separately from what is mapped in
-    /// `mapping(toMap:context:)` and are never remapped to objects fetched from the database.
+    /// `mapping(toMap:payload:)` and are never remapped to objects fetched from the database.
     var primaryKeys: [PrimaryKeyDescriptor]? { get }
     
     /// Override to perform mappings to properties.
-    func mapping(toMap: inout MappedObject, context: MappingPayload<MappingKeyType>) throws
+    func mapping(toMap: inout MappedObject, payload: MappingPayload<MappingKeyType>) throws
 }
 
 public enum DefaultDatabaseTag: String {
@@ -172,16 +172,16 @@ public protocol Transform: AnyMapping {
 }
 
 public extension Transform {
-    func mapping(toMap: inout MappedObject, context: MappingPayload<RootKey>) {
-        switch context.dir {
+    func mapping(toMap: inout MappedObject, payload: MappingPayload<RootKey>) {
+        switch payload.dir {
         case .fromJSON:
             do {
-                try toMap = self.fromJSON(context.json)
+                try toMap = self.fromJSON(payload.json)
             } catch let err as NSError {
-                context.error = err
+                payload.error = err
             }
         case .toJSON:
-            context.json = self.toJSON(toMap)
+            payload.json = self.toJSON(toMap)
         }
     }
 }

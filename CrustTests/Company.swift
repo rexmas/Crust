@@ -54,7 +54,7 @@ class CompanyMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Company, context: MappingPayload<CompanyCodingKey>) {
+    func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
@@ -63,13 +63,13 @@ class CompanyMapping: Mapping {
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(toMap: inout Company, context: MappingPayload<CompanyCodingKey>) {
+    override func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .collectionMapping(.employees([]), employeeMapping, (.append, true, true)) >*<
@@ -78,7 +78,7 @@ class CompanyMappingWithDupes: CompanyMapping {
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }
 
@@ -107,7 +107,7 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingPayload<CompanyCodingKey>) {
+    func mapping(toMap: inout CompanyWithOptionalEmployees, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees         <- .mapping(.employees([]), employeeMapping) >*<
@@ -116,6 +116,6 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         toMap.name              <- .name >*<
         toMap.foundingDate      <- .foundingDate  >*<
         toMap.pendingLawsuits   <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }

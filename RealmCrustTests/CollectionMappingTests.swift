@@ -30,9 +30,9 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByAppendUnique() {
         class CompanyMappingAppendUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
-                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context))
+                map(toRLMArray: toMap.employees, using: (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), payload))
             }
         }
         
@@ -76,10 +76,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceUnique() {
         class CompanyMappingReplaceUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: nil), true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: nil), true, false)), payload))
             }
         }
         
@@ -117,10 +117,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testMappingCollectionByReplaceDeleteUnique() {
         class CompanyMappingReplaceDeleteUnique: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, false)), payload))
             }
         }
         
@@ -164,10 +164,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenReplaceNullableRemovesAllAndDeletes() {
         class CompanyMappingReplaceNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, true)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.replace(delete: { $0 }), true, true)), payload))
             }
         }
         
@@ -214,10 +214,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenAppendNullableDoesNothing() {
         class CompanyMappingAppendNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, true)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, true)), payload))
             }
         }
         
@@ -263,10 +263,10 @@ class CollectionMappingTests: RealmMappingTest {
     
     func testAssigningNullToCollectionWhenNonNullableThrows() {
         class CompanyMappingAppendNonNullable: CompanyMapping {
-            override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
+            override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
                 let employeeMapping = EmployeeMapping(adapter: self.adapter)
                 map(toRLMArray: toMap.employees,
-                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context))
+                    using: (.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), payload))
             }
         }
         

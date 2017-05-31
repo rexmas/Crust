@@ -14,12 +14,12 @@ class PrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingPayload<String>) {
+    func mapping(toMap: inout PrimaryObj1, payload: MappingPayload<String>) {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
-        map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), context))
+        map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), payload))
         toMap.uuid          <- "data.uuid" >*<
-        context
+        payload
     }
 }
 
@@ -35,7 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingPayload<AnyMappingKey>) { }
+    func mapping(toMap: inout PrimaryObj1, payload: MappingPayload<AnyMappingKey>) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -49,7 +49,7 @@ class PrimaryObj2Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj2, context: MappingPayload<String>) {
+    func mapping(toMap: inout PrimaryObj2, payload: MappingPayload<String>) {
         // TODO: Including this mapping fails. Need to support making some mappings as optional
         // so when the recursive cycle of json between these two relationships runs out it doesn't error
         // from expecting json.
@@ -60,7 +60,7 @@ class PrimaryObj2Mapping : RealmMapping {
         let obj1Mapping = NestedPrimaryObj1Mapping(adapter: self.adapter)
         
         toMap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
-        context
+        payload
     }
 }
 
@@ -75,9 +75,9 @@ public class DatePrimaryObjMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout DatePrimaryObj, context: MappingPayload<AnyMappingKey>) {
-        toMap.date <- ("date", context)
-        toMap.junk <- ("junk", context)
+    public func mapping(toMap: inout DatePrimaryObj, payload: MappingPayload<AnyMappingKey>) {
+        toMap.date <- ("date", payload)
+        toMap.junk <- ("junk", payload)
     }
 }
 
