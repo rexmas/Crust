@@ -14,7 +14,7 @@ class Company {
 
 extension Company: AnyMappable { }
 
-enum CompanyCodingKey: Keypath {
+enum CompanyCodingKey: MappingKey {
     case uuid
     case employees(Set<EmployeeCodingKey>)
     case founder
@@ -33,7 +33,7 @@ enum CompanyCodingKey: Keypath {
         }
     }
     
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let employeeKeys):
             return AnyKeyCollection.wrapAs(employeeKeys)

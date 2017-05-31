@@ -427,10 +427,10 @@ class CollectionMappingTests: XCTestCase {
             }
         }
         
-        enum EquatableKeys: String, Keypath {
+        enum EquatableKeys: String, MappingKey {
             case equatables
             
-            func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+            func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
                 return AnyKeyCollection.wrapAs(SetKeyCollection(["uuid"]))
             }
         }

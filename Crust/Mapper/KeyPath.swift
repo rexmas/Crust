@@ -13,16 +13,16 @@ enum CrustError: LocalizedError {
 }
 
 // TODO: Change to MappingKey
-public protocol Keypath: JSONKeypath, DynamicMappingKey, Hashable {
+public protocol MappingKey: JSONKeypath, DynamicMappingKey, Hashable {
     /// Return the collection of coding keys for a nested set of JSON. A non-nil value is required for every key
     /// that is used to key into JSON passed to a nested `Mapping`, otherwise the mapping operation
     /// for that nested type will fail and throw an error.
     ///
     /// - returns: Collection of MappingKeys for the nested JSON. `nil` on error - results in error during mapping.
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>?
+    func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>?
 }
 
-public extension Keypath {
+public extension MappingKey {
     public var hashValue: Int {
         return self.keyPath.hashValue
     }
@@ -33,28 +33,28 @@ public extension Keypath {
 }
 
 public protocol DynamicMappingKey {
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>?
+    func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>?
 }
 
 // Use in place of `MappingKey` if the keys have no nested values.
-public protocol RawMappingKey: Keypath { }
+public protocol RawMappingKey: MappingKey { }
 extension RawMappingKey {
-    public func nestedMappingKeys<K: Keypath>() -> AnyKeyCollection<K>? {
+    public func nestedMappingKeys<K: MappingKey>() -> AnyKeyCollection<K>? {
         return nil
     }
 }
 
-public extension RawRepresentable where Self: Keypath, RawValue == String {
+public extension RawRepresentable where Self: MappingKey, RawValue == String {
     public var keyPath: String {
         return self.rawValue
     }
 }
 
-public struct RootKeyPath: Keypath {
+public struct RootKeyPath: MappingKey {
     public let keyPath: String = ""
     public init() { }
     
-    public func nestedMappingKeys<K: Keypath>() -> AnyKeyCollection<K>? {
+    public func nestedMappingKeys<K: MappingKey>() -> AnyKeyCollection<K>? {
         return AnyKeyCollection.wrapAs([self])
     }
 }
@@ -63,7 +63,7 @@ extension String: RawMappingKey { }
 
 extension Int: RawMappingKey { }
 
-public struct AnyKeyPath: Keypath, ExpressibleByStringLiteral {
+public struct AnyKeyPath: MappingKey, ExpressibleByStringLiteral {
     public var hashValue: Int {
         return _hashValue()
     }
@@ -77,14 +77,14 @@ public struct AnyKeyPath: Keypath, ExpressibleByStringLiteral {
     public let type: Any.Type
     public let base: DynamicMappingKey
     
-    public init<K>(_ base: K) where K: Keypath {
+    public init<K>(_ base: K) where K: MappingKey {
         self.base = base
         self.type = K.self
         self._keyPath = { base.keyPath }
         self._hashValue = { base.hashValue }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         return self.base.nestedMappingKeys()
     }
     
@@ -105,22 +105,22 @@ public struct AnyKeyPath: Keypath, ExpressibleByStringLiteral {
 }
 
 public protocol KeyCollection: DynamicKeyCollection {
-    associatedtype MappingKeyType: Keypath
+    associatedtype MappingKeyType: MappingKey
     
     init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == MappingKeyType
     func containsKey(_ key: MappingKeyType) -> Bool
-    func nestedKeyCollection<Key: Keypath>(`for` key: MappingKeyType) -> AnyKeyCollection<Key>?
+    func nestedKeyCollection<Key: MappingKey>(`for` key: MappingKeyType) -> AnyKeyCollection<Key>?
 }
 
 public extension KeyCollection {
-    public func nestedDynamicKeyCollection<Key: Keypath>(`for` key: Any) -> AnyKeyCollection<Key>? {
+    public func nestedDynamicKeyCollection<Key: MappingKey>(`for` key: Any) -> AnyKeyCollection<Key>? {
         guard case let key as MappingKeyType = key else {
             return nil
         }
         return self.nestedKeyCollection(for: key)
     }
     
-    func nestedKeyCollection<Key: Keypath>(`for` key: MappingKeyType) throws -> AnyKeyCollection<Key> {
+    func nestedKeyCollection<Key: MappingKey>(`for` key: MappingKeyType) throws -> AnyKeyCollection<Key> {
         guard let nested = (self.nestedKeyCollection(for: key) as AnyKeyCollection<Key>?) else {
             throw CrustError.nestedCodingKeyError(type: MappingKeyType.self, keyPath: key.keyPath)
         }
@@ -128,14 +128,14 @@ public extension KeyCollection {
     }
 }
 
-/// This exists to get around the fact that `AnyKeyCollection` cannot capture `nestedKeyCollection<K: Keypath>` in a closure.
+/// This exists to get around the fact that `AnyKeyCollection` cannot capture `nestedKeyCollection<K: MappingKey>` in a closure.
 public protocol DynamicKeyCollection {
-    /// This exists to get around the fact that `AnyKeyCollection` cannot capture `nestedKeyCollection<K: Keypath>` in a closure.
+    /// This exists to get around the fact that `AnyKeyCollection` cannot capture `nestedKeyCollection<K: MappingKey>` in a closure.
     /// This is automatically implemented for `KeyCollection`.
-    func nestedDynamicKeyCollection<Key: Keypath>(`for` key: Any) -> AnyKeyCollection<Key>?
+    func nestedDynamicKeyCollection<Key: MappingKey>(`for` key: Any) -> AnyKeyCollection<Key>?
 }
 
-public struct AnyKeyCollection<K: Keypath>: KeyCollection {
+public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
     public let mappingKeyType: K.Type
     public let keyCollectionType: Any.Type
     private let _containsKey: (K) -> Bool
@@ -143,7 +143,7 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
     
     /// This function is really dumb. `AnyKeyCollection<K> as? AnyKeyCollection<K2>` always fails (though `Set<K> as? Set<K2>` doesn't)
     /// so we check and force cast here. This should be fixed in Swift 4.
-    public static func wrapAs<P: KeyCollection, K2: Keypath>(_ keyCollection: P) -> AnyKeyCollection<K2>? where P.MappingKeyType == K {
+    public static func wrapAs<P: KeyCollection, K2: MappingKey>(_ keyCollection: P) -> AnyKeyCollection<K2>? where P.MappingKeyType == K {
         guard K.self is K2.Type else {
             return nil
         }
@@ -151,7 +151,7 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
         return unsafeBitCast(provider, to: AnyKeyCollection<K2>.self)
     }
     
-    public static func wrapAs<Source: Sequence, K2: Keypath>(_ keys: Source) -> AnyKeyCollection<K2>? where Source.Iterator.Element == K {
+    public static func wrapAs<Source: Sequence, K2: MappingKey>(_ keys: Source) -> AnyKeyCollection<K2>? where Source.Iterator.Element == K {
         guard K.self is K2.Type else {
             return nil
         }
@@ -205,7 +205,7 @@ public struct AnyKeyCollection<K: Keypath>: KeyCollection {
         return self._containsKey(key)
     }
     
-    public func nestedKeyCollection<Key: Keypath>(for key: K) -> AnyKeyCollection<Key>? {
+    public func nestedKeyCollection<Key: MappingKey>(for key: K) -> AnyKeyCollection<Key>? {
         return self.dynamicKeyCollection.nestedDynamicKeyCollection(for: key)
     }
 }
@@ -232,7 +232,7 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
         self = anyKeyPathKeyCollection
     }
     
-    public init<Source, KeyType: Keypath>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (KeyType) {
+    public init<Source, KeyType: MappingKey>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (KeyType) {
         let keyCollection = SetKeyCollection(Set(sequence))
         self.mappingKeyType = KeyType.self
         self._containsKey = { key in
@@ -249,16 +249,16 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
         return self._containsKey(key)
     }
     
-    public func containsKey<K: Keypath>(_ key: K) -> Bool {
+    public func containsKey<K: MappingKey>(_ key: K) -> Bool {
         return self._containsKey(key)
     }
     
-    public func nestedKeyCollection<Key: Keypath>(for key: AnyKeyPath) -> AnyKeyCollection<Key>? {
+    public func nestedKeyCollection<Key: MappingKey>(for key: AnyKeyPath) -> AnyKeyCollection<Key>? {
         return self.dynamicKeyCollection.nestedDynamicKeyCollection(for: key.base)
     }
 }
 
-public struct AllKeys<K: Keypath>: KeyCollection {
+public struct AllKeys<K: MappingKey>: KeyCollection {
     public init() {}
     public init(arrayLiteral elements: K...) { }
     public init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (K) { }
@@ -267,7 +267,7 @@ public struct AllKeys<K: Keypath>: KeyCollection {
         return true
     }
     
-    public func nestedKeyCollection<Key: Keypath>(for key: K) -> AnyKeyCollection<Key>? {
+    public func nestedKeyCollection<Key: MappingKey>(for key: K) -> AnyKeyCollection<Key>? {
         return AnyKeyCollection(AllKeys<Key>())
     }
 }
@@ -275,7 +275,7 @@ public struct AllKeys<K: Keypath>: KeyCollection {
 /// A `Set` of `MappingKey`s.
 ///
 /// TODO: Can make Set follow `KeyCollection` protocol once conditional conformances are available in Swift 4.
-public struct SetKeyCollection<K: Keypath>: KeyCollection, ExpressibleByArrayLiteral {
+public struct SetKeyCollection<K: MappingKey>: KeyCollection, ExpressibleByArrayLiteral {
     public let keys: Set<K>
     
     public init(_ keys: Set<K>) {
@@ -298,7 +298,7 @@ public struct SetKeyCollection<K: Keypath>: KeyCollection, ExpressibleByArrayLit
         return self.keys.contains(key)
     }
     
-    public func nestedKeyCollection<Key: Keypath>(for key: K) -> AnyKeyCollection<Key>? {
+    public func nestedKeyCollection<Key: MappingKey>(for key: K) -> AnyKeyCollection<Key>? {
         guard let index = self.keys.index(of: key) else {
             return nil
         }
@@ -307,7 +307,7 @@ public struct SetKeyCollection<K: Keypath>: KeyCollection, ExpressibleByArrayLit
     }
 }
 
-internal struct NestedMappingKey<RootKey: Keypath, NestedCollection: KeyCollection>: Keypath, KeyCollection {
+internal struct NestedMappingKey<RootKey: MappingKey, NestedCollection: KeyCollection>: MappingKey, KeyCollection {
     let rootKey: RootKey
     let nestedKeys: NestedCollection
     
@@ -329,16 +329,16 @@ internal struct NestedMappingKey<RootKey: Keypath, NestedCollection: KeyCollecti
         return key == rootKey
     }
     
-    func nestedKeyCollection<Key: Keypath>(for key: RootKey) -> AnyKeyCollection<Key>? {
+    func nestedKeyCollection<Key: MappingKey>(for key: RootKey) -> AnyKeyCollection<Key>? {
         return AnyKeyCollection.wrapAs(self.nestedKeys)
     }
     
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         return AnyKeyCollection.wrapAs(self.nestedKeys)
     }
 }
 
-public struct KeyedBinding<K: Keypath, M: Mapping> {
+public struct KeyedBinding<K: MappingKey, M: Mapping> {
     public let binding: Binding<K, M>
     public let codingKeys: AnyKeyCollection<M.MappingKeyType>
     

@@ -2,7 +2,7 @@ import Crust
 import JSONValueRX
 import Realm
 
-public enum CompanyKey: RawRepresentable, Keypath {
+public enum CompanyKey: RawRepresentable, MappingKey {
     case uuid
     case employees([EmployeeKey])
     case founder
@@ -38,7 +38,7 @@ public enum CompanyKey: RawRepresentable, Keypath {
         }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let keys):
             return AnyKeyCollection.wrapAs(keys)

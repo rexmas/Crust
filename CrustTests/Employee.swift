@@ -12,7 +12,7 @@ class Employee {
     var percentYearlyRaise: Double = 0.0
 }
 
-enum EmployeeCodingKey: Keypath {
+enum EmployeeCodingKey: MappingKey {
     case employer(Set<CompanyCodingKey>)
     case uuid
     case name
@@ -33,7 +33,7 @@ enum EmployeeCodingKey: Keypath {
         }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employer(let companyKeys):
             return AnyKeyCollection.wrapAs(companyKeys)

@@ -9,7 +9,7 @@ public enum CollectionInsertionMethod<Element> {
 public typealias CollectionUpdatePolicy<Element> =
     (insert: CollectionInsertionMethod<Element>, unique: Bool, nullable: Bool)
 
-public enum Binding<K: Keypath, M: Mapping> {
+public enum Binding<K: MappingKey, M: Mapping> {
     
     case mapping(K, M)
     case collectionMapping(K, M, CollectionUpdatePolicy<M.MappedObject>)
@@ -68,7 +68,7 @@ public protocol Mapping {
     /// The DB adapter type.
     associatedtype AdapterKind: Adapter
     
-    associatedtype MappingKeyType: Keypath
+    associatedtype MappingKeyType: MappingKey
     
     var adapter: AdapterKind { get }
     

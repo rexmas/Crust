@@ -241,7 +241,7 @@ public class RealmSwiftObjectAdapterBridge<T>: Adapter {
 }
 
 /// Wrapper used to map `RLMObjects`. Relies on `RLMArrayBridge` since `RLMArray` does not support `RangeReplaceableCollection`.
-public class RLMArrayMappingBridge<T: RLMObject, K: Keypath>: Mapping {
+public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
     public typealias MappedObject = T
     
     public let adapter: RealmSwiftObjectAdapterBridge<MappedObject>
@@ -282,13 +282,13 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
 }
 
 @discardableResult
-public func <- <U: RealmMapping, K: Keypath, C: MappingContext<K>>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, context: C)) -> C {
+public func <- <U: RealmMapping, K: MappingKey, C: MappingContext<K>>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, context: C)) -> C {
     
     return map(toRLMArray: field, using: binding)
 }
 
 @discardableResult
-public func map<U: RealmMapping, K: Keypath, C: MappingContext<K>>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<K, U>, context: C)) -> C {
+public func map<U: RealmMapping, K: MappingKey, C: MappingContext<K>>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<K, U>, context: C)) -> C {
     
     var variableList = RLMArrayBridge(rlmArray: field)
     let bridge = binding.key.generateRLMArrayMappingBridge()

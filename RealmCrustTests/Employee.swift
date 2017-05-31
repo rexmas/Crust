@@ -1,7 +1,7 @@
 import Crust
 import Realm
 
-public enum EmployeeKey: Keypath {
+public enum EmployeeKey: MappingKey {
     case employer(Set<CompanyKey>)
     case uuid
     case name
@@ -22,7 +22,7 @@ public enum EmployeeKey: Keypath {
         }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employer(let companyKeys):
             return AnyKeyCollection.wrapAs(companyKeys)
