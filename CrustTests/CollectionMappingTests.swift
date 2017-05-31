@@ -431,7 +431,7 @@ class CollectionMappingTests: XCTestCase {
             case equatables
             
             func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
-                return AnyKeyCollection.wrapAs(SetKeyCollection(["uuid"]))
+                return ["uuid"].anyKeyCollection()
             }
         }
         
