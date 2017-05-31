@@ -35,7 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingContext<AnyKeyPath>) { }
+    func mapping(toMap: inout PrimaryObj1, context: MappingContext<AnyMappingKey>) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -75,7 +75,7 @@ public class DatePrimaryObjMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext<AnyKeyPath>) {
+    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext<AnyMappingKey>) {
         toMap.date <- ("date", context)
         toMap.junk <- ("junk", context)
     }

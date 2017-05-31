@@ -13,7 +13,7 @@ open class MappingContext<K: MappingKey> {
     open internal(set) var keys: AnyKeyCollection<K>
     open internal(set) var object: Any
     open internal(set) var error: Error?
-    open internal(set) var parent: MappingContext<AnyKeyPath>? = nil
+    open internal(set) var parent: MappingContext<AnyMappingKey>? = nil
     open internal(set) var adapterType: String
     open fileprivate(set) var dir: MappingDirection
     
@@ -29,9 +29,9 @@ open class MappingContext<K: MappingKey> {
         self.dir = direction
     }
     
-    internal func typeErased() -> MappingContext<AnyKeyPath> {
-        let keys = AnyKeyPathKeyCollection(self.keys)
-        let parent = MappingContext<AnyKeyPath>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
+    internal func typeErased() -> MappingContext<AnyMappingKey> {
+        let keys = AnyMappingKeyKeyCollection(self.keys)
+        let parent = MappingContext<AnyMappingKey>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
         parent.error = self.error
         parent.parent = self.parent
         return parent
@@ -240,7 +240,7 @@ public extension Mapping {
             
             // Walk parent contexts, if using the same adapter type assume that we'll call end mapping later.
             let adapterType = context.adapterType
-            var context: MappingContext<AnyKeyPath> = context.typeErased()
+            var context: MappingContext<AnyMappingKey> = context.typeErased()
             while let parent = context.parent {
                 if parent.adapterType == adapterType {
                     return false

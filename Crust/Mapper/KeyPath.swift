@@ -63,7 +63,7 @@ extension String: RawMappingKey { }
 
 extension Int: RawMappingKey { }
 
-public struct AnyKeyPath: MappingKey, ExpressibleByStringLiteral {
+public struct AnyMappingKey: MappingKey, ExpressibleByStringLiteral {
     public var hashValue: Int {
         return _hashValue()
     }
@@ -159,17 +159,17 @@ public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
         return unsafeBitCast(provider, to: AnyKeyCollection<K2>.self)
     }
     
-    public init?(_ anyKeyPathKeyCollection: AnyKeyPathKeyCollection) {
-        guard case let mappingKeyType as K.Type = anyKeyPathKeyCollection.mappingKeyType else {
+    public init?(_ anyMappingKeyKeyCollection: AnyMappingKeyKeyCollection) {
+        guard case let mappingKeyType as K.Type = anyMappingKeyKeyCollection.mappingKeyType else {
             return nil
         }
         
-        self.keyCollectionType = anyKeyPathKeyCollection.keyCollectionType
+        self.keyCollectionType = anyMappingKeyKeyCollection.keyCollectionType
         self.mappingKeyType = mappingKeyType
         self._containsKey = { key in
-            return anyKeyPathKeyCollection.containsKey(key)
+            return anyMappingKeyKeyCollection.containsKey(key)
         }
-        self.dynamicKeyCollection = anyKeyPathKeyCollection
+        self.dynamicKeyCollection = anyMappingKeyKeyCollection
     }
     
     public init<P: KeyCollection>(_ keyCollection: P) where P.MappingKeyType == K {
@@ -210,7 +210,7 @@ public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
     }
 }
 
-public struct AnyKeyPathKeyCollection: KeyCollection {
+public struct AnyMappingKeyKeyCollection: KeyCollection {
     public let mappingKeyType: Any.Type
     public let keyCollectionType: Any.Type
     private let _containsKey: (Any) -> Bool
@@ -228,8 +228,8 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
         self.dynamicKeyCollection = keyCollection
     }
     
-    public init(_ anyKeyPathKeyCollection: AnyKeyPathKeyCollection) {
-        self = anyKeyPathKeyCollection
+    public init(_ anyMappingKeyKeyCollection: AnyMappingKeyKeyCollection) {
+        self = anyMappingKeyKeyCollection
     }
     
     public init<Source, KeyType: MappingKey>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (KeyType) {
@@ -245,7 +245,7 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
         self.dynamicKeyCollection = keyCollection
     }
     
-    public func containsKey(_ key: AnyKeyPath) -> Bool {
+    public func containsKey(_ key: AnyMappingKey) -> Bool {
         return self._containsKey(key)
     }
     
@@ -253,7 +253,7 @@ public struct AnyKeyPathKeyCollection: KeyCollection {
         return self._containsKey(key)
     }
     
-    public func nestedKeyCollection<Key: MappingKey>(for key: AnyKeyPath) -> AnyKeyCollection<Key>? {
+    public func nestedKeyCollection<Key: MappingKey>(for key: AnyMappingKey) -> AnyKeyCollection<Key>? {
         return self.dynamicKeyCollection.nestedDynamicKeyCollection(for: key.base)
     }
 }
