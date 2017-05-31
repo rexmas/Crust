@@ -54,7 +54,7 @@ public struct RootKey: MappingKey {
     public init() { }
     
     public func nestedMappingKeys<K: MappingKey>() -> AnyKeyCollection<K>? {
-        return [self].wrapped()
+        return [self].anyKeyCollection()
     }
 }
 
@@ -119,7 +119,7 @@ public extension KeyCollection {
         return self.nestedKeyCollection(for: key)
     }
     
-    public func wrapped<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
+    public func anyKeyCollection<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
         return AnyKeyCollection.wrapAs(self)
     }
     

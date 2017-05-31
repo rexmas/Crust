@@ -11,7 +11,7 @@ public extension Collection where Iterator.Element: Equatable {
 }
 
 public extension Sequence where Iterator.Element: MappingKey {
-    public func wrapped<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
+    public func anyKeyCollection<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
         return AnyKeyCollection.wrapAs(self)
     }
 }

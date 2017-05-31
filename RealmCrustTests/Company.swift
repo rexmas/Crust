@@ -41,7 +41,7 @@ public enum CompanyKey: RawRepresentable, MappingKey {
     public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let keys):
-            return keys.wrapped()
+            return keys.anyKeyCollection()
         default:
             return nil
         }
