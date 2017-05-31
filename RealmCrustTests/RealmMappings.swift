@@ -246,7 +246,7 @@ public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
     
     public let adapter: RealmSwiftObjectAdapterBridge<MappedObject>
     public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
-    public let rlmObjectMapping: (inout MappedObject, MappingContext<K>) throws -> Void
+    public let rlmObjectMapping: (inout MappedObject, MappingPayload<K>) throws -> Void
     
     public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject, OGMapping.MappedObject == T, OGMapping.MappingKeyType == K {
         
@@ -254,13 +254,13 @@ public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
                                                      rlmObjectType: OGMapping.MappedObject.self)
         self.primaryKeys = rlmObjectMapping.primaryKeys
         
-        self.rlmObjectMapping = { (toMap: inout MappedObject, context: MappingContext<K>) throws -> Void in
+        self.rlmObjectMapping = { (toMap: inout MappedObject, context: MappingPayload<K>) throws -> Void in
             var ogObject = unsafeDowncast(toMap, to: OGMapping.MappedObject.self)
             try rlmObjectMapping.mapping(toMap: &ogObject, context: context)
         }
     }
     
-    public final func mapping(toMap: inout MappedObject, context: MappingContext<K>) throws {
+    public final func mapping(toMap: inout MappedObject, context: MappingPayload<K>) throws {
         try self.rlmObjectMapping(&toMap, context)
     }
 }
@@ -282,13 +282,13 @@ public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
 }
 
 @discardableResult
-public func <- <U: RealmMapping, K: MappingKey, C: MappingContext<K>>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, context: C)) -> C {
+public func <- <U: RealmMapping, K: MappingKey, C: MappingPayload<K>>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, context: C)) -> C {
     
     return map(toRLMArray: field, using: binding)
 }
 
 @discardableResult
-public func map<U: RealmMapping, K: MappingKey, C: MappingContext<K>>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<K, U>, context: C)) -> C {
+public func map<U: RealmMapping, K: MappingKey, C: MappingPayload<K>>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<K, U>, context: C)) -> C {
     
     var variableList = RLMArrayBridge(rlmArray: field)
     let bridge = binding.key.generateRLMArrayMappingBridge()

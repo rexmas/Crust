@@ -56,7 +56,7 @@ class EmployeeMapping: MockMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Employee, context: MappingContext<EmployeeCodingKey>) {
+    func mapping(toMap: inout Employee, context: MappingPayload<EmployeeCodingKey>) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
         toMap.employer              <- .mapping(.employer([]), companyMapping) >*<

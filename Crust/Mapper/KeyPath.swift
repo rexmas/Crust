@@ -352,7 +352,7 @@ public struct KeyedBinding<K: MappingKey, M: Mapping> {
         self.codingKeys = codingKeys
     }
     
-    public init?(binding: Binding<K, M>, context: MappingContext<K>) throws {
+    public init?(binding: Binding<K, M>, context: MappingPayload<K>) throws {
         guard context.keys.containsKey(binding.key) else {
             return nil
         }

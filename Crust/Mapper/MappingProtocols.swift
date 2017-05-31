@@ -87,7 +87,7 @@ public protocol Mapping {
     var primaryKeys: [PrimaryKeyDescriptor]? { get }
     
     /// Override to perform mappings to properties.
-    func mapping(toMap: inout MappedObject, context: MappingContext<MappingKeyType>) throws
+    func mapping(toMap: inout MappedObject, context: MappingPayload<MappingKeyType>) throws
 }
 
 public enum DefaultDatabaseTag: String {
@@ -172,7 +172,7 @@ public protocol Transform: AnyMapping {
 }
 
 public extension Transform {
-    func mapping(toMap: inout MappedObject, context: MappingContext<RootKey>) {
+    func mapping(toMap: inout MappedObject, context: MappingPayload<RootKey>) {
         switch context.dir {
         case .fromJSON:
             do {

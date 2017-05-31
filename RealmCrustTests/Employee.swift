@@ -43,7 +43,7 @@ public class EmployeeMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout Employee, context: MappingContext<EmployeeKey>) {
+    public func mapping(toMap: inout Employee, context: MappingPayload<EmployeeKey>) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
         let key = Binding<EmployeeKey, CompanyMapping>.mapping(.employer([]), companyMapping)
         

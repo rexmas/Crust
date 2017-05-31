@@ -14,7 +14,7 @@ class PrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingContext<String>) {
+    func mapping(toMap: inout PrimaryObj1, context: MappingPayload<String>) {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
         map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), context))
@@ -35,7 +35,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj1, context: MappingContext<AnyMappingKey>) { }
+    func mapping(toMap: inout PrimaryObj1, context: MappingPayload<AnyMappingKey>) { }
 }
 
 class PrimaryObj2Mapping : RealmMapping {
@@ -49,7 +49,7 @@ class PrimaryObj2Mapping : RealmMapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout PrimaryObj2, context: MappingContext<String>) {
+    func mapping(toMap: inout PrimaryObj2, context: MappingPayload<String>) {
         // TODO: Including this mapping fails. Need to support making some mappings as optional
         // so when the recursive cycle of json between these two relationships runs out it doesn't error
         // from expecting json.
@@ -75,7 +75,7 @@ public class DatePrimaryObjMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout DatePrimaryObj, context: MappingContext<AnyMappingKey>) {
+    public func mapping(toMap: inout DatePrimaryObj, context: MappingPayload<AnyMappingKey>) {
         toMap.date <- ("date", context)
         toMap.junk <- ("junk", context)
     }

@@ -23,7 +23,7 @@ class ParentMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Parent, context: MappingContext<AnyMappingKey>) {
+    func mapping(toMap: inout Parent, context: MappingPayload<AnyMappingKey>) {
         let childMapping = ChildMapping(adapter: self.adapter)
         
         toMap.children  <- (.mapping("children", childMapping), context)
@@ -40,7 +40,7 @@ class ChildMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Child, context: MappingContext<AnyMappingKey>) {
+    func mapping(toMap: inout Child, context: MappingPayload<AnyMappingKey>) {
         toMap.uuid <- "uuid" >*< context
     }
 }
@@ -73,7 +73,7 @@ class NestedMappingTests: XCTestCase {
     func testMappingBeginCalledWhenNestedMappingOfDifferentAdapter() {
         class ParentMappingWithDifferentChildAdapter: ParentMapping {
             let childAdapter = MockAdapter<Node>()
-            override func mapping(toMap: inout Parent, context: MappingContext<AnyMappingKey>) {
+            override func mapping(toMap: inout Parent, context: MappingPayload<AnyMappingKey>) {
                 let childMapping = ChildMapping(adapter: self.childAdapter)
                 
                 toMap.children  <- .mapping("children", childMapping) >*<

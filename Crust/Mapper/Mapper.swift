@@ -8,12 +8,12 @@ public enum MappingDirection {
 
 internal let CrustMappingDomain = "CrustMappingDomain"
 
-open class MappingContext<K: MappingKey> {
+open class MappingPayload<K: MappingKey> {
     open internal(set) var json: JSONValue
     open internal(set) var keys: AnyKeyCollection<K>
     open internal(set) var object: Any
     open internal(set) var error: Error?
-    open internal(set) var parent: MappingContext<AnyMappingKey>? = nil
+    open internal(set) var parent: MappingPayload<AnyMappingKey>? = nil
     open internal(set) var adapterType: String
     open fileprivate(set) var dir: MappingDirection
     
@@ -29,9 +29,9 @@ open class MappingContext<K: MappingKey> {
         self.dir = direction
     }
     
-    internal func typeErased() -> MappingContext<AnyMappingKey> {
+    internal func typeErased() -> MappingPayload<AnyMappingKey> {
         let keys = AnyMappingKeyKeyCollection(self.keys)
-        let parent = MappingContext<AnyMappingKey>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
+        let parent = MappingPayload<AnyMappingKey>(withObject: self.object, json: self.json, keys: keys, adapterType: self.adapterType, direction: self.dir)
         parent.error = self.error
         parent.parent = self.parent
         return parent
@@ -48,7 +48,7 @@ public struct Mapper {
         
         var collection = C()
         let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
-        let context = MappingContext(withObject: collection, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+        let context = MappingPayload(withObject: collection, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         
         try binding.mapping.start(context: context)
         collection <- (binding, context)
@@ -62,7 +62,7 @@ public struct Mapper {
             
             var collection = C()
             let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
-            let context = MappingContext(withObject: collection, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+            let context = MappingPayload(withObject: collection, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
             
             try binding.mapping.start(context: context)
             collection <- (binding, context)
@@ -72,16 +72,16 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
+        return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, K: MappingKey, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, K: MappingKey, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         
         let baseJson = try baseJSON(from: json, via: binding.key, ifIn: SetKeyCollection([binding.key])) ?? json
         
         var object = try binding.mapping.fetchOrCreateObject(from: baseJson)
         let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
-        let context = MappingContext(withObject: object, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+        let context = MappingPayload(withObject: object, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         context.parent = parentContext?.typeErased()
         
         let mapping = binding.mapping
@@ -93,21 +93,21 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
+        return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         let object = try mapping.fetchOrCreateObject(from: json)
         return try self.map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: parentContext)
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingContext<RootKey>>.none)
+        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingContext<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         var object = object
-        let context = MappingContext(withObject: object, json: json, keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+        let context = MappingPayload(withObject: object, json: json, keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
         context.parent = parentContext?.typeErased()
         try self.perform(mapping, on: &object, with: context)
         return object
@@ -115,12 +115,12 @@ public struct Mapper {
     
     public func mapFromObjectToJSON<M: Mapping, KC: KeyCollection>(_ object: M.MappedObject, mapping: M, keyedBy keys: KC) throws -> JSONValue where KC.MappingKeyType == M.MappingKeyType {
         var object = object
-        let context = MappingContext(withObject: object, json: JSONValue.object([:]), keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.toJSON)
+        let context = MappingPayload(withObject: object, json: JSONValue.object([:]), keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.toJSON)
         try self.perform(mapping, on: &object, with: context)
         return context.json
     }
     
-    internal func perform<M: Mapping>(_ mapping: M, on object: inout M.MappedObject, with context: MappingContext<M.MappingKeyType>) throws {
+    internal func perform<M: Mapping>(_ mapping: M, on object: inout M.MappedObject, with context: MappingPayload<M.MappingKeyType>) throws {
         try mapping.start(context: context)
         mapping.execute(object: &object, context: context)
         try mapping.complete(object: &object, context: context)
@@ -215,7 +215,7 @@ public extension Mapping {
         }
     }
     
-    internal func start<K: MappingKey>(context: MappingContext<K>) throws {
+    internal func start<K: MappingKey>(context: MappingPayload<K>) throws {
         try self.checkForAdapterBaseTypeConformance()
         if context.parent == nil || !self.adapter.isInTransaction {
             var underlyingError: NSError?
@@ -232,7 +232,7 @@ public extension Mapping {
         }
     }
     
-    internal func endMapping<K: MappingKey>(context: MappingContext<K>) throws {
+    internal func endMapping<K: MappingKey>(context: MappingPayload<K>) throws {
         let shouldCallEndMapping = { () -> Bool in 
             guard context.parent != nil else {
                 return true
@@ -240,7 +240,7 @@ public extension Mapping {
             
             // Walk parent contexts, if using the same adapter type assume that we'll call end mapping later.
             let adapterType = context.adapterType
-            var context: MappingContext<AnyMappingKey> = context.typeErased()
+            var context: MappingPayload<AnyMappingKey> = context.typeErased()
             while let parent = context.parent {
                 if parent.adapterType == adapterType {
                     return false
@@ -266,7 +266,7 @@ public extension Mapping {
         }
     }
     
-    public func execute(object: inout MappedObject, context: MappingContext<MappingKeyType>) {
+    public func execute(object: inout MappedObject, context: MappingPayload<MappingKeyType>) {
         do {
             try self.mapping(toMap: &object, context: context)
         }
@@ -275,17 +275,17 @@ public extension Mapping {
         }
     }
     
-    internal func complete<K: MappingKey>(object: inout MappedObject, context: MappingContext<K>) throws {
+    internal func complete<K: MappingKey>(object: inout MappedObject, context: MappingPayload<K>) throws {
         try self.completeMapping(objects: [object], context: context)
         context.object = object
     }
     
-    internal func completeMapping<C: Sequence, K: MappingKey>(collection: C, context: MappingContext<K>) throws where C.Iterator.Element == MappedObject {
+    internal func completeMapping<C: Sequence, K: MappingKey>(collection: C, context: MappingPayload<K>) throws where C.Iterator.Element == MappedObject {
         try self.completeMapping(objects: collection, context: context)
         context.object = collection
     }
     
-    internal func completeMapping<C: Sequence, K: MappingKey>(objects: C, context: MappingContext<K>) throws where C.Iterator.Element == MappedObject {
+    internal func completeMapping<C: Sequence, K: MappingKey>(objects: C, context: MappingPayload<K>) throws where C.Iterator.Element == MappedObject {
         if context.error == nil {
             do {
                 try self.checkForAdapterBaseTypeConformance()

@@ -8,7 +8,7 @@ class MockMap: Mapping, Adapter {
     
     init() { }
     
-    var catchMapping: ((_ toMap: MockMap, _ context: MappingContext<String>) -> ())? = nil
+    var catchMapping: ((_ toMap: MockMap, _ context: MappingPayload<String>) -> ())? = nil
     
     var adapter: MockMap {
         return self
@@ -17,7 +17,7 @@ class MockMap: Mapping, Adapter {
         return nil
     }
     
-    func mapping(toMap: inout MockMap, context: MappingContext<String>) {
+    func mapping(toMap: inout MockMap, context: MappingPayload<String>) {
         catchMapping!(toMap, context)
     }
     
@@ -39,7 +39,7 @@ class CRMapperTests: XCTestCase {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [ "cool" : "json" ])
-        let parent = MappingContext<String>(withObject: mockMap, json: json, keys: AllKeys(), adapterType: "derp", direction: MappingDirection.fromJSON)
+        let parent = MappingPayload<String>(withObject: mockMap, json: json, keys: AllKeys(), adapterType: "derp", direction: MappingDirection.fromJSON)
         let mapper = Mapper()
         
         var tested = false

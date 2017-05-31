@@ -59,7 +59,7 @@ public class CompanyMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
+    public func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         toMap.employees             <- (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), context)
@@ -73,7 +73,7 @@ public class CompanyMapping : RealmMapping {
 
 public class CompanyMappingWithDupes : CompanyMapping {
     
-    public override func mapping(toMap: inout Company, context: MappingContext<CompanyKey>) {
+    public override func mapping(toMap: inout Company, context: MappingPayload<CompanyKey>) {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         toMap.employees             <- (.collectionMapping(.employees([]), employeeMapping, (.append, false, false)), context)

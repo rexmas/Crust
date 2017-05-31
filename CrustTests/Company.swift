@@ -54,7 +54,7 @@ class CompanyMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
+    func mapping(toMap: inout Company, context: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
@@ -69,7 +69,7 @@ class CompanyMapping: Mapping {
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
+    override func mapping(toMap: inout Company, context: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .collectionMapping(.employees([]), employeeMapping, (.append, true, true)) >*<
@@ -107,7 +107,7 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
+    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees         <- .mapping(.employees([]), employeeMapping) >*<
