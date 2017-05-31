@@ -35,7 +35,7 @@ class MockMap: Mapping, Adapter {
 
 class CRMapperTests: XCTestCase {
 
-    func testMapFromJSONUsesParentContext() {
+    func testMapFromJSONUsesParentPayload() {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [ "cool" : "json" ])
@@ -51,7 +51,7 @@ class CRMapperTests: XCTestCase {
             XCTAssertEqual(resultParent.json, parent.json)
             XCTAssertEqual(resultParent.dir, parent.dir)
         }
-        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeys(), parentContext: parent)
+        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeys(), parentPayload: parent)
         
         XCTAssertTrue(tested)
     }

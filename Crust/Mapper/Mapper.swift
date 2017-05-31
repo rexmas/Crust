@@ -72,17 +72,17 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: binding, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
+        return try self.map(from: json, using: binding, keyedBy: keys, parentPayload: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, K: MappingKey, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, K: MappingKey, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC, parentPayload: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         
         let baseJson = try baseJSON(from: json, via: binding.key, ifIn: SetKeyCollection([binding.key])) ?? json
         
         var object = try binding.mapping.fetchOrCreateObject(from: baseJson)
         let codingKey = NestedMappingKey(rootKey: binding.key, nestedKeys: keys)
         let payload = MappingPayload(withObject: object, json: json, keys: codingKey, adapterType: binding.mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
-        payload.parent = parentContext?.typeErased()
+        payload.parent = parentPayload?.typeErased()
         
         let mapping = binding.mapping
         try mapping.start(payload: payload)
@@ -93,22 +93,22 @@ public struct Mapper {
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try self.map(from: json, using: mapping, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
+        return try self.map(from: json, using: mapping, keyedBy: keys, parentPayload: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC, parentPayload: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         let object = try mapping.fetchOrCreateObject(from: json)
-        return try self.map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: parentContext)
+        return try self.map(from: json, to: object, using: mapping, keyedBy: keys, parentPayload: parentPayload)
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
-        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentContext: Optional<MappingPayload<RootKey>>.none)
+        return try map(from: json, to: object, using: mapping, keyedBy: keys, parentPayload: Optional<MappingPayload<RootKey>>.none)
     }
     
-    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentContext: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
+    public func map<M: Mapping, KP: MappingKey, KC: KeyCollection>(from json: JSONValue, to object: M.MappedObject, using mapping: M, keyedBy keys: KC, parentPayload: MappingPayload<KP>?) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
         var object = object
         let payload = MappingPayload(withObject: object, json: json, keys: keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
-        payload.parent = parentContext?.typeErased()
+        payload.parent = parentPayload?.typeErased()
         try self.perform(mapping, on: &object, with: payload)
         return object
     }

@@ -285,7 +285,7 @@ private func map<T, M: Mapping, KC: KeyCollection>(to json: JSONValue, from fiel
 private func map<T, M: Mapping, K: MappingKey>(from json: JSONValue, to field: inout T, using mapping: M, keyedBy keys: AnyKeyCollection<M.MappingKeyType>, payload: MappingPayload<K>) throws where M.MappedObject == T {
     
     let mapper = Mapper()
-    field = try mapper.map(from: json, using: mapping, keyedBy: keys, parentContext: payload)
+    field = try mapper.map(from: json, using: mapping, keyedBy: keys, parentPayload: payload)
 }
 
 private func map<T, M: Mapping, K: MappingKey>(from json: JSONValue, to field: inout T?, using mapping: M, keyedBy keys: AnyKeyCollection<M.MappingKeyType>, payload: MappingPayload<K>) throws where M.MappedObject == T {
@@ -296,7 +296,7 @@ private func map<T, M: Mapping, K: MappingKey>(from json: JSONValue, to field: i
     }
     
     let mapper = Mapper()
-    field = try mapper.map(from: json, using: mapping, keyedBy: keys, parentContext: payload)
+    field = try mapper.map(from: json, using: mapping, keyedBy: keys, parentPayload: payload)
 }
 
 // MARK: - RangeReplaceableCollection (Array and Realm List follow this protocol).
@@ -475,19 +475,19 @@ private func mapFromJSON<M: Mapping, K: MappingKey, MC: MappingPayload<K>, RRC: 
         
         let keyedBinding = binding.key
         let mapping = keyedBinding.binding.mapping
-        let parentContext = binding.payload
+        let parentPayload = binding.payload
         
-        guard parentContext.error == nil else {
-            throw parentContext.error!
+        guard parentPayload.error == nil else {
+            throw parentPayload.error!
         }
         
-        guard let baseJSON = try baseJSONForCollection(json: parentContext.json, via: keyedBinding.binding.key, ifIn: parentContext.keys) else {
+        guard let baseJSON = try baseJSONForCollection(json: parentPayload.json, via: keyedBinding.binding.key, ifIn: parentPayload.keys) else {
             return
         }
         
         // Generate an extra sub-payload so that we batch our array operations to the Adapter.
-        let payload = MappingPayload<K>(withObject: parentContext.object, json: parentContext.json, keys: parentContext.keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
-        payload.parent = parentContext.typeErased()
+        let payload = MappingPayload<K>(withObject: parentPayload.object, json: parentPayload.json, keys: parentPayload.keys, adapterType: mapping.adapter.dataBaseTag, direction: MappingDirection.fromJSON)
+        payload.parent = parentPayload.typeErased()
         
         try mapping.start(payload: payload)
         
@@ -636,7 +636,7 @@ private func generateNewValues<T, M: Mapping, K: MappingKey>(
         var newValues = [T]()
         
         for json in jsonArray {
-            let val = try mapper.map(from: json, using: mapping, keyedBy: codingKeys, parentContext: payload)
+            let val = try mapper.map(from: json, using: mapping, keyedBy: codingKeys, parentPayload: payload)
             
             if updatePolicy.unique {
                 if isUnique(val, newValues, fieldContains) {
