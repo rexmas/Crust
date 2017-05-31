@@ -28,6 +28,62 @@ class CollectionMappingTests: RealmMappingTest {
         XCTAssertTrue(employeeStub2.matches(object: collection[1]))
     }
     
+    func testPartiallyMappingCollection() {
+        let companyStub = CompanyStub()
+        let employeeStub = EmployeeStub()
+        let employeeStub2 = EmployeeStub()
+        companyStub.employees = [employeeStub, employeeStub2]
+        let json = try! JSONValue(object: companyStub.generateJsonObject())
+        
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 0)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 0)
+        
+        let mapping = CompanyMapping(adapter: self.adapter!)
+        let mapper = Mapper()
+        
+        let binding = Binding.mapping(RootKey(), mapping)
+        var company: Company = try! mapper.map(from: json, using: binding, keyedBy: [
+            .uuid,
+            .employees([
+                .uuid,
+                .joinDate,
+                .name
+                ])
+            ])
+        
+        XCTAssertEqual(Company.allObjects(in: realm!).count, 1)
+        XCTAssertEqual(Employee.allObjects(in: realm!).count, 2)
+        
+        XCTAssertEqual(company.uuid!, companyStub.uuid)
+        XCTAssertNil(company.name)
+        XCTAssertNil(company.founder)
+        XCTAssertNil(company.foundingDate)
+        XCTAssertNil(company.pendingLawsuits)
+        XCTAssertEqual(company.employees.count, 2)
+        
+        let employee1 = company.employees[0]
+        XCTAssertEqual(employee1.uuid!, employeeStub.uuid)
+        XCTAssertEqual(floor(employee1.joinDate!.timeIntervalSinceNow), floor(employeeStub.joinDate.timeIntervalSinceNow))
+        XCTAssertEqual(employee1.name!, employeeStub.name)
+        XCTAssertNil(employee1.salary)
+        XCTAssertNil(employee1.isEmployeeOfMonth)
+        XCTAssertNil(employee1.percentYearlyRaise)
+        XCTAssertNil(employee1.employer)
+        
+        let employee2 = company.employees[0]
+        XCTAssertEqual(employee2.uuid!, employeeStub.uuid)
+        XCTAssertEqual(floor(employee2.joinDate!.timeIntervalSinceNow), floor(employeeStub.joinDate.timeIntervalSinceNow))
+        XCTAssertEqual(employee2.name!, employeeStub.name)
+        XCTAssertNil(employee2.salary)
+        XCTAssertNil(employee2.isEmployeeOfMonth)
+        XCTAssertNil(employee2.percentYearlyRaise)
+        XCTAssertNil(employee2.employer)
+        
+        company = try! mapper.map(from: json, using: binding, keyedBy: [.foundingDate])
+        
+        XCTAssertEqual(floor(company.foundingDate!.timeIntervalSinceNow), floor(companyStub.foundingDate.timeIntervalSinceNow))
+    }
+    
     func testMappingCollectionByAppendUnique() {
         class CompanyMappingAppendUnique: CompanyMapping {
             override func mapping(toMap: inout Company, payload: MappingPayload<CompanyKey>) {
