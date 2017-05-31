@@ -23,13 +23,13 @@ class ParentMapping: AnyMapping {
     
     var numberOfCallsToMappingWillBegin = 0
     
-    func mapping(toMap: inout Parent, context: MappingContext<String>) {
+    func mapping(toMap: inout Parent, payload: MappingPayload<String>) {
         let realmAdapter = MockRealmAdapter(realm: RLMRealm.default())
         let companyMapping = CompanyMapping(adapter: realmAdapter)
         
         toMap.companies <- .mapping("companies", companyMapping) >*<
         toMap.uuid      <- "uuid" >*<
-        context
+        payload
         
         numberOfCallsToMappingWillBegin = realmAdapter.numberOfCallsToMappingWillBegin
     }

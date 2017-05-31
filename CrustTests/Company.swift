@@ -14,7 +14,7 @@ class Company {
 
 extension Company: AnyMappable { }
 
-enum CompanyCodingKey: Keypath {
+enum CompanyCodingKey: MappingKey {
     case uuid
     case employees(Set<EmployeeCodingKey>)
     case founder
@@ -33,7 +33,7 @@ enum CompanyCodingKey: Keypath {
         }
     }
     
-    func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let employeeKeys):
             return AnyKeyCollection.wrapAs(employeeKeys)
@@ -54,7 +54,7 @@ class CompanyMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
+    func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
@@ -63,13 +63,13 @@ class CompanyMapping: Mapping {
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }
 
 class CompanyMappingWithDupes: CompanyMapping {
     
-    override func mapping(toMap: inout Company, context: MappingContext<CompanyCodingKey>) {
+    override func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees             <- .collectionMapping(.employees([]), employeeMapping, (.append, true, true)) >*<
@@ -78,7 +78,7 @@ class CompanyMappingWithDupes: CompanyMapping {
         toMap.name                  <- .name >*<
         toMap.foundingDate          <- .foundingDate  >*<
         toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }
 
@@ -107,7 +107,7 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         self.adapter = adapter
     }
     
-    func mapping(toMap: inout CompanyWithOptionalEmployees, context: MappingContext<CompanyCodingKey>) {
+    func mapping(toMap: inout CompanyWithOptionalEmployees, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
         toMap.employees         <- .mapping(.employees([]), employeeMapping) >*<
@@ -116,6 +116,6 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
         toMap.name              <- .name >*<
         toMap.foundingDate      <- .foundingDate  >*<
         toMap.pendingLawsuits   <- .pendingLawsuits  >*<
-        context
+        payload
     }
 }

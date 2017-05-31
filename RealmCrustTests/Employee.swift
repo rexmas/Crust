@@ -1,7 +1,7 @@
 import Crust
 import Realm
 
-public enum EmployeeKey: Keypath {
+public enum EmployeeKey: MappingKey {
     case employer(Set<CompanyKey>)
     case uuid
     case name
@@ -22,7 +22,7 @@ public enum EmployeeKey: Keypath {
         }
     }
     
-    public func nestedMappingKeys<Key: Keypath>() -> AnyKeyCollection<Key>? {
+    public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employer(let companyKeys):
             return AnyKeyCollection.wrapAs(companyKeys)
@@ -43,16 +43,16 @@ public class EmployeeMapping : RealmMapping {
         self.adapter = adapter
     }
     
-    public func mapping(toMap: inout Employee, context: MappingContext<EmployeeKey>) {
+    public func mapping(toMap: inout Employee, payload: MappingPayload<EmployeeKey>) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
         let key = Binding<EmployeeKey, CompanyMapping>.mapping(.employer([]), companyMapping)
         
-        toMap.employer              <- (key, context)
-        toMap.joinDate              <- (.joinDate, context)
-        toMap.uuid                  <- (.uuid, context)
-        toMap.name                  <- (.name, context)
-        toMap.salary                <- (.salary, context)
-        toMap.isEmployeeOfMonth     <- (.isEmployeeOfMonth, context)
-        toMap.percentYearlyRaise    <- (.percentYearlyRaise, context)
+        toMap.employer              <- (key, payload)
+        toMap.joinDate              <- (.joinDate, payload)
+        toMap.uuid                  <- (.uuid, payload)
+        toMap.name                  <- (.name, payload)
+        toMap.salary                <- (.salary, payload)
+        toMap.isEmployeeOfMonth     <- (.isEmployeeOfMonth, payload)
+        toMap.percentYearlyRaise    <- (.percentYearlyRaise, payload)
     }
 }

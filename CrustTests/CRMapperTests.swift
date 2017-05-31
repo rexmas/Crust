@@ -8,7 +8,7 @@ class MockMap: Mapping, Adapter {
     
     init() { }
     
-    var catchMapping: ((_ toMap: MockMap, _ context: MappingContext<String>) -> ())? = nil
+    var catchMapping: ((_ toMap: MockMap, _ payload: MappingPayload<String>) -> ())? = nil
     
     var adapter: MockMap {
         return self
@@ -17,8 +17,8 @@ class MockMap: Mapping, Adapter {
         return nil
     }
     
-    func mapping(toMap: inout MockMap, context: MappingContext<String>) {
-        catchMapping!(toMap, context)
+    func mapping(toMap: inout MockMap, payload: MappingPayload<String>) {
+        catchMapping!(toMap, payload)
     }
     
     var dataBaseTag: String = "none"
@@ -35,23 +35,23 @@ class MockMap: Mapping, Adapter {
 
 class CRMapperTests: XCTestCase {
 
-    func testMapFromJSONUsesParentContext() {
+    func testMapFromJSONUsesParentPayload() {
         let mockMap = MockMap()
         
         let json = try! JSONValue(object: [ "cool" : "json" ])
-        let parent = MappingContext<String>(withObject: mockMap, json: json, keys: AllKeys(), adapterType: "derp", direction: MappingDirection.fromJSON)
+        let parent = MappingPayload<String>(withObject: mockMap, json: json, keys: AllKeys(), adapterType: "derp", direction: MappingDirection.fromJSON)
         let mapper = Mapper()
         
         var tested = false
-        mockMap.catchMapping = { (toMap, context) in
+        mockMap.catchMapping = { (toMap, payload) in
             tested = true
-            let resultParent = context.parent!
+            let resultParent = payload.parent!
             XCTAssertEqual(resultParent.adapterType, parent.adapterType)
             XCTAssertTrue((resultParent.object as! MockMap) === (parent.object as! MockMap))
             XCTAssertEqual(resultParent.json, parent.json)
             XCTAssertEqual(resultParent.dir, parent.dir)
         }
-        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeys(), parentContext: parent)
+        let _ = try! mapper.map(from: json, using: mockMap, keyedBy: AllKeys(), parentPayload: parent)
         
         XCTAssertTrue(tested)
     }
