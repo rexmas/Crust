@@ -43,6 +43,15 @@ public struct Mapper {
     
     public init() { }
     
+    // MARK: - Map Collections.
+    
+    // Equatable Collections.
+    public func map<M: Mapping, C: RangeReplaceableCollection, K: MappingKey>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: Set<M.MappingKeyType>) throws -> C
+        where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable {
+            
+            return try self.map(from: json, using: binding, keyedBy: SetKeyCollection(keys))
+    }
+    
     public func map<M: Mapping, C: RangeReplaceableCollection, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> C
     where M.MappedObject == C.Iterator.Element, M.MappedObject: Equatable, KC.MappingKeyType == M.MappingKeyType {
         
@@ -57,6 +66,12 @@ public struct Mapper {
         return collection
     }
     
+    // Non-equatable Collections.
+    public func map<M: Mapping, C: RangeReplaceableCollection, K: MappingKey>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: Set<M.MappingKeyType>) throws -> C where M.MappedObject == C.Iterator.Element {
+        
+        return try self.map(from: json, using: binding, keyedBy: SetKeyCollection(keys))
+    }
+    
     public func map<M: Mapping, C: RangeReplaceableCollection, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> C
         where M.MappedObject == C.Iterator.Element, KC.MappingKeyType == M.MappingKeyType {
             
@@ -69,6 +84,12 @@ public struct Mapper {
             try binding.mapping.completeMapping(collection: collection, payload: payload)
             
             return collection
+    }
+    
+    // MARK: - Map using Binding.
+    
+    public func map<M: Mapping, K: MappingKey>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: Set<M.MappingKeyType>) throws -> M.MappedObject {
+        return try self.map(from: json, using: binding, keyedBy: SetKeyCollection(keys), parentPayload: Optional<MappingPayload<RootKey>>.none)
     }
     
     public func map<M: Mapping, K: MappingKey, KC: KeyCollection>(from json: JSONValue, using binding: Binding<K, M>, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
@@ -90,6 +111,12 @@ public struct Mapper {
         try mapping.complete(object: &object, payload: payload)
         
         return object
+    }
+    
+    // MARK: - Map using Mapping.
+    
+    public func map<M: Mapping>(from json: JSONValue, using mapping: M, keyedBy keys: Set<M.MappingKeyType>) throws -> M.MappedObject {
+        return try self.map(from: json, using: mapping, keyedBy: SetKeyCollection(keys), parentPayload: Optional<MappingPayload<RootKey>>.none)
     }
     
     public func map<M: Mapping, KC: KeyCollection>(from json: JSONValue, using mapping: M, keyedBy keys: KC) throws -> M.MappedObject where KC.MappingKeyType == M.MappingKeyType {
