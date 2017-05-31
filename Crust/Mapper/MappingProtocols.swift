@@ -16,19 +16,19 @@ public enum Binding<K: MappingKey, M: Mapping> {
     
     public var keyPath: String {
         switch self {
-        case .mapping(let keyPath, _):
-            return keyPath.keyPath
-        case .collectionMapping(let keyPath, _, _):
-            return keyPath.keyPath
+        case .mapping(let key, _):
+            return key.keyPath
+        case .collectionMapping(let key, _, _):
+            return key.keyPath
         }
     }
     
     public var key: K {
         switch self {
-        case .mapping(let keyPath, _):
-            return keyPath
-        case .collectionMapping(let keyPath, _, _):
-            return keyPath
+        case .mapping(let key, _):
+            return key
+        case .collectionMapping(let key, _, _):
+            return key
         }
     }
     

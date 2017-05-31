@@ -27,8 +27,8 @@ public func <- <T: JSONable, K: MappingKey, MC: MappingContext<K>>(field: inout 
 
 // MARK: - To JSON
 
-private func shouldMapToJSON<KC: KeyCollection>(via keyPath: KC.MappingKeyType, ifIn keys: KC) -> Bool {
-    return keys.containsKey(keyPath) || (keyPath is RootKey)
+private func shouldMapToJSON<KC: KeyCollection>(via key: KC.MappingKeyType, ifIn keys: KC) -> Bool {
+    return keys.containsKey(key) || (key is RootKey)
 }
 
 private func map<T: JSONable, KC: KeyCollection>(to json: JSONValue, from field: T?, via key: KC.MappingKeyType, ifIn keys: KC) -> JSONValue where T == T.ConversionType {
@@ -100,23 +100,23 @@ public func <- <T: JSONable, TF: Transform, K: MappingKey, MC: MappingContext<K>
 
 // MARK: - Mapping.
 
-/// - returns: The json to be used from mapping keyed by `keyPath`, or `nil` if `keyPath` is not in `keys`, or throws and error.
-internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    guard !(keyPath is RootKey) else {
+/// - returns: The json to be used from mapping keyed by `key`, or `nil` if `key` is not in `keys`, or throws and error.
+internal func baseJSON<KC: KeyCollection>(from json: JSONValue, via key: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
+    guard !(key is RootKey) else {
         return json
     }
     
-    guard keys.containsKey(keyPath) else {
+    guard keys.containsKey(key) else {
         return nil
     }
     
-    let baseJSON = json[keyPath]
+    let baseJSON = json[key]
     
-    if baseJSON == nil && keyPath.keyPath == "" {
+    if baseJSON == nil && key.keyPath == "" {
         return json
     }
     else if baseJSON == nil {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON does not have key path \(keyPath) to map from" ]
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON does not have data at key path \(key.keyPath) from key \(key) to map from" ]
         throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
     }
     
@@ -514,7 +514,7 @@ private func mapFromJSON<M: Mapping, K: MappingKey, MC: MappingContext<K>, RRC: 
 /// Handles null JSON values. Only nullable collections do not error on null (newValues == nil).
 private func transform<T, K: MappingKey>(
     newValues: [T]?,
-    via keyPath: K,
+    via key: K,
     forUpdatePolicyNullability updatePolicy: CollectionUpdatePolicy<T>)
     throws -> [T] {
     
@@ -525,7 +525,7 @@ private func transform<T, K: MappingKey>(
         return []
     }
     else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Attempting to assign \"null\" to non-nullable collection on type \(T.self) using JSON at key path \(keyPath) is not allowed. Please change the `CollectionUpdatePolicy` for this mapping to have `nullable: true`" ]
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Attempting to assign \"null\" to non-nullable collection on type \(T.self) using JSON at key path \(key.keyPath) from \(key) is not allowed. Please change the `CollectionUpdatePolicy` for this mapping to have `nullable: true`" ]
         throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
     }
 }
@@ -571,27 +571,27 @@ private func insert<M: Mapping, RRC: RangeReplaceableCollection>
         }
 }
 
-private func baseJSONForCollection<KC: KeyCollection>(json: JSONValue, via keyPath: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
-    guard !(keyPath is RootKey) else {
+private func baseJSONForCollection<KC: KeyCollection>(json: JSONValue, via key: KC.MappingKeyType, ifIn keys: KC) throws -> JSONValue? {
+    guard !(key is RootKey) else {
         return json
     }
     
-    guard keys.containsKey(keyPath) else {
+    guard keys.containsKey(key) else {
         return nil
     }
     
-    let baseJSON = json[keyPath]
+    let baseJSON = json[key]
     
     // Walked an empty keypath, return the whole json payload if it's an empty array since subscripting on a json array calls `map`.
     // TODO: May be simpler to support `nil` keyPaths.
-    if case .some(.array(let arr)) = baseJSON, keyPath.keyPath == "", arr.count == 0 {
+    if case .some(.array(let arr)) = baseJSON, key.keyPath == "", arr.count == 0 {
         return json
     }
     else if let baseJSON = baseJSON {
         return baseJSON
     }
     else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(keyPath) does not exist to map from" ]
+        let userInfo = [ NSLocalizedFailureReasonErrorKey : "JSON at key path \(key.keyPath) from key \(key) does not exist to map from" ]
         throw NSError(domain: CrustMappingDomain, code: 0, userInfo: userInfo)
     }
 }
