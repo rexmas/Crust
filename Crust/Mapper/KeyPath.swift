@@ -12,7 +12,6 @@ enum CrustError: LocalizedError {
     }
 }
 
-// TODO: Change to MappingKey
 public protocol MappingKey: JSONKeypath, DynamicMappingKey, Hashable {
     /// Return the collection of coding keys for a nested set of JSON. A non-nil value is required for every key
     /// that is used to key into JSON passed to a nested `Mapping`, otherwise the mapping operation
