@@ -36,7 +36,7 @@ enum CompanyCodingKey: MappingKey {
     func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
         switch self {
         case .employees(let employeeKeys):
-            return AnyKeyCollection.wrapAs(employeeKeys)
+            return employeeKeys.wrapped()
         default:
             return nil
         }

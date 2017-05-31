@@ -55,7 +55,7 @@ public struct RootKey: MappingKey {
     public init() { }
     
     public func nestedMappingKeys<K: MappingKey>() -> AnyKeyCollection<K>? {
-        return AnyKeyCollection.wrapAs([self])
+        return [self].wrapped()
     }
 }
 
@@ -120,6 +120,10 @@ public extension KeyCollection {
         return self.nestedKeyCollection(for: key)
     }
     
+    public func wrapped<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
+        return AnyKeyCollection.wrapAs(self)
+    }
+    
     func nestedKeyCollection<Key: MappingKey>(`for` key: MappingKeyType) throws -> AnyKeyCollection<Key> {
         guard let nested = (self.nestedKeyCollection(for: key) as AnyKeyCollection<Key>?) else {
             throw CrustError.nestedCodingKeyError(type: MappingKeyType.self, keyPath: key.keyPath)
@@ -141,22 +145,22 @@ public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
     private let _containsKey: (K) -> Bool
     private let dynamicKeyCollection: DynamicKeyCollection
     
-    /// This function is really dumb. `AnyKeyCollection<K> as? AnyKeyCollection<K2>` always fails (though `Set<K> as? Set<K2>` doesn't)
+    /// This function is really dumb. `AnyKeyCollection<K> as? AnyKeyCollection<TargetKey>` always fails (though `Set<K> as? Set<TargetKey>` doesn't)
     /// so we check and force cast here. This should be fixed in Swift 4.
-    public static func wrapAs<P: KeyCollection, K2: MappingKey>(_ keyCollection: P) -> AnyKeyCollection<K2>? where P.MappingKeyType == K {
-        guard K.self is K2.Type else {
+    public static func wrapAs<KC: KeyCollection, TargetKey: MappingKey>(_ keyCollection: KC) -> AnyKeyCollection<TargetKey>? where KC.MappingKeyType == K {
+        guard K.self is TargetKey.Type else {
             return nil
         }
         let provider = AnyKeyCollection(keyCollection)
-        return unsafeBitCast(provider, to: AnyKeyCollection<K2>.self)
+        return unsafeBitCast(provider, to: AnyKeyCollection<TargetKey>.self)
     }
     
-    public static func wrapAs<Source: Sequence, K2: MappingKey>(_ keys: Source) -> AnyKeyCollection<K2>? where Source.Iterator.Element == K {
-        guard K.self is K2.Type else {
+    public static func wrapAs<Source: Sequence, TargetKey: MappingKey>(_ keys: Source) -> AnyKeyCollection<TargetKey>? where Source.Iterator.Element == K {
+        guard K.self is TargetKey.Type else {
             return nil
         }
         let provider = AnyKeyCollection(SetKeyCollection(keys))
-        return unsafeBitCast(provider, to: AnyKeyCollection<K2>.self)
+        return unsafeBitCast(provider, to: AnyKeyCollection<TargetKey>.self)
     }
     
     public init?(_ anyMappingKeyKeyCollection: AnyMappingKeyKeyCollection) {
