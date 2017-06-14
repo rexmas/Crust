@@ -40,6 +40,7 @@ class NestedPrimaryObj1Mapping : RealmMapping {
 
 class PrimaryObj2Mapping : RealmMapping {
     
+    let nested: NestedPrimaryObj1Mapping
     var adapter: RealmAdapter
     var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [ ("uuid", "data.more_data.uuid", nil) ]
@@ -47,6 +48,12 @@ class PrimaryObj2Mapping : RealmMapping {
     
     required init(adapter: RealmAdapter) {
         self.adapter = adapter
+        self.nested = NestedPrimaryObj1Mapping(adapter: adapter)
+    }
+    
+    required init(adapter: RealmAdapter, nested: NestedPrimaryObj1Mapping) {
+        self.adapter = adapter
+        self.nested = nested
     }
     
     func mapping(toMap: inout PrimaryObj2, payload: MappingPayload<String>) {
@@ -57,7 +64,7 @@ class PrimaryObj2Mapping : RealmMapping {
         // In the meantime, user can write separate Nested Mappings for the top level object and nested objects.
 //        let obj1Mapping = PrimaryObj1Mapping(adapter: self.adapter)
         
-        let obj1Mapping = NestedPrimaryObj1Mapping(adapter: self.adapter)
+        let obj1Mapping = nested
         
         toMap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
         payload
@@ -105,7 +112,6 @@ class PrimaryKeyTests: RealmMappingTest {
     }
     
     func testMappingsWithPrimaryKeysForAlreadyPresentObject() {
-        
         let obj = PrimaryObj2()
         obj.uuid = "primary2"
         realm!.beginWriteTransaction()
@@ -126,7 +132,7 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(object, obj)
     }
     
-    func testFeatchingWithStringDateCorrectlySantizesValue() {
+    func testFetchingWithStringDateCorrectlySantizesValue() {
         let date = Date().isoString
         let obj = DatePrimaryObj()
         obj.remoteId = 1
@@ -160,7 +166,7 @@ class PrimaryKeyTests: RealmMappingTest {
             override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
                 return [ ("remoteId", "remoteId", { [weak self] in
                     self?.called = true
-                    let remoteId = $0["data"]
+                    let remoteId = $0.0["data"]
                     return Int.fromJSON(remoteId!)
                 }) ]
             }
@@ -178,12 +184,54 @@ class PrimaryKeyTests: RealmMappingTest {
         XCTAssertEqual(object.remoteId!, 1)
     }
     
+    func testPrimaryKeyTransformParentPayloadIsPassedThrough() {
+        struct Garbage: Error { }
+        class NestedPrimaryObj1MappingWithParent : NestedPrimaryObj1Mapping {
+            var called = false
+            let parentJSON: JSONValue
+            
+            init(adapter: RealmAdapter, parentJSON: JSONValue) {
+                self.parentJSON = parentJSON
+                super.init(adapter: adapter)
+            }
+            
+            required init(adapter: RealmAdapter) {
+                fatalError("init(adapter:) has not been implemented")
+            }
+            
+            override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
+                return [ ("uuid", "data.uuid", { (json: JSONValue?, parent: MappingPayload<AnyMappingKey>?) throws -> CVarArg? in
+                    XCTAssertNotNil(parent)
+                    XCTAssertEqual(self.parentJSON, parent!.json)
+                    XCTAssertEqual(json!, self.parentJSON["class1.data.uuid"])
+                    self.called = true
+                    return nil
+                }) ]
+            }
+        }
+        
+        let obj = PrimaryObj2()
+        obj.uuid = "primary2"
+        realm!.beginWriteTransaction()
+        realm!.add(obj)
+        try! realm!.commitWriteTransaction()
+        
+        let json2Dict = [ "data.more_data.uuid" : "primary2", "class1" : [ "data" : [ "uuid" : "primary1" ] ] ] as [String : Any]
+        let json = try! JSONValue(object: json2Dict)
+        let mapper = Mapper()
+        let nestedMapping = NestedPrimaryObj1MappingWithParent(adapter: adapter!, parentJSON: json)
+        _ = try! mapper.map(from: json, using: PrimaryObj2Mapping(adapter: adapter!, nested: nestedMapping), keyedBy: AllKeys())
+        
+        XCTAssertTrue(nestedMapping.called)
+        XCTAssertEqual(PrimaryObj2.allObjects(in: realm!).count, 1)
+    }
+    
     func testPrimaryKeyTransformThrownErrorIsReturned() {
         struct Garbage: Error { }
         class DatePrimaryObjMappingWithTransform : DatePrimaryObjMapping {
             var called = false
             override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
-                return [ ("remoteId", "remoteId", { (json: JSONValue?) throws -> CVarArg? in
+                return [ ("remoteId", "remoteId", { (json: JSONValue?, _) throws -> CVarArg? in
                     throw Garbage()
                 }) ]
             }
