@@ -175,6 +175,10 @@ public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
         self.dynamicKeyCollection = anyMappingKeyKeyCollection
     }
     
+    public init(_ keyCollection: AnyKeyCollection<K>) {
+        self = keyCollection
+    }
+    
     public init<P: KeyCollection>(_ keyCollection: P) where P.MappingKeyType == K {
         self.keyCollectionType = P.self
         self.mappingKeyType = K.self
