@@ -57,6 +57,7 @@ public class RealmAdapter: Adapter {
         let saveBlock = {
             for obj in objects {
                 self.cache.remove(obj)
+                obj.sanitizeValues(in: self.realm)
                 if obj.objectSchema.primaryKeyProperty != nil {
                     self.realm.addOrUpdate(obj)
                 }
@@ -131,9 +132,9 @@ public class RealmAdapter: Adapter {
             type(of: $0) == type
         }
         .filter {
-            predicate.evaluate(with: $0)
+                predicate.evaluate(with: $0)
         }
-
+        
         if objects.count > 0 {
             return Array(objects)
         }
