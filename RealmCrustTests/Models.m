@@ -45,3 +45,19 @@
 }
 
 @end
+
+@implementation GQLConcreteObj
+
++ (NSString *)primaryKey {
+    return @"uuid";
+}
+
+@end
+
+@implementation GQLInterfaceObj
+
++ (NSString *)primaryKey {
+    return @"uuid";
+}
+
+@end

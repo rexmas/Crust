@@ -45,9 +45,8 @@ public class EmployeeMapping : RealmMapping {
     
     public func mapping(toMap: inout Employee, payload: MappingPayload<EmployeeKey>) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
-        let key = Binding<EmployeeKey, CompanyMapping>.mapping(.employer([]), companyMapping)
         
-        toMap.employer              <- (key, payload)
+        toMap.employer              <- (.mapping(.employer([]), companyMapping), payload)
         toMap.joinDate              <- (.joinDate, payload)
         toMap.uuid                  <- (.uuid, payload)
         toMap.name                  <- (.name, payload)
