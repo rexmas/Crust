@@ -86,6 +86,16 @@ public func <- <T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(field: inou
     return map(to: &field, using: binding)
 }
 
+@discardableResult
+public func <- <T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(field: inout T, binding:(key: Binding<RootedKey<K>, M>, payload: MC)) -> MC where M.MappedObject == T {
+    return map(to: &field, using: binding)
+}
+
+@discardableResult
+public func <- <T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(field: inout T?, binding:(key: Binding<RootedKey<K>, M>, payload: MC)) -> MC where M.MappedObject == T {
+    return map(to: &field, using: binding)
+}
+
 // Transform.
 
 @discardableResult
@@ -184,36 +194,76 @@ public func map<T: JSONable, K: MappingKey, MC: MappingPayload<K>>(to field: ino
 }
 
 // Mapping.
-public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: inout T, using binding:(key: Binding<K, M>, payload: MC)) -> MC where M.MappedObject == T {
-    
-    let payload = binding.payload
-    let binding = binding.key
-    
-    guard payload.error == nil else {
-        return payload
-    }
-    
-    guard case .mapping(let key, let mapping) = binding else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.mapping to map type \(T.self)" ]
-        payload.error = NSError(domain: CrustMappingDomain, code: -1000, userInfo: userInfo)
-        return payload
-    }
-    
-    do {
-        guard let keyedBinding = try KeyedBinding(binding: binding, payload: payload) else {
-            return payload
+fileprivate enum ResolvedBinding<K: MappingKey, M: Mapping> {
+    case toJSON(json: JSONValue, key: K, inKeys: AnyKeyCollection<K>, mapping: M, nestedKeys: AnyKeyCollection<M.MappingKeyType>)
+    case fromJSON(baseJSON: JSONValue, mapping: M, nestedKeys: AnyKeyCollection<M.MappingKeyType>)
+    case skip
+}
+
+extension MappingPayload {
+    fileprivate func resolve<T, M: Mapping>(binding: Binding<K, M>, fieldType: T.Type) throws -> ResolvedBinding<K, M> {
+        guard self.error == nil else {
+            throw self.error!
         }
         
-        switch payload.dir {
+        let (key, mapping) = try self.deconstruct(binding: binding, fieldType: fieldType)
+        guard let keyedBinding = try KeyedBinding(binding: binding, payload: self) else {
+            return .skip
+        }
+        
+        return try resolve(keyedBinding: keyedBinding, key: key, inKeys: self.keys, mapping: mapping)
+    }
+    
+    private func deconstruct<T, K: MappingKey, M: Mapping>(binding: Binding<K, M>, fieldType: T.Type) throws -> (key: K, mapping: M) {
+        guard case .mapping(let key, let mapping) = binding else {
+            let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected Binding.mapping to map type \(fieldType)" ]
+            throw NSError(domain: CrustMappingDomain, code: -1000, userInfo: userInfo)
+        }
+        
+        return (key, mapping)
+    }
+    
+    private func resolve<K: MappingKey, M: Mapping>(keyedBinding: KeyedBinding<K, M>, key: K, inKeys: AnyKeyCollection<K>, mapping: M) throws -> ResolvedBinding<K, M> {
+        switch self.dir {
         case .toJSON:
-            let json = payload.json
-            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: payload.keys, using: mapping, keyedBy: keyedBinding.codingKeys)
+            return .toJSON(json: self.json, key: key, inKeys: inKeys, mapping: mapping, nestedKeys: keyedBinding.codingKeys)
         case .fromJSON:
-            guard let baseJSON = try baseJSON(from: payload.json, via: key, ifIn: payload.keys) else {
-                return payload
+            guard let baseJSON = try baseJSON(from: self.json, via: key, ifIn: inKeys) else {
+                return .skip
             }
-            
-            try map(from: baseJSON, to: &field, using: mapping, keyedBy: keyedBinding.codingKeys, payload: payload)
+            return .fromJSON(baseJSON: baseJSON, mapping: mapping, nestedKeys: keyedBinding.codingKeys)
+        }
+    }
+    
+    fileprivate func resolve<T, M: Mapping>(binding: Binding<RootedKey<K>, M>, fieldType: T.Type) throws -> ResolvedBinding<RootKey, M> {
+        guard self.error == nil else {
+            throw self.error!
+        }
+        
+        let (_, mapping) = try self.deconstruct(binding: binding, fieldType: fieldType)
+        guard let keyedBinding = try KeyedBinding(binding: binding, payload: self) else {
+            return .skip
+        }
+        
+        let rootKey = RootKey()
+        let inKeys = AnyKeyCollection([rootKey])
+        
+        return try resolve(keyedBinding: keyedBinding, key: rootKey, inKeys: inKeys, mapping: mapping)
+    }
+}
+
+public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: inout T, using binding:(key: Binding<K, M>, payload: MC)) -> MC where M.MappedObject == T {
+    let payload = binding.payload
+    let binding = binding.key
+    do {
+        let resolvedBinding = try payload.resolve(binding: binding, fieldType: type(of: field))
+        switch resolvedBinding {
+        case let .toJSON(json: json, key: key, inKeys: keys, mapping: mapping, nestedKeys: nestedKeys):
+            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: keys, using: mapping, keyedBy: nestedKeys)
+        case let .fromJSON(baseJSON: baseJSON, mapping: mapping, nestedKeys: nestedKeys):
+            try map(from: baseJSON, to: &field, using: mapping, keyedBy: nestedKeys, payload: payload)
+        case .skip:
+            break
         }
     }
     catch let error {
@@ -224,35 +274,59 @@ public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: i
 }
 
 public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: inout T?, using binding:(key: Binding<K, M>, payload: MC)) -> MC where M.MappedObject == T {
-    
     let payload = binding.payload
     let binding = binding.key
-    
-    guard payload.error == nil else {
-        return payload
-    }
-    
-    guard case .mapping(let key, let mapping) = binding else {
-        let userInfo = [ NSLocalizedFailureReasonErrorKey : "Expected KeyExtension.mapping to map type \(T.self)" ]
-        payload.error = NSError(domain: CrustMappingDomain, code: -1000, userInfo: userInfo)
-        return payload
-    }
-    
     do {
-        guard let keyedBinding = try KeyedBinding(binding: binding, payload: payload) else {
-            return payload
+        let resolvedBinding = try payload.resolve(binding: binding, fieldType: type(of: field))
+        switch resolvedBinding {
+        case let .toJSON(json: json, key: key, inKeys: keys, mapping: mapping, nestedKeys: nestedKeys):
+            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: keys, using: mapping, keyedBy: nestedKeys)
+        case let .fromJSON(baseJSON: baseJSON, mapping: mapping, nestedKeys: nestedKeys):
+            try map(from: baseJSON, to: &field, using: mapping, keyedBy: nestedKeys, payload: payload)
+        case .skip:
+            break
         }
-        
-        switch payload.dir {
-        case .toJSON:
-            let json = payload.json
-            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: payload.keys, using: mapping, keyedBy: keyedBinding.codingKeys)
-        case .fromJSON:
-            guard let baseJSON = try baseJSON(from: payload.json, via: key, ifIn: payload.keys) else {
-                return payload
-            }
-            
-            try map(from: baseJSON, to: &field, using: mapping, keyedBy: keyedBinding.codingKeys, payload: payload)
+    }
+    catch let error {
+        payload.error = error
+    }
+    
+    return payload
+}
+
+public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: inout T, using binding:(key: Binding<RootedKey<K>, M>, payload: MC)) -> MC where M.MappedObject == T {
+    let payload = binding.payload
+    let binding = binding.key
+    do {
+        let resolvedBinding = try payload.resolve(binding: binding, fieldType: type(of: field))
+        switch resolvedBinding {
+        case let .toJSON(json: json, key: key, inKeys: keys, mapping: mapping, nestedKeys: nestedKeys):
+            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: keys, using: mapping, keyedBy: nestedKeys)
+        case let .fromJSON(baseJSON: baseJSON, mapping: mapping, nestedKeys: nestedKeys):
+            try map(from: baseJSON, to: &field, using: mapping, keyedBy: nestedKeys, payload: payload)
+        case .skip:
+            break
+        }
+    }
+    catch let error {
+        payload.error = error
+    }
+    
+    return payload
+}
+
+public func map<T, M: Mapping, K: MappingKey, MC: MappingPayload<K>>(to field: inout T?, using binding:(key: Binding<RootedKey<K>, M>, payload: MC)) -> MC where M.MappedObject == T {
+    let payload = binding.payload
+    let binding = binding.key
+    do {
+        let resolvedBinding = try payload.resolve(binding: binding, fieldType: type(of: field))
+        switch resolvedBinding {
+        case let .toJSON(json: json, key: key, inKeys: keys, mapping: mapping, nestedKeys: nestedKeys):
+            payload.json = try Crust.map(to: json, from: field, via: key, ifIn: keys, using: mapping, keyedBy: nestedKeys)
+        case let .fromJSON(baseJSON: baseJSON, mapping: mapping, nestedKeys: nestedKeys):
+            try map(from: baseJSON, to: &field, using: mapping, keyedBy: nestedKeys, payload: payload)
+        case .skip:
+            break
         }
     }
     catch let error {
@@ -275,7 +349,8 @@ private func map<T, M: Mapping, KC: KeyCollection>(to json: JSONValue, from fiel
         json[key] = .null()
         return json
     }
-        
+    
+    // TODO: Needs to handle insertion at root key case. Something to add to JSONValue lib.
     json[key] = try Mapper().mapFromObjectToJSON(field, mapping: mapping, keyedBy: nestedKeys)
     return json
 }
@@ -619,9 +694,7 @@ private func generateNewValues<T, M: Mapping, K: MappingKey>(
             let userInfo = [ NSLocalizedFailureReasonErrorKey : "Trying to map json of type \(type(of: json)) to Collection of <\(T.self)>" ]
             throw NSError(domain: CrustMappingDomain, code: -1, userInfo: userInfo)
         }
-        
-        let mapper = Mapper()
-        
+                
         let isUnique = { (val: T, newValues: [T], fieldContains: (T) -> Bool) -> Bool in
             let newValuesContainsVal = newValues.contains(where: newValuesContains(val))
             
@@ -636,7 +709,7 @@ private func generateNewValues<T, M: Mapping, K: MappingKey>(
         var newValues = [T]()
         
         for json in jsonArray {
-            let val = try mapper.map(from: json, using: mapping, keyedBy: codingKeys, parentPayload: payload)
+            let val = try Mapper().map(from: json, using: mapping, keyedBy: codingKeys, parentPayload: payload)
             
             if updatePolicy.unique {
                 if isUnique(val, newValues, fieldContains) {

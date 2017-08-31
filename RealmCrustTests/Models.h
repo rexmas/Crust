@@ -45,8 +45,6 @@ RLM_ARRAY_TYPE(PrimaryObj2)
 
 @end
 
-NS_ASSUME_NONNULL_END
-
 @interface DatePrimaryObj : RLMObject
 
 @property (nullable) NSNumber<RLMInt> *remoteId;
@@ -54,3 +52,20 @@ NS_ASSUME_NONNULL_END
 @property (nullable) NSString *junk;
 
 @end
+
+@interface GQLConcreteObj : RLMObject
+
+@property (nullable) NSString *uuid;
+@property (nullable) NSString *prop;
+
+@end
+RLM_ARRAY_TYPE(GQLConcreteObj)
+
+@interface GQLInterfaceObj : RLMObject
+
+@property (nullable) NSString *uuid;
+@property (nullable) GQLConcreteObj *concreteObj;
+
+@end
+
+NS_ASSUME_NONNULL_END
