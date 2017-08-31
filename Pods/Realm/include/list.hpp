@@ -69,16 +69,25 @@ public:
 
     void add(size_t target_row_ndx);
     void insert(size_t list_ndx, size_t target_row_ndx);
+    void set(size_t row_ndx, size_t target_row_ndx);
+
+    void add(RowExpr row);
+    void insert(size_t list_ndx, RowExpr row);
+    void set(size_t row_ndx, RowExpr row);
+
     void move(size_t source_ndx, size_t dest_ndx);
     void remove(size_t list_ndx);
     void remove_all();
-    void set(size_t row_ndx, size_t target_row_ndx);
     void swap(size_t ndx1, size_t ndx2);
 
     void delete_all();
 
-    Results sort(SortDescriptor order);
-    Results filter(Query q);
+    Results sort(SortDescriptor order) const;
+    Results sort(std::vector<std::pair<std::string, bool>> const& keypaths) const;
+    Results filter(Query q) const;
+
+    // Return a Results representing a live view of this List.
+    Results as_results() const;
 
     // Return a Results representing a snapshot of this List.
     Results snapshot() const;
@@ -97,15 +106,20 @@ public:
 
     NotificationToken add_notification_callback(CollectionChangeCallback cb) &;
 
-    // These are implemented in object_accessor.hpp
     template <typename ValueType, typename ContextType>
-    void add(ContextType ctx, ValueType value);
+    void add(ContextType& ctx, ValueType value, bool update=false);
 
     template <typename ValueType, typename ContextType>
-    void insert(ContextType ctx, ValueType value, size_t list_ndx);
+    void insert(ContextType& ctx, size_t list_ndx, ValueType value, bool update=false);
 
     template <typename ValueType, typename ContextType>
-    void set(ContextType ctx, ValueType value, size_t list_ndx);
+    void set(ContextType& ctx, size_t list_ndx, ValueType value, bool update=false);
+
+    template <typename ValueType, typename ContextType>
+    size_t find(ContextType& ctx, ValueType value);
+
+    template<typename Context>
+    auto get(Context&, size_t row_ndx) const;
 
     // The List object has been invalidated (due to the Realm being invalidated,
     // or the containing object being deleted)
@@ -130,9 +144,45 @@ private:
     _impl::CollectionNotifier::Handle<_impl::ListNotifier> m_notifier;
 
     void verify_valid_row(size_t row_ndx, bool insertion = false) const;
+    void validate(RowExpr row) const;
 
     friend struct std::hash<List>;
 };
+
+template <typename ValueType, typename ContextType>
+void List::add(ContextType& ctx, ValueType value, bool update)
+{
+    verify_attached();
+    add(ctx.template unbox<RowExpr>(value, true, update));
+}
+
+template <typename ValueType, typename ContextType>
+void List::insert(ContextType& ctx, size_t list_ndx, ValueType value, bool update)
+{
+    verify_attached();
+    insert(list_ndx, ctx.template unbox<RowExpr>(value, true, update));
+}
+
+template <typename ValueType, typename ContextType>
+void List::set(ContextType& ctx, size_t list_ndx, ValueType value, bool update)
+{
+    verify_attached();
+    set(list_ndx, ctx.template unbox<RowExpr>(value, true, update));
+}
+
+template <typename ValueType, typename ContextType>
+size_t List::find(ContextType& ctx, ValueType value)
+{
+    verify_attached();
+    return find(ctx.template unbox<RowExpr>(value));
+}
+
+template<typename Context>
+auto List::get(Context& ctx, size_t row_ndx) const
+{
+    return ctx.box(get(row_ndx));
+}
+
 } // namespace realm
 
 namespace std {
