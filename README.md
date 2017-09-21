@@ -156,7 +156,7 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
             let companyMapping = CompanyTransformableMapping()
             
             // No need to map the primary key here.
-            toMap.employer              <- .mapping(.employer(_), companyMapping) >*<
+            toMap.employer              <- .mapping(.employer([]), companyMapping) >*<
             toMap.name                  <- .name >*<
             payload
         }
@@ -170,8 +170,8 @@ Crust relies on [JSONValue](https://github.com/rexmas/JSONValue) for it's JSON e
         func mapping(inout toMap: inout Company, payload: MappingPayload<CompanyKey>) throws {
             let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
         
-            toMap.employees             <- .mapping(.employees(_), employeeMapping) >*<
-            toMap.founder               <- .mapping(.founder(_), employeeMapping) >*<
+            toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
+            toMap.founder               <- .mapping(.founder([]), employeeMapping) >*<
             toMap.uuid                  <- .uuid >*<
             toMap.name                  <- .name >*<
             toMap.foundingDate          <- .foundingDate  >*<
@@ -221,7 +221,7 @@ E.g. from above
 func mapping(inout toMap: Company, payload: MappingPayload<CompanyKey>) throws {
     let employeeMapping = EmployeeMapping(adapter: CoreDataAdapter())
     
-    toMap.employees <- Binding.mapping(.employees(_), employeeMapping) >*<
+    toMap.employees <- Binding.mapping(.employees([]), employeeMapping) >*<
     payload
 }
 ```
