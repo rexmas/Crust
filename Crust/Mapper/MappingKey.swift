@@ -341,7 +341,7 @@ internal struct NestedMappingKey<RootKey: MappingKey, NestedCollection: KeyColle
         self.nestedKeys = nestedKeys
     }
     
-    @available(*, unavailable)
+    //@available(*, unavailable)
     init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (RootKey) {
         fatalError("Don't use this.")
     }
