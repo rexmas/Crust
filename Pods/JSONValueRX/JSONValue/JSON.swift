@@ -133,7 +133,7 @@ public enum JSONValue: CustomStringConvertible {
             let start = string.index(string.startIndex, offsetBy: 1)
             let end = string.index(string.endIndex, offsetBy: -1)
             let range = start..<end
-            string = string.substring(with: range)
+            string = String(string[range])
         }
         
         return string

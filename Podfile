@@ -3,7 +3,7 @@ platform :ios, '8.0'
 use_frameworks!
 
 target 'Crust' do
-  pod 'JSONValueRX', '~> 1.6'
+  pod 'JSONValueRX', '~> 2.0.0'
 
   target 'CrustTests' do
     inherit! :complete
