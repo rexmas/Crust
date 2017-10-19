@@ -31,7 +31,7 @@ class CompanyMappingTests: XCTestCase {
             self.company = company
         }
         
-        override func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> [Company] {
+        override func fetchObjects(baseType type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> [Company] {
             return [ self.company ]
         }
     }

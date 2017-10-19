@@ -27,8 +27,8 @@ class MockMap: Mapping, Adapter {
     func mappingDidEnd() throws { }
     func mappingErrored(_ error: Error) { }
     public func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: MockMap.Type) -> CVarArg? { return nil }
-    func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return nil }
-    func createObject(type: BaseType.Type) -> BaseType { return self }
+    func fetchObjects(baseType type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return nil }
+    func createObject(baseType type: BaseType.Type) -> BaseType { return self }
     func deleteObject(_ obj: BaseType) throws { }
     func save(objects: [ BaseType ]) throws { }
 }

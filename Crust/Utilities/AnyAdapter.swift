@@ -45,16 +45,16 @@ public extension AnyAdapter {
     func mappingDidEnd() throws { }
     func mappingErrored(_ error: Error) { }
     
-    func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: Self.BaseType.Type) -> CVarArg? {
+    func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType baseType: Self.BaseType.Type) -> CVarArg? {
         return nil
     }
     
-    func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> [BaseType]? {
+    func fetchObjects(baseType: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> [BaseType]? {
         return nil
     }
     
-    func createObject(type: BaseType.Type) throws -> BaseType {
-        return type.init()
+    func createObject(baseType: BaseType.Type) throws -> BaseType {
+        return baseType.init()
     }
     
     func deleteObject(_ obj: BaseType) throws { }

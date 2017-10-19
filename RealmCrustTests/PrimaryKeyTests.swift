@@ -135,14 +135,14 @@ class PrimaryKeyTests: RealmMappingTest {
     func testFetchingWithStringDateCorrectlySantizesValue() {
         let date = Date().isoString
         let obj = DatePrimaryObj()
-        obj.remoteId = 1
+        obj.remoteId = 1 as NSNumber & RLMInt
         obj.date = Date(isoString: date)
         realm!.beginWriteTransaction()
         realm!.add(obj)
         try! realm!.commitWriteTransaction()
         
         let mapping = DatePrimaryObjMapping(adapter: adapter!)
-        let object = mapping.adapter.fetchObjects(type: DatePrimaryObj.self, primaryKeyValues: [["date" : date as CVarArg]], isMapping: false)?.first as! DatePrimaryObj
+        let object = mapping.adapter.fetchObjects(baseType: DatePrimaryObj.self, primaryKeyValues: [["date" : date as CVarArg]], isMapping: false)?.first as! DatePrimaryObj
         XCTAssertEqual(object.date!, Date(isoString: date))
     }
     
@@ -157,16 +157,16 @@ class PrimaryKeyTests: RealmMappingTest {
         let object = try! mapper.map(from: json, using: DatePrimaryObjMapping(adapter: adapter!), keyedBy: AllKeys())
         
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
-        XCTAssertEqual(object.remoteId!, 1)
+        XCTAssertEqual(object.remoteId! as NSNumber, 1 as NSNumber)
     }
     
     func testPrimaryKeyTransformIsRespected() {
         class DatePrimaryObjMappingWithTransform : DatePrimaryObjMapping {
             var called = false
             override var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
-                return [ ("remoteId", "remoteId", { [weak self] in
+                return [ ("remoteId", "remoteId", { [weak self] (json, _) in
                     self?.called = true
-                    let remoteId = $0.0["data"]
+                    let remoteId = json["data"]
                     return Int.fromJSON(remoteId!)
                 }) ]
             }
@@ -181,7 +181,7 @@ class PrimaryKeyTests: RealmMappingTest {
         
         XCTAssertTrue(mapping.called)
         XCTAssertEqual(DatePrimaryObj.allObjects(in: realm!).count, 1)
-        XCTAssertEqual(object.remoteId!, 1)
+        XCTAssertEqual(object.remoteId! as NSNumber, 1)
     }
     
     func testPrimaryKeyTransformParentPayloadIsPassedThrough() {
