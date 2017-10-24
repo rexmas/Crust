@@ -1,5 +1,6 @@
 import Crust
 import Realm
+import JSONValueRX
 
 public enum EmployeeKey: MappingKey {
     case employer(Set<CompanyKey>)
@@ -45,7 +46,6 @@ public class EmployeeMapping : RealmMapping {
     
     public func mapping(toMap: inout Employee, payload: MappingPayload<EmployeeKey>) {
         let companyMapping = CompanyMapping(adapter: self.adapter)
-        
         toMap.employer              <- (.mapping(.employer([]), companyMapping), payload)
         toMap.joinDate              <- (.joinDate, payload)
         toMap.uuid                  <- (.uuid, payload)

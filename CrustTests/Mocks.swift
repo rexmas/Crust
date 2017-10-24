@@ -1,6 +1,6 @@
 import Crust
 
-class MockAdapter<T: AnyMappable>: Adapter {
+class MockAdapter<T: AnyMappable>: PersistanceAdapter {
     var deletedObjects = [T]()
     var numberOfCallsToMappingWillBegin: Int = 0
     
@@ -16,8 +16,8 @@ class MockAdapter<T: AnyMappable>: Adapter {
     func mappingDidEnd() throws { }
     func mappingErrored(_ error: Error) { }
     func sanitize(primaryKeyProperty property: String, forValue value: CVarArg, ofType type: T.Type) -> CVarArg? { return nil }
-    func fetchObjects(type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return [] }
-    func createObject(type: BaseType.Type) throws -> BaseType { return type.init() }
+    func fetchObjects(baseType type: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType? { return [] }
+    func createObject(baseType type: BaseType.Type) throws -> BaseType { return type.init() }
     func deleteObject(_ obj: BaseType) throws { deletedObjects.append(obj) }
     func save(objects: [ BaseType ]) throws { }
 }

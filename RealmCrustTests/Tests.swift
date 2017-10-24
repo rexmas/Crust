@@ -4,15 +4,14 @@ import JSONValueRX
 import Realm
 
 public class User: RLMObject {
-    
-    public dynamic var identifier: String = ""
-    public dynamic var name: String? = nil
-    public dynamic var surname: String? = nil
-    public dynamic var height: Int = 170
-    public dynamic var weight: Int = 70
-    public dynamic var birthDate: NSDate? = nil
-    public dynamic var sex: Int = 2
-    public dynamic var photoPath: String? = nil
+    @objc public dynamic var identifier: String = ""
+    @objc public dynamic var name: String? = nil
+    @objc public dynamic var surname: String? = nil
+    @objc public dynamic var height: Int = 170
+    @objc public dynamic var weight: Int = 70
+    @objc public dynamic var birthDate: NSDate? = nil
+    @objc public dynamic var sex: Int = 2
+    @objc public dynamic var photoPath: String? = nil
     
 //    override public static func primaryKey() -> String? {
 //        return "identifier"
@@ -21,7 +20,6 @@ public class User: RLMObject {
 }
 
 public class UserMapping: RealmMapping {
-    
     public var adapter: RealmAdapter
     public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [("identifier", "id_hash", nil)]
