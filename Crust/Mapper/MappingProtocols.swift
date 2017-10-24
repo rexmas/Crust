@@ -66,7 +66,7 @@ public protocol Mapping {
     associatedtype MappedObject
     
     /// The DB adapter type.
-    associatedtype AdapterKind: Adapter
+    associatedtype AdapterKind: PersistanceAdapter
     
     associatedtype MappingKeyType: MappingKey
     
@@ -98,15 +98,15 @@ public enum DefaultDatabaseTag: String {
     case none = "None"
 }
 
-/// An Adapter to use to write and read objects from a persistance layer.
-public protocol Adapter {
+/// An PersistanceAdapter to use to write and read objects from a persistance layer.
+public protocol PersistanceAdapter {
     /// The type of object being mapped to. If Realm then RLMObject or Object. If Core Data then NSManagedObject.
     associatedtype BaseType
     
     /// The type of returned results after a fetch.
     associatedtype ResultsType: Collection
     
-    /// Informs the caller if the Adapter is currently within a transaction. The type which inherits Adapter
+    /// Informs the caller if the PersistanceAdapter is currently within a transaction. The type which inherits PersistanceAdapter
     /// will generally set this value to `true` explicitly or implicitly in the call to `mappingWillBegin` 
     /// `false` in the call to `mappingDidEnd`.
     ///
@@ -149,8 +149,8 @@ public protocol Adapter {
     ///     Dict1Key0 == Dict1Val0 AND Dict1Key1 == Dict1Val1" etc. Where Dict0 is the first dictionary in the
     ///     array and contains all the primary key/value pairs to search for for a single object of type `type`.
     /// - parameter isMapping: Indicates whether or not we're in the process of mapping an object. If `true` then
-    ///     the `Adapter` may need to avoid querying the store since the returned object's primary key may be written
-    ///     to if available. If this is the case, the `Adapter` may need to return any objects cached in memory during the current
+    ///     the `PersistanceAdapter` may need to avoid querying the store since the returned object's primary key may be written
+    ///     to if available. If this is the case, the `PersistanceAdapter` may need to return any objects cached in memory during the current
     ///     mapping process, not query the persistance layer.
     /// - returns: Results of the query.
     func fetchObjects(baseType: BaseType.Type, primaryKeyValues: [[String : CVarArg]], isMapping: Bool) -> ResultsType?

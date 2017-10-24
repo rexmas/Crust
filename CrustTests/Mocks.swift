@@ -1,6 +1,6 @@
 import Crust
 
-class MockAdapter<T: AnyMappable>: Adapter {
+class MockAdapter<T: AnyMappable>: PersistanceAdapter {
     var deletedObjects = [T]()
     var numberOfCallsToMappingWillBegin: Int = 0
     

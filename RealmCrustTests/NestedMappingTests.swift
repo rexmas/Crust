@@ -18,9 +18,6 @@ class MockRealmAdapter: RealmAdapter {
 }
 
 class ParentMapping: AnyMapping {
-    typealias MappedObject = Parent
-    typealias AdapterKind = AnyAdapterImp<Parent>
-    
     var numberOfCallsToMappingWillBegin = 0
     
     func mapping(toMap: inout Parent, payload: MappingPayload<String>) {

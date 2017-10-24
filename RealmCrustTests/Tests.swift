@@ -4,7 +4,6 @@ import JSONValueRX
 import Realm
 
 public class User: RLMObject {
-    
     @objc public dynamic var identifier: String = ""
     @objc public dynamic var name: String? = nil
     @objc public dynamic var surname: String? = nil
@@ -21,7 +20,6 @@ public class User: RLMObject {
 }
 
 public class UserMapping: RealmMapping {
-    
     public var adapter: RealmAdapter
     public var primaryKeys: [Mapping.PrimaryKeyDescriptor]? {
         return [("identifier", "id_hash", nil)]

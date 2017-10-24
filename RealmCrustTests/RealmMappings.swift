@@ -8,7 +8,7 @@ import RealmSwift
 
 public let RealmAdapterDomain = "RealmAdapterDomain"
 
-public class RealmAdapter: Adapter {
+public class RealmAdapter: PersistanceAdapter {
     public typealias BaseType = RLMObject
     public typealias ResultsType = [BaseType]
     
@@ -179,7 +179,7 @@ extension RLMArray {
     }
 }
 
-public class RealmSwiftObjectAdapterBridge<T>: Adapter {
+public class RealmSwiftObjectAdapterBridge<T>: PersistanceAdapter {
     public typealias BaseType = T
     public typealias ResultsType = [BaseType]
     

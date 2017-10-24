@@ -16,8 +16,6 @@ extension Int: AnyMappable { }
 class CollectionMappingTests: XCTestCase {
     
     class IntMapping: AnyMapping {
-        typealias AdapterKind = AnyAdapterImp<Int>
-        typealias MappedObject = Int
         func mapping(toMap: inout Int, payload: MappingPayload<String>) { }
     }
     
