@@ -134,7 +134,7 @@ public extension KeyCollection {
     }
     
     public func anyKeyCollection<TargetKey: MappingKey>() -> AnyKeyCollection<TargetKey>? {
-        return AnyKeyCollection.wrapAs(self)
+        return AnyKeyCollection(self) as? AnyKeyCollection<TargetKey>
     }
     
     func nestedKeyCollection<Key: MappingKey>(`for` key: MappingKeyType) throws -> AnyKeyCollection<Key> {
@@ -157,24 +157,6 @@ public struct AnyKeyCollection<K: MappingKey>: KeyCollection {
     public let keyCollectionType: Any.Type
     private let _containsKey: (K) -> Bool
     private let dynamicKeyCollection: DynamicKeyCollection
-    
-    /// This function is really dumb. `AnyKeyCollection<K> as? AnyKeyCollection<TargetKey>` always fails (though `Set<K> as? Set<TargetKey>` doesn't)
-    /// so we check and force cast here. This should be fixed in Swift 4.
-    public static func wrapAs<KC: KeyCollection, TargetKey: MappingKey>(_ keyCollection: KC) -> AnyKeyCollection<TargetKey>? where KC.MappingKeyType == K {
-        guard K.self is TargetKey.Type else {
-            return nil
-        }
-        let provider = AnyKeyCollection(keyCollection)
-        return unsafeBitCast(provider, to: AnyKeyCollection<TargetKey>.self)
-    }
-    
-    public static func wrapAs<Source: Sequence, TargetKey: MappingKey>(_ keys: Source) -> AnyKeyCollection<TargetKey>? where Source.Iterator.Element == K {
-        guard K.self is TargetKey.Type else {
-            return nil
-        }
-        let provider = AnyKeyCollection(SetKeyCollection(keys))
-        return unsafeBitCast(provider, to: AnyKeyCollection<TargetKey>.self)
-    }
     
     public init?(_ anyMappingKeyKeyCollection: AnyMappingKeyKeyCollection) {
         guard case let mappingKeyType as K.Type = anyMappingKeyKeyCollection.mappingKeyType else {
@@ -351,11 +333,11 @@ internal struct NestedMappingKey<RootKey: MappingKey, NestedCollection: KeyColle
     }
     
     func nestedKeyCollection<Key: MappingKey>(for key: RootKey) -> AnyKeyCollection<Key>? {
-        return AnyKeyCollection.wrapAs(self.nestedKeys)
+        return AnyKeyCollection(self.nestedKeys) as? AnyKeyCollection<Key>
     }
     
     func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
-        return AnyKeyCollection.wrapAs(self.nestedKeys)
+        return AnyKeyCollection(self.nestedKeys) as? AnyKeyCollection<Key>
     }
 }
 
