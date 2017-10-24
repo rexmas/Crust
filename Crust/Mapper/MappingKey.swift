@@ -277,7 +277,8 @@ public struct AllKeys<K: MappingKey>: KeyCollection {
 
 /// A `Set` of `MappingKey`s.
 ///
-/// TODO: Can make Set follow `KeyCollection` protocol once conditional conformances are available in Swift 4.
+/// TODO: Can make Set follow `KeyCollection` protocol once conditional conformances are available in Swift 4.1
+/// https://github.com/apple/swift-evolution/blob/master/proposals/0143-conditional-conformances.md .
 public struct SetKeyCollection<K: MappingKey>: KeyCollection, ExpressibleByArrayLiteral {
     public let keys: Set<K>
     
@@ -323,7 +324,7 @@ internal struct NestedMappingKey<RootKey: MappingKey, NestedCollection: KeyColle
         self.nestedKeys = nestedKeys
     }
     
-    //@available(*, unavailable)
+    // NOTE: cannot mark @available(*, unavailable) in Swift 4.
     init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == (RootKey) {
         fatalError("Don't use this.")
     }

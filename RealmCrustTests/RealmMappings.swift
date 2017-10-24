@@ -9,7 +9,6 @@ import RealmSwift
 public let RealmAdapterDomain = "RealmAdapterDomain"
 
 public class RealmAdapter: Adapter {
-    
     public typealias BaseType = RLMObject
     public typealias ResultsType = [BaseType]
     
@@ -147,8 +146,7 @@ public class RealmAdapter: Adapter {
     }
 }
 
-public protocol RealmMapping: Mapping {
-    associatedtype AdapterKind = RealmAdapter
+public protocol RealmMapping: Mapping where MappedObject: RLMObject, AdapterKind: RealmAdapter {
     init(adapter: AdapterKind)
 }
 
@@ -249,9 +247,9 @@ public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
     public let primaryKeys: [Mapping.PrimaryKeyDescriptor]?
     public let rlmObjectMapping: (inout MappedObject, MappingPayload<K>) throws -> Void
     
-    public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject: RLMObject, OGMapping.MappedObject == T, OGMapping.MappingKeyType == K {
+    public required init<OGMapping: RealmMapping>(rlmObjectMapping: OGMapping) where OGMapping.MappedObject == T, OGMapping.MappingKeyType == K {
         
-        self.adapter = RealmSwiftObjectAdapterBridge(realmObjCAdapter: rlmObjectMapping.adapter as! RealmAdapter,
+        self.adapter = RealmSwiftObjectAdapterBridge(realmObjCAdapter: rlmObjectMapping.adapter as RealmAdapter,
                                                      rlmObjectType: OGMapping.MappedObject.self)
         self.primaryKeys = rlmObjectMapping.primaryKeys
         
@@ -266,10 +264,8 @@ public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
     }
 }
 
-public extension Binding where M: RealmMapping, M.MappedObject: RLMObject {
-    
+public extension Binding where M: RealmMapping {
     func generateRLMArrayMappingBridge() -> Binding<K, RLMArrayMappingBridge<M.MappedObject, M.MappingKeyType>> {
-        
         switch self {
         case .mapping(let keyPath, let mapping):
             let bridge = RLMArrayMappingBridge(rlmObjectMapping: mapping)
