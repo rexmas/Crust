@@ -333,14 +333,14 @@ let company2 = try! mapper.map(from: json, using: CompanyMappingWithNameUUIDReve
 ```
 
 ## Persistance Adapter
-Follow the `PersistanceAdapter` protocol to create a storage adapter to Core Data, Realm, etc.
+Follow the `PersistanceAdapter` protocol to store data into Core Data, Realm, etc.
 
 The object conforming to `PersistanceAdapter` must include two `associatedtype`s:
 - `BaseType` - the top level class for this storage systems model objects.
   - Core Data this would be `NSManagedObject`.
   - Realm this would be `RLMObject`.
   - RealmSwift this would be `Object`.
-- `ResultsType: Collection` - Used for object lookups. Should return a collection of `BaseType`s.
+- `ResultsType: Collection` - Used for object lookups. Should be set to a collection of `BaseType`s.
 
 The `Mapping` must then set it's `associatedtype AdapterKind = <Your Adapter>` to use it during mapping.
 
