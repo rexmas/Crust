@@ -6,7 +6,6 @@ import Realm
 class RootedKeyTests: RealmMappingTest {
     
     func testJsonToInterface() {
-        
         XCTAssertEqual(GQLInterfaceObj.allObjects(in: realm!).count, 0)
         let stub = GQLInterfaceObjStub()
         let json = try! JSONValue(object: stub.generateJsonObject())
@@ -18,7 +17,94 @@ class RootedKeyTests: RealmMappingTest {
         XCTAssertEqual(GQLInterfaceObj.allObjects(in: realm!).count, 1)
         XCTAssertTrue(stub.matches(object: object))
     }
+    
+    func testWithArrayOfStructs() {
+        let jsonObj = [
+            [ "item" : [ "a", "b", "c" ] ],
+            [ "item" : [ "a", "b", "c" ] ]
+        ]
+        let json = try! JSONValue(object: jsonObj)
+        let mapper = Mapper()
+        let object = try! mapper.map(from: json, using: Stream.Mapping(), keyedBy: [
+            .subStreams([
+                .items
+                ])
+            ])
+        
+        XCTAssertEqual(object.subStreams[0].items, [ "a", "b", "c" ])
+        XCTAssertEqual(object.subStreams[1].items, [ "a", "b", "c" ])
+    }
 }
+
+// MARK: - Structs
+
+public struct Stream: AnyMappable {
+    public init() { }
+    
+    public private(set) var subStreams = [SubStream]()
+    
+    public enum Key: MappingKey {
+        case subStreams([SubStream.Key])
+        
+        public var keyPath: String {
+            switch self {
+            case .subStreams: return "subStreams"
+            }
+        }
+        
+        public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
+            switch self {
+            case .subStreams(let keys): return keys.anyKeyCollection()
+            }
+        }
+    }
+    
+    public class Mapping: AnyMapping {
+        public typealias AdapterKind = AnyAdapterImp<Stream>
+        public typealias MappedObject = Stream
+        
+        public required init() { }
+        
+        public func mapping(toMap: inout Stream, payload: MappingPayload<Key>) {
+            toMap.subStreams <- (.mapping(RootedKey(.subStreams([])), SubStream.Mapping()), payload)
+        }
+    }
+    
+    public struct SubStream: AnyMappable {
+        public init() { }
+        
+        public var items = [String]()
+        
+        public enum Key: MappingKey {
+            case items
+            
+            public var keyPath: String {
+                switch self {
+                case .items: return "item"
+                }
+            }
+            
+            public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
+                switch self {
+                case .items: return nil
+                }
+            }
+        }
+        
+        public class Mapping: AnyMapping {
+            public typealias AdapterKind = AnyAdapterImp<SubStream>
+            public typealias MappedObject = SubStream
+            
+            public required init() { }
+            
+            public func mapping(toMap: inout SubStream, payload: MappingPayload<Key>) {
+                toMap.items <- (.items, payload)
+            }
+        }
+    }
+}
+
+// MARK: - Realm
 
 class GQLInterfaceObjStub {
     
@@ -50,7 +136,7 @@ public enum GQLInterfaceObjKey: MappingKey {
     public var keyPath: String {
         switch self {
         case .uuid:                 return "uuid"
-        case .concreteObj(_):       return ""
+        case .concreteObj(_):       return "blah"
         }
     }
     
