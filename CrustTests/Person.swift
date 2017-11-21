@@ -27,18 +27,12 @@ class HairColorMapping: Transform {
     func fromJSON(_ json: JSONValue) throws -> HairColor {
         switch json {
         case .string(let str):
-            switch str {
-            case "Gold":
-                return .Gold
-            case "Brown":
-                return .Brown
-            case "Blue":
-                return .Blue
-            default:
-                return .Unknown
+            guard let val = HairColor(rawValue: str) else {
+                throw NSError(domain: "", code: -1, userInfo: nil)
             }
+            return val
         default:
-            return .Unknown
+            throw NSError(domain: "", code: -1, userInfo: nil)
         }
     }
     
