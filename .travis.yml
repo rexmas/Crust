@@ -1,10 +1,10 @@
 language: objective-c
-osx_image: xcode9
+osx_image: xcode9.1
 xcode_workspace: Crust.xcworkspace
 xcode_scheme: Crust
-xcode_sdk: iphonesimulator11.0
+xcode_sdk: iphonesimulator11.1
 script:
  - set -o pipefail
  - xcodebuild -version
  - xcodebuild -showsdks
- - xcodebuild -workspace Crust.xcworkspace -scheme Crust -sdk iphonesimulator -destination "OS=11.0,name=iPhone 8" ONLY_ACTIVE_ARCH=NO build test
+ - xcodebuild -workspace Crust.xcworkspace -scheme Crust -sdk iphonesimulator -destination "OS=11.1,name=iPhone 8" ONLY_ACTIVE_ARCH=NO build test
