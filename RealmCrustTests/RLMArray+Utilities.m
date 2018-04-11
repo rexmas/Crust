@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
         {
             case RLMPropertyTypeInt:
             {
-                return @([value integerValue]);
+                return @([value longLongValue]);
             }
             case RLMPropertyTypeFloat:
             {
