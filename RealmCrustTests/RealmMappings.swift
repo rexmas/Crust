@@ -264,22 +264,8 @@ public class RLMArrayMappingBridge<T: RLMObject, K: MappingKey>: Mapping {
     }
 }
 
-public extension Binding where M: RealmMapping {
-    func generateRLMArrayMappingBridge() -> Binding<K, RLMArrayMappingBridge<M.MappedObject, M.MappingKeyType>> {
-        switch self {
-        case .mapping(let keyPath, let mapping):
-            let bridge = RLMArrayMappingBridge(rlmObjectMapping: mapping)
-            return .mapping(keyPath, bridge)
-            
-        case .collectionMapping(let keyPath, let mapping, let updatePolicy):
-            let bridge = RLMArrayMappingBridge<M.MappedObject, M.MappingKeyType>(rlmObjectMapping: mapping)
-            return .collectionMapping(keyPath, bridge, updatePolicy)
-        }
-    }
-}
-
 @discardableResult
-public func <- <U: RealmMapping, K, C: MappingPayload<K>>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, payload: C)) -> C {
+public func <- <U: RealmMapping, K>(field: RLMArray<U.MappedObject>, binding:(key: Binding<K, U>, payload: MappingPayload<K>)) -> MappingPayload<K> {
     return map(toRLMArray: field, using: binding)
 }
 
@@ -287,7 +273,18 @@ public func <- <U: RealmMapping, K, C: MappingPayload<K>>(field: RLMArray<U.Mapp
 public func map<U: RealmMapping, K, C: MappingPayload<K>>(toRLMArray field: RLMArray<U.MappedObject>, using binding:(key: Binding<K, U>, payload: C)) -> C {
     
     var variableList = RLMArrayBridge(rlmArray: field)
-    let bridge = binding.key.generateRLMArrayMappingBridge()
+    let key = binding.key
+    let bridge: Binding<K, RLMArrayMappingBridge<U.MappedObject, U.MappingKeyType>> = {
+        switch key {
+        case .mapping(let keyPath, let mapping):
+            let bridge = RLMArrayMappingBridge(rlmObjectMapping: mapping)
+            return Binding.mapping(keyPath, bridge)
+            
+        case .collectionMapping(let keyPath, let mapping, let updatePolicy):
+            let bridge = RLMArrayMappingBridge<U.MappedObject, U.MappingKeyType>(rlmObjectMapping: mapping)
+            return Binding.collectionMapping(keyPath, bridge, updatePolicy)
+        }
+    }()
     return map(toCollection: &variableList, using: (bridge, binding.payload))
 }
 
