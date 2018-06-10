@@ -11,34 +11,17 @@ enum HairColor: String, AnyMappable {
     init() {
         self = .Unknown
     }
+    
+    struct Mapping: StringRawValueTransform {
+        typealias MappedObject = HairColor
+    }
 }
 
 struct Person: AnyMappable {
-    
     var bankAccounts: [Int] = [ 1234, 5678 ]
     var attitude: String = "awesome"
     var hairColor: HairColor = .Unknown
     var ownsCat: Bool? = nil
-}
-
-class HairColorMapping: Transform {
-    typealias MappedObject = HairColor
-    
-    func fromJSON(_ json: JSONValue) throws -> HairColor {
-        switch json {
-        case .string(let str):
-            guard let val = HairColor(rawValue: str) else {
-                throw NSError(domain: "", code: -1, userInfo: nil)
-            }
-            return val
-        default:
-            throw NSError(domain: "", code: -1, userInfo: nil)
-        }
-    }
-    
-    func toJSON(_ obj: HairColor) -> JSONValue {
-        return .string(obj.rawValue)
-    }
 }
 
 enum PersonCodingKey: String, RawMappingKey {
@@ -49,20 +32,18 @@ enum PersonCodingKey: String, RawMappingKey {
 }
 
 class PersonMapping: AnyMapping {
-    
     typealias MappedObject = Person
     
     func mapping(toMap: inout Person, payload: MappingPayload<PersonCodingKey>) {
         toMap.bankAccounts  <- .bankAccounts >*<
         toMap.attitude      <- .attitude >*<
-        toMap.hairColor     <- .mapping(.hairColor, HairColorMapping()) >*<
+        toMap.hairColor     <- .mapping(.hairColor, HairColor.Mapping()) >*<
         toMap.ownsCat       <- .ownsCat >*<
         payload
     }
 }
 
 class PersonStub {
-    
     var bankAccounts: [Int] = [ 0987, 6543 ]
     var attitude: String = "whoaaaa"
     var hairColor: HairColor = .Blue
