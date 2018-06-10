@@ -98,7 +98,7 @@ public enum DefaultDatabaseTag: String {
     case none = "None"
 }
 
-/// An PersistanceAdapter to use to write and read objects from a persistance layer.
+/// A PersistanceAdapter to use to write and read objects from a persistance layer.
 public protocol PersistanceAdapter {
     /// The type of object being mapped to. If Realm then RLMObject or Object. If Core Data then NSManagedObject.
     associatedtype BaseType
