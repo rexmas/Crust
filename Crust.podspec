@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Crust"
-  s.version          = "0.9.0"
+  s.version          = "0.9.1"
   s.summary          = "Flexible Swift JSON object mapping with support for Realm, etc."
 
 # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '8.0'
   s.requires_arc = true
 
-  s.dependency 'JSONValueRX', '~> 4.0.0'
+  s.dependency 'JSONValueRX', '~> 4.0.2'
   s.source_files = 'Crust/**/*.swift'
   s.resource_bundles = {
   }
