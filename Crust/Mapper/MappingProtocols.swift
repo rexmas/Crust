@@ -188,3 +188,21 @@ public extension Transform {
     }
 }
 
+public protocol StringRawValueTransform: Transform where MappedObject: RawRepresentable, MappedObject.RawValue == String { }
+extension StringRawValueTransform {
+    public func fromJSON(_ json: JSONValue) throws -> MappedObject {
+        switch json {
+        case .string(let str):
+            guard let val = MappedObject(rawValue: str) else {
+                throw NSError(domain: "Failed to map \(str) to type\(MappedObject.self)", code: -1, userInfo: nil)
+            }
+            return val
+        default:
+            throw NSError(domain: "Failed to map \(json.values()) to type\(MappedObject.self)", code: -1, userInfo: nil)
+        }
+    }
+    
+    public func toJSON(_ obj: MappedObject) -> JSONValue {
+        return .string(obj.rawValue)
+    }
+}

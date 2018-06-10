@@ -20,7 +20,6 @@ class CompanyMappingTests: RealmMappingTest {
     }
     
     func testUsesExistingObject() {
-        
         let uuid = NSUUID().uuidString
         
         let original = Company()
