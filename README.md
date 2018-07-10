@@ -31,6 +31,12 @@ use_frameworks!
 
 pod 'Crust'
 ```
+### Swift Package Manager (SPM)
+```swift
+dependencies: [
+.package(url: "https://github.com/rexmas/Crust.git", .upToNextMinor(from: "0.9.2"))
+]
+```
 
 ## Structs and Classes
 Can map to/from classes or structs
@@ -340,6 +346,7 @@ Pull requests are welcome!
 
 - Open an issue if you run into any problems.
 - Fork the project and submit a pull request to contribute. Please include tests for new code.
+- Keep LinuxTests up-to-date `swift test --generate-linuxmain`
 
 ## License
 The MIT License (MIT)
