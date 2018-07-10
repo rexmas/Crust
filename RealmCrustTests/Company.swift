@@ -63,11 +63,10 @@ public class CompanyMapping : RealmMapping {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         toMap.employees             <- (Binding.collectionMapping(.employees([]), employeeMapping, (.append, true, false)), payload)
-        toMap.founder               <- .mapping(.founder, employeeMapping) >*< payload
-        toMap.name                  <- .name >*<
-        toMap.foundingDate          <- .foundingDate  >*<
-        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        payload
+        toMap.founder               <- (.mapping(.founder, employeeMapping), payload)
+        toMap.name                  <- (.name, payload)
+        toMap.foundingDate          <- (.foundingDate, payload)
+        toMap.pendingLawsuits       <- (.pendingLawsuits, payload)
     }
 }
 
@@ -77,11 +76,10 @@ public class CompanyMappingWithDupes : CompanyMapping {
         let employeeMapping = EmployeeMapping(adapter: self.adapter)
         
         toMap.employees             <- (.collectionMapping(.employees([]), employeeMapping, (.append, false, false)), payload)
-        toMap.founder               <- Binding.mapping(.founder, employeeMapping) >*<
-        toMap.uuid                  <- .uuid >*<
-        toMap.name                  <- .name >*<
-        toMap.foundingDate          <- .foundingDate  >*<
-        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        payload
+        toMap.founder               <- (.mapping(.founder, employeeMapping), payload)
+        toMap.uuid                  <- (.uuid, payload)
+        toMap.name                  <- (.name, payload)
+        toMap.foundingDate          <- (.foundingDate, payload)
+        toMap.pendingLawsuits       <- (.pendingLawsuits, payload)
     }
 }

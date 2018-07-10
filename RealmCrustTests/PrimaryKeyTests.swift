@@ -18,8 +18,7 @@ class PrimaryObj1Mapping : RealmMapping {
         let obj2Mapping = PrimaryObj2Mapping(adapter: self.adapter)
         
         map(toRLMArray: toMap.class2s, using: (.mapping("class2s", obj2Mapping), payload))
-        toMap.uuid          <- "data.uuid" >*<
-        payload
+        toMap.uuid          <- ("data.uuid", payload)
     }
 }
 
@@ -66,8 +65,7 @@ class PrimaryObj2Mapping : RealmMapping {
         
         let obj1Mapping = nested
         
-        toMap.class1        <- Binding.mapping("class1", obj1Mapping) >*<
-        payload
+        toMap.class1        <- (Binding.mapping("class1", obj1Mapping), payload)
     }
 }
 

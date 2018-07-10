@@ -1,4 +1,5 @@
 import Crust
+import Foundation
 
 class Employee {
     required init() { }
@@ -59,13 +60,12 @@ class EmployeeMapping: MockMapping {
     func mapping(toMap: inout Employee, payload: MappingPayload<EmployeeCodingKey>) {
         let companyMapping = CompanyMapping(adapter: MockAdapter<Company>())
         
-        toMap.employer              <- .mapping(.employer([]), companyMapping) >*<
-        toMap.joinDate              <- .joinDate  >*<
-        toMap.uuid                  <- .uuid >*<
-        toMap.name                  <- .name >*<
-        toMap.salary                <- .salary  >*<
-        toMap.isEmployeeOfMonth     <- .isEmployeeOfMonth  >*<
-        toMap.percentYearlyRaise    <- .percentYearlyRaise >*<
-        payload
+        toMap.employer              <- (.mapping(.employer([]), companyMapping), payload)
+        toMap.joinDate              <- (.joinDate, payload)
+        toMap.uuid                  <- (.uuid, payload)
+        toMap.name                  <- (.name, payload)
+        toMap.salary                <- (.salary, payload)
+        toMap.isEmployeeOfMonth     <- (.isEmployeeOfMonth, payload)
+        toMap.percentYearlyRaise    <- (.percentYearlyRaise, payload)
     }
 }

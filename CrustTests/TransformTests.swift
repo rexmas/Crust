@@ -99,11 +99,10 @@ class UserMapping: Mapping {
     func mapping(toMap: inout User, payload: MappingPayload<UserCodingKey>) {
         let userBirthdateMapping = DateMapping(dateFormatter: DateFormatter.birthdateFormatter())
         
-        toMap.identifier        <- .identifier >*<
-        toMap.birthDate         <- Binding.mapping(.birthDate, userBirthdateMapping) >*<
-        toMap.name              <- .name >*<
-        toMap.surname           <- .surname >*<
-        payload
+        toMap.identifier        <- (.identifier, payload)
+        toMap.birthDate         <- (Binding.mapping(.birthDate, userBirthdateMapping), payload)
+        toMap.name              <- (.name, payload)
+        toMap.surname           <- (.surname, payload)
     }
 }
 

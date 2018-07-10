@@ -35,11 +35,10 @@ class PersonMapping: AnyMapping {
     typealias MappedObject = Person
     
     func mapping(toMap: inout Person, payload: MappingPayload<PersonCodingKey>) {
-        toMap.bankAccounts  <- .bankAccounts >*<
-        toMap.attitude      <- .attitude >*<
-        toMap.hairColor     <- .mapping(.hairColor, HairColor.Mapping()) >*<
-        toMap.ownsCat       <- .ownsCat >*<
-        payload
+        toMap.bankAccounts  <- (.bankAccounts, payload)
+        toMap.attitude      <- (.attitude, payload)
+        toMap.hairColor     <- (.mapping(.hairColor, HairColor.Mapping()), payload)
+        toMap.ownsCat       <- (.ownsCat, payload)
     }
 }
 
