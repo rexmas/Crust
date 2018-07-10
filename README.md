@@ -346,7 +346,7 @@ Pull requests are welcome!
 
 - Open an issue if you run into any problems.
 - Fork the project and submit a pull request to contribute. Please include tests for new code.
-- Keep LinuxTests up-to-date `swift test --generate-linuxmain`
+- Keep Linux tests up-to-date `swift test --generate-linuxmain`
 
 ## License
 The MIT License (MIT)
