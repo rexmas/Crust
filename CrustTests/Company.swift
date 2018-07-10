@@ -1,4 +1,5 @@
 import Crust
+import Foundation
 
 class Company {
     
@@ -57,13 +58,12 @@ class CompanyMapping: Mapping {
     func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- .mapping(.employees([]), employeeMapping) >*<
-        toMap.founder               <- .mapping(.founder, employeeMapping) >*<
-        toMap.uuid                  <- .uuid >*<
-        toMap.name                  <- .name >*<
-        toMap.foundingDate          <- .foundingDate  >*<
-        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        payload
+        toMap.employees             <- (.mapping(.employees([]), employeeMapping), payload)
+        toMap.founder               <- (.mapping(.founder, employeeMapping), payload)
+        toMap.uuid                  <- (.uuid, payload)
+        toMap.name                  <- (.name, payload)
+        toMap.foundingDate          <- (.foundingDate, payload)
+        toMap.pendingLawsuits       <- (.pendingLawsuits, payload)
     }
 }
 
@@ -72,13 +72,12 @@ class CompanyMappingWithDupes: CompanyMapping {
     override func mapping(toMap: inout Company, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees             <- .collectionMapping(.employees([]), employeeMapping, (.append, true, true)) >*<
-        toMap.founder               <- .mapping(.founder, employeeMapping) >*<
-        toMap.uuid                  <- .uuid >*<
-        toMap.name                  <- .name >*<
-        toMap.foundingDate          <- .foundingDate  >*<
-        toMap.pendingLawsuits       <- .pendingLawsuits  >*<
-        payload
+        toMap.employees             <- (.collectionMapping(.employees([]), employeeMapping, (.append, true, true)), payload)
+        toMap.founder               <- (.mapping(.founder, employeeMapping), payload)
+        toMap.uuid                  <- (.uuid, payload)
+        toMap.name                  <- (.name, payload)
+        toMap.foundingDate          <- (.foundingDate, payload)
+        toMap.pendingLawsuits       <- (.pendingLawsuits, payload)
     }
 }
 
@@ -110,12 +109,11 @@ class CompanyWithOptionalEmployeesMapping: Mapping {
     func mapping(toMap: inout CompanyWithOptionalEmployees, payload: MappingPayload<CompanyCodingKey>) {
         let employeeMapping = EmployeeMapping(adapter: MockAdapter<Employee>())
         
-        toMap.employees         <- .mapping(.employees([]), employeeMapping) >*<
-        toMap.founder           <- .mapping(.founder, employeeMapping) >*<
-        toMap.uuid              <- .uuid >*<
-        toMap.name              <- .name >*<
-        toMap.foundingDate      <- .foundingDate  >*<
-        toMap.pendingLawsuits   <- .pendingLawsuits  >*<
-        payload
+        toMap.employees         <- (.mapping(.employees([]), employeeMapping), payload)
+        toMap.founder           <- (.mapping(.founder, employeeMapping), payload)
+        toMap.uuid              <- (.uuid, payload)
+        toMap.name              <- (.name, payload)
+        toMap.foundingDate      <- (.foundingDate, payload)
+        toMap.pendingLawsuits   <- (.pendingLawsuits, payload)
     }
 }

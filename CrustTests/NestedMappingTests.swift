@@ -41,7 +41,7 @@ class ChildMapping: Mapping {
     }
     
     func mapping(toMap: inout Child, payload: MappingPayload<AnyMappingKey>) {
-        toMap.uuid <- "uuid" >*< payload
+        toMap.uuid <- ("uuid", payload)
     }
 }
 
@@ -76,9 +76,8 @@ class NestedMappingTests: XCTestCase {
             override func mapping(toMap: inout Parent, payload: MappingPayload<AnyMappingKey>) {
                 let childMapping = ChildMapping(adapter: self.childAdapter)
                 
-                toMap.children  <- .mapping("children", childMapping) >*<
-                toMap.uuid      <- "uuid" >*<
-                payload
+                toMap.children  <- (.mapping("children", childMapping), payload)
+                toMap.uuid      <- ("uuid", payload)
             }
         }
         

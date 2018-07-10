@@ -24,9 +24,8 @@ class ParentMapping: AnyMapping {
         let realmAdapter = MockRealmAdapter(realm: RLMRealm.default())
         let companyMapping = CompanyMapping(adapter: realmAdapter)
         
-        toMap.companies <- .mapping("companies", companyMapping) >*<
-        toMap.uuid      <- "uuid" >*<
-        payload
+        toMap.companies <- (.mapping("companies", companyMapping), payload)
+        toMap.uuid      <- ("uuid", payload)
         
         numberOfCallsToMappingWillBegin = realmAdapter.numberOfCallsToMappingWillBegin
     }
