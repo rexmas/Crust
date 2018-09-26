@@ -34,3 +34,6 @@ Carthage/Build
 
 # SPM
 .build
+
+# MAC
+.DS_Store
