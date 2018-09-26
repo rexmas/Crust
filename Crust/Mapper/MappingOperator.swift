@@ -1,16 +1,6 @@
 import Foundation
 import JSONValueRX
 
-// MARK: - Merge right into tuple operator definition
-
-// TODO: Remove this operator.
-infix operator >*< : AssignmentPrecedence
-
-@available(*, deprecated, message: "operator will be removed in next version")
-public func >*< <T, U>(left: T, right: U) -> (T, U) {
-    return (left, right)
-}
-
 // MARK: - Map value operator definition
 
 infix operator <- : AssignmentPrecedence
