@@ -112,7 +112,7 @@ class TransformTests: XCTestCase {
     func testMappingFromJSON() {
         let json = try! JSONValue(object: 1)
         let mapper = Mapper()
-        let object = try! mapper.map(from: json, using: TransformableMapping(), keyedBy: SetKeyCollection([RootKey()]))
+        let object = try! mapper.map(from: json, using: TransformableMapping(), keyedBy: Set([RootKey()]))
         
         XCTAssertEqual(object.value, "1.0")
     }
@@ -121,7 +121,7 @@ class TransformTests: XCTestCase {
         var object = Transformable()
         object.value = "derp"
         let mapper = Mapper()
-        let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping(), keyedBy: SetKeyCollection([RootKey()]))
+        let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping(), keyedBy: Set([RootKey()]))
         
         XCTAssertEqual(json, JSONValue.number(Double(object.value.hash)))
     }
