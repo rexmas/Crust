@@ -35,7 +35,7 @@ open class MappingPayload<K: MappingKey> {
     open internal(set) var adapterType: String
     open fileprivate(set) var dir: MappingDirection
     
-    convenience init(withObject object: Any, json: JSONValue, keys: Set<K>, adapterType: String, direction: MappingDirection) {
+    convenience init(withObject object: Any, json: JSONValue, keys: [K], adapterType: String, direction: MappingDirection) {
         self.init(withObject: object, json: json, keys: Set(keys), adapterType: adapterType, direction: direction)
     }
     

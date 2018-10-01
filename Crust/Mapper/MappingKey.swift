@@ -50,7 +50,7 @@ public extension RawRepresentable where Self: MappingKey, RawValue == String {
 }
 
 /// Use this as a key if you intend to map the whole json payload.
-public struct RootKey: MappingKey {
+public struct RootKey: MappingKey, Hashable {
     public let keyPath = ""
     public init() { }
     
@@ -122,6 +122,7 @@ public protocol KeyCollection: DynamicKeyCollection {
     
     init<Source>(_ sequence: Source) where Source : Sequence, Source.Iterator.Element == MappingKeyType
     func containsKey(_ key: MappingKeyType) -> Bool
+    // TODO: If opaque types arrive in Swift 5 can replace this.
     func nestedKeyCollection<Key: MappingKey>(`for` key: MappingKeyType) -> AnyKeyCollection<Key>?
 }
 
