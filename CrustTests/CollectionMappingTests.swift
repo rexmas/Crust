@@ -452,4 +452,109 @@ class CollectionMappingTests: XCTestCase {
         
         XCTAssertEqual(equatableThings.map { $0.uuid }, [remainingEquatable1.uuid, remainingEquatable2.uuid, newUUID])
     }
+    
+    // MARK: Array of Optional enums
+    
+    func testMappingArrayOfOptionalEnums() {
+        enum Color: RawRepresentable, Hashable, AnyMappable {
+            public typealias RawValue = String
+            
+            case red
+            case blue
+            case green
+            case __unknown(RawValue)
+            
+            public init() {
+                self = .__unknown("")
+            }
+            
+            public init?(rawValue: String) {
+                switch rawValue {
+                case "red":
+                    self = .red
+                case "blue":
+                    self = .blue
+                case "green":
+                    self = .green
+                default:
+                    self = .__unknown(rawValue)
+                }
+            }
+            
+            public var rawValue: String {
+                switch self {
+                case .red:
+                    return "red"
+                case .blue:
+                    return "blue"
+                case .green:
+                    return "green"
+                case .__unknown(let val):
+                    return val
+                }
+            }
+            
+            public func graphQLInputValue() throws -> String {
+                return self.rawValue
+            }
+            
+            public struct Mapping: StringRawValueTransform {
+                public typealias MappedObject = Color
+            }
+        }
+        
+        struct OuterObject: AnyMappable, Equatable {
+            init() {}
+            var enums: [Color?] = []
+            
+            public enum Key: RawRepresentable, MappingKey {
+                case enums
+                
+                public var keyPath: String {
+                    return self.rawValue
+                }
+                
+                public init?(rawValue: String) {
+                    switch rawValue {
+                    case "enums": self = .enums
+                    default: return nil
+                    }
+                }
+                
+                public var rawValue: String {
+                    switch self {
+                    case .enums: return "enums"
+                    }
+                }
+                
+                public func nestedMappingKeys<Key: MappingKey>() -> AnyKeyCollection<Key>? {
+                    switch self {
+                    default: return nil
+                    }
+                }
+            }
+            
+            class Mapping: AnyMapping {
+                typealias AdapterKind = AnyAdapterImp<OuterObject>
+                typealias MappedObject = OuterObject
+                
+                required init() { }
+                
+                func mapping(toMap: inout OuterObject, payload: MappingPayload<Key>) {
+                    toMap.enums <- (.mapping(.enums, OptionalAnyMapping(wrappedMapping: Color.Mapping())), payload)
+                }
+            }
+        }
+        
+        let jsonObj = [ "enums" : [ "red", "blue", "green" ]]
+        let json = try! JSONValue(object: jsonObj)
+        
+        let mapper = Mapper()
+        
+        let outer: OuterObject = try! mapper.map(from: json, using: OuterObject.Mapping(), keyedBy: [ .enums ])
+        var expected = OuterObject()
+        expected.enums = [ .red, .blue, .green ]
+        
+        XCTAssertEqual(outer, expected)
+    }
 }
