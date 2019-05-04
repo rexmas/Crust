@@ -37,18 +37,6 @@
 namespace realm {
 namespace sync {
 
-/// Supported protocols:
-///
-///      Protocol    URL scheme     Default port
-///     -----------------------------------------------------------------------------------
-///      realm       "realm:"       7800 (80 if Client::Config::enable_default_port_hack)
-///      realm_ssl   "realms:"      7801 (443 if Client::Config::enable_default_port_hack)
-///
-enum class Protocol {
-    realm,
-    realm_ssl
-};
-
 
 class Client {
 public:
@@ -90,6 +78,40 @@ public:
 
     struct Config {
         Config() {}
+
+        /// An optional custom platform description to be sent to server as part
+        /// of a user agent description (HTTP `User-Agent` header).
+        ///
+        /// If left empty, the platform description will be whatever is returned
+        /// by util::get_platform_info().
+        std::string user_agent_platform_info;
+
+        /// Optional information about the application to be added to the user
+        /// agent description as sent to the server. The intention is that the
+        /// application describes itself using the following (rough) syntax:
+        ///
+        ///     <application info>  ::=  (<space> <layer>)*
+        ///     <layer>             ::=  <name> "/" <version> [<space> <details>]
+        ///     <name>              ::=  (<alnum>)+
+        ///     <version>           ::=  <digit> (<alnum> | "." | "-" | "_")*
+        ///     <details>           ::=  <parentherized>
+        ///     <parentherized>     ::=  "(" (<nonpar> | <parentherized>)* ")"
+        ///
+        /// Where `<space>` is a single space character, `<digit>` is a decimal
+        /// digit, `<alnum>` is any alphanumeric character, and `<nonpar>` is
+        /// any character other than `(` and `)`.
+        ///
+        /// When multiple levels are present, the innermost layer (the one that
+        /// is closest to this API) should appear first.
+        ///
+        /// Example:
+        ///
+        ///     RealmJS/2.13.0 RealmStudio/2.9.0
+        ///
+        /// Note: The user agent description is not intended for machine
+        /// interpretation, but should still follow the specified syntax such
+        /// that it remains easily interpretable by human beings.
+        std::string user_agent_application_info;
 
         /// The maximum number of Realm files that will be kept open
         /// concurrently by this client. The client keeps a cache of open Realm
@@ -288,8 +310,8 @@ public:
     bool wait_for_session_terminations_or_client_stopped();
 
     /// Returns false if the specified URL is invalid.
-    bool decompose_server_url(const std::string& url, Protocol& protocol, std::string& address,
-                              port_type& port, std::string& path) const;
+    bool decompose_server_url(const std::string& url, ProtocolEnvelope& protocol,
+                              std::string& address, port_type& port, std::string& path) const;
 
 private:
     class Impl;
@@ -382,8 +404,8 @@ public:
         std::string server_address = "localhost";
 
         /// server_port is the port at which the server listens. If server_port
-        /// is zero, the default port for the specified protocol is used. See \ref
-        /// Protocol for information on default ports.
+        /// is zero, the default port for the specified protocol is used. See
+        /// ProtocolEnvelope for information on default ports.
         port_type server_port = 0;
 
         /// server_path is  the virtual path by which the server identifies the
@@ -399,8 +421,9 @@ public:
         /// virtual paths from actual file system paths.
         std::string server_path = "/";
 
-        /// The protocol used for communicating with the server. See \ref Protocol.
-        Protocol protocol = Protocol::realm;
+        /// The protocol used for communicating with the server. See
+        /// ProtocolEnvelope.
+        ProtocolEnvelope protocol_envelope = ProtocolEnvelope::realm;
 
         /// url_prefix is a prefix that is prepended to the server_path
         /// in the HTTP GET request that initiates a sync connection. The value
@@ -434,9 +457,8 @@ public:
         /// for partitioning the sessions.
         std::string multiplex_ident;
 
-        /// verify_servers_ssl_certificate controls whether the server
-        /// certificate is verified for SSL connections. It should generally be
-        /// true in production.
+        /// Controls whether the server certificate is verified for SSL
+        /// connections. It should generally be true in production.
         bool verify_servers_ssl_certificate = true;
 
         /// ssl_trust_certificate_path is the path of a trust/anchor
@@ -454,7 +476,7 @@ public:
         /// If ssl_trust_certificate_path is None (default), ssl_verify_callback
         /// (see below) is used if set, and the default device trust/anchor
         /// store is used otherwise.
-        Optional<std::string> ssl_trust_certificate_path;
+        util::Optional<std::string> ssl_trust_certificate_path;
 
         /// If Client::Config::ssl_verify_callback is set, that function is called
         /// to verify the certificate, unless verify_servers_ssl_certificate is
@@ -532,7 +554,7 @@ public:
         std::shared_ptr<ClientHistory::ChangesetCooker> changeset_cooker;
 
         /// The encryption key the SharedGroup will be opened with.
-        Optional<std::array<char, 64>> encryption_key;
+        util::Optional<std::array<char, 64>> encryption_key;
     };
 
     /// \brief Start a new session for the specified client-side Realm.
@@ -785,7 +807,7 @@ public:
     /// The two other forms of bind() are convenience functions.
     /// void bind(std::string server_address, std::string server_path,
     ///           std::string signed_user_token, port_type server_port = 0,
-    ///           Protocol protocol = Protocol::realm);
+    ///           ProtocolEnvelope protocol = ProtocolEnvelope::realm);
     /// replaces the corresponding parameters from the Session::Config object
     /// before the session is bound.
     /// void bind(std::string server_url, std::string signed_user_token) parses
@@ -793,22 +815,24 @@ public:
     /// before the session is bound.
     ///
     /// \param server_url For example "realm://sync.realm.io/test". See
-    /// server_address, server_path, and server_port in Session::Config for information
-    /// about the individual components of the URL. See \ref Protocol for the list of
-    /// available URL schemes and the associated default ports.
+    /// server_address, server_path, and server_port in Session::Config for
+    /// information about the individual components of the URL. See
+    /// ProtocolEnvelope for the list of available URL schemes and the
+    /// associated default ports.
     ///
     /// \throw BadServerUrl if the specified server URL is malformed.
     void bind();
     void bind(std::string server_url, std::string signed_user_token);
     void bind(std::string server_address, std::string server_path,
               std::string signed_user_token, port_type server_port = 0,
-              Protocol protocol = Protocol::realm);
+              ProtocolEnvelope protocol = ProtocolEnvelope::realm);
     /// @}
 
     /// \brief Refresh the access token associated with this session.
     ///
     /// This causes the REFRESH protocol message to be sent to the server. See
-    /// \ref Protocol.
+    /// ProtocolEnvelope. It is an error to pass a token with a different user
+    /// identity than the token used to initiate the session.
     ///
     /// In an on-going session the application may expect the access token to
     /// expire at a certain time and schedule acquisition of a fresh access
@@ -833,7 +857,7 @@ public:
     /// Note: This function is thread-safe.
     ///
     /// \param signed_user_token A cryptographically signed token describing the
-    /// identity and access rights of the current user. See \ref Protocol.
+    /// identity and access rights of the current user. See ProtocolEnvelope.
     void refresh(std::string signed_user_token);
 
     /// \brief Inform the synchronization agent about changes of local origin.

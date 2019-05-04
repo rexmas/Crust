@@ -454,7 +454,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Crust-RealmCrustTests/Pods-Crust-RealmCrustTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Crust-RealmCrustTests/Pods-Crust-RealmCrustTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/JSONValueRX/JSONValueRX.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
@@ -467,7 +467,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Crust-RealmCrustTests/Pods-Crust-RealmCrustTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Crust-RealmCrustTests/Pods-Crust-RealmCrustTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		045C2D55FFB18493A3511662 /* [CP] Check Pods Manifest.lock */ = {
@@ -494,7 +494,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/JSONValueRX/JSONValueRX.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -503,7 +503,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Crust-CrustTests/Pods-Crust-CrustTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4FB17661EB2B69D310EB25F9 /* [CP] Check Pods Manifest.lock */ = {

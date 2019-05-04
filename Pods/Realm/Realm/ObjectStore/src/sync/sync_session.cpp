@@ -404,6 +404,11 @@ struct sync_session_states::Inactive : public SyncSession::State {
     {
         session.m_server_override = SyncSession::ServerOverride{address, port};
     }
+
+    void close(std::unique_lock<std::mutex>& lock, SyncSession& session) const override
+    {
+        session.unregister(lock); // releases lock
+    }
 };
 
 
@@ -444,7 +449,7 @@ SyncSession::SyncSession(SyncClient& client, std::string realm_path, SyncConfig 
 
 std::string SyncSession::get_recovery_file_path()
 {
-    return util::reserve_unique_file_name(SyncManager::shared().recovery_directory_path(),
+    return util::reserve_unique_file_name(SyncManager::shared().recovery_directory_path(m_config.recovery_directory),
                                           util::create_timestamped_template("recovered_realm"));
 }
 
@@ -676,7 +681,8 @@ void SyncSession::create_sync_session()
 
     // Sets up the connection state listener. This callback is used for both reporting errors as well as changes to the
     // connection state.
-    m_session->set_connection_state_change_listener([weak_self](realm::sync::Session::ConnectionState state, const realm::sync::Session::ErrorInfo* error) {
+    m_session->set_connection_state_change_listener([weak_self](sync::Session::ConnectionState state,
+                                                                const sync::Session::ErrorInfo* error) {
         // If the OS SyncSession object is destroyed, we ignore any events from the underlying Session as there is
         // nothing useful we can do with them.
         if (auto self = weak_self.lock()) {
@@ -805,7 +811,6 @@ void SyncSession::set_multiplex_identifier(std::string multiplex_identity)
     m_multiplex_identity = std::move(multiplex_identity);
 }
 
-
 SyncSession::PublicState SyncSession::get_public_state() const
 {
     if (m_state == nullptr) {
@@ -822,7 +827,6 @@ SyncSession::PublicState SyncSession::get_public_state() const
     REALM_UNREACHABLE();
 }
 
-
 SyncSession::PublicState SyncSession::state() const
 {
     std::unique_lock<std::mutex> lock(m_state_mutex);
@@ -832,12 +836,37 @@ SyncSession::PublicState SyncSession::state() const
 SyncSession::ConnectionState SyncSession::connection_state() const
 {
     switch (m_connection_state) {
-        case realm::sync::Session::ConnectionState::disconnected: return ConnectionState::Disconnected;
-        case realm::sync::Session::ConnectionState::connecting: return ConnectionState::Connecting;
-        case realm::sync::Session::ConnectionState::connected: return ConnectionState::Connected;
+        case sync::Session::ConnectionState::disconnected: return ConnectionState::Disconnected;
+        case sync::Session::ConnectionState::connecting: return ConnectionState::Connecting;
+        case sync::Session::ConnectionState::connected: return ConnectionState::Connected;
         default:
             REALM_UNREACHABLE();
     }
+}
+
+void SyncSession::update_configuration(SyncConfig new_config)
+{
+    while (true) {
+        std::unique_lock<std::mutex> lock(m_state_mutex);
+        if (m_state != &State::inactive) {
+            // Changing the state releases the lock, which means that by the
+            // time we reacquire the lock the state may have changed again
+            // (either due to one of the callbacks being invoked or another
+            // thread coincidentally doing something). We just attempt to keep
+            // switching it to inactive until it stays there.
+            advance_state(lock, State::inactive);
+            continue;
+        }
+
+        REALM_ASSERT(m_state == &State::inactive);
+        REALM_ASSERT(!m_session);
+        REALM_ASSERT(m_config.user == new_config.user);
+        REALM_ASSERT(m_config.reference_realm_url == new_config.reference_realm_url);
+        REALM_ASSERT(m_config.is_partial == new_config.is_partial);
+        m_config = std::move(new_config);
+        break;
+    }
+    revive_if_needed();
 }
 
 // Represents a reference to the SyncSession from outside of the sync subsystem.

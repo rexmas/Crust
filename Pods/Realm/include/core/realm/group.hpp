@@ -529,12 +529,17 @@ public:
     /// If this group accessor is the detached state, this function returns
     /// zero.
     size_t compute_aggregated_byte_size(SizeAggregateControl ctrl = SizeAggregateControl::size_of_all) const noexcept;
+    /// Return the size taken up by the current snapshot. This is in contrast to
+    /// the number returned by SharedGroup::get_stats() which will return the
+    /// size of the last snapshot done in that SharedGroup. If the snapshots are
+    /// identical, the numbers will of course be equal.
+    size_t get_used_space() const noexcept;
 
     void verify() const;
 #ifdef REALM_DEBUG
     void print() const;
     void print_free() const;
-    MemStats stats();
+    MemStats get_stats();
     void enable_mem_diagnostics(bool enable = true)
     {
         m_alloc.enable_debug(enable);
@@ -791,6 +796,7 @@ private:
     void set_history_schema_version(int version);
     void set_history_parent(Array& history_root) noexcept;
     void prepare_history_parent(Array& history_root, int history_type, int history_schema_version);
+    static void validate_top_array(const Array& arr, const SlabAlloc& alloc);
 
     friend class Table;
     friend class GroupWriter;

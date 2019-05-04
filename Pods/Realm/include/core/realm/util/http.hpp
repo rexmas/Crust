@@ -360,7 +360,7 @@ struct HTTPClient: protected HTTPParser<Socket> {
     void async_request(const HTTPRequest& request, std::function<Handler> handler)
     {
         if (REALM_UNLIKELY(m_handler)) {
-            throw std::runtime_error("Request already in progress.");
+            throw util::runtime_error("Request already in progress.");
         }
         this->set_write_buffer(request);
         m_handler = std::move(handler);
@@ -441,7 +441,7 @@ struct HTTPServer: protected HTTPParser<Socket> {
     void async_receive_request(std::function<RequestHandler> handler)
     {
         if (REALM_UNLIKELY(m_request_handler)) {
-            throw std::runtime_error("Response already in progress.");
+            throw util::runtime_error("Response already in progress.");
         }
         m_request_handler = std::move(handler);
         this->read_first_line();
@@ -462,11 +462,11 @@ struct HTTPServer: protected HTTPParser<Socket> {
                              std::function<RespondHandler> handler)
     {
         if (REALM_UNLIKELY(!m_request_handler)) {
-            throw std::runtime_error("No request in progress.");
+            throw util::runtime_error("No request in progress.");
         }
         if (m_respond_handler) {
             // FIXME: Proper exception type.
-            throw std::runtime_error("Already responding to request");
+            throw util::runtime_error("Already responding to request");
         }
         m_respond_handler = std::move(handler);
         this->set_write_buffer(response);

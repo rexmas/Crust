@@ -27,6 +27,7 @@
 #include <realm/alloc.hpp>
 #include <realm/impl/array_writer.hpp>
 #include <realm/array_integer.hpp>
+#include <realm/group_shared_options.hpp>
 
 
 namespace realm {
@@ -51,7 +52,8 @@ public:
     // (Group::m_is_shared), the constructor also adds version tracking
     // information to the group, if it is not already present (6th and 7th entry
     // in Group::m_top).
-    GroupWriter(Group&);
+    using Durability = SharedGroupOptions::Durability;
+    GroupWriter(Group&, Durability dura = Durability::Full);
     ~GroupWriter();
 
     void set_versions(uint64_t current, uint64_t read_lock) noexcept;
@@ -69,16 +71,17 @@ public:
 
     size_t get_file_size() const noexcept;
 
-    /// Write the specified chunk into free space.
-    void write(const char* data, size_t size);
-
     ref_type write_array(const char*, size_t, uint32_t) override;
 
 #ifdef REALM_DEBUG
     void dump();
 #endif
 
-    size_t get_free_space();
+    size_t get_free_space_size()
+    {
+        return m_free_space_size;
+    }
+
 private:
     class MapWindow;
     Group& m_group;
@@ -89,6 +92,8 @@ private:
     uint64_t m_current_version;
     uint64_t m_readlock_version;
     size_t m_window_alignment;
+    size_t m_free_space_size;
+    Durability m_durability;
 
     struct FreeSpaceEntry {
         FreeSpaceEntry(size_t r, size_t s, uint64_t v)
@@ -110,7 +115,7 @@ private:
     // Merge adjacent chunks
     void merge_adjacent_entries_in_freelist();
     void read_in_freelist();
-    size_t recreate_freelist(size_t reserve_pos);
+    size_t recreate_freelist(size_t reserve_pos, size_t& free_space_size);
     // Currently cached memory mappings. We keep as many as 16 1MB windows
     // open for writing. The allocator will favor sequential allocation
     // from a modest number of windows, depending upon fragmentation, so
