@@ -227,6 +227,11 @@ public:
     // object store team before using it.
     void override_server(std::string address, int port);
 
+    // Update the sync configuration used for this session. The new configuration must have the
+    // same user and reference realm url as the old configuration. The session will immediately
+    // disconnect (if it was active), and then attempt to connect using the new configuration.
+    void update_configuration(SyncConfig new_config);
+
     // An object representing the user who owns the Realm this `SyncSession` represents.
     std::shared_ptr<SyncUser> user() const
     {
@@ -327,7 +332,7 @@ private:
     void cancel_pending_waits(std::unique_lock<std::mutex>&);
     enum class ShouldBackup { yes, no };
     void update_error_and_mark_file_for_deletion(SyncError&, ShouldBackup);
-    static std::string get_recovery_file_path();
+    std::string get_recovery_file_path();
     void handle_progress_update(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 
     void set_sync_transact_callback(std::function<SyncSessionTransactCallback>);

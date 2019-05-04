@@ -118,11 +118,29 @@ namespace sync {
 //     file identifier (UPLOAD)".
 //
 //  24 Support schema-breaking instructions. Official support for partial sync.
+//
+//  25 Include "last server version" in the UPLOAD message for history trimming
+//     on the server.
 
 constexpr int get_current_protocol_version() noexcept
 {
-    return 24;
+    return 25;
 }
+
+
+/// Supported protocol envelopes:
+///
+///                                                             Alternative (*)
+///      Name     Envelope          URL scheme   Default port   default port
+///     ------------------------------------------------------------------------
+///      realm    WebSocket         realm:       7800           80
+///      realms   WebSocket + SSL   realms:      7801           443
+///      ws       WebSocket         ws:          80
+///      wss      WebSocket + SSL   wss:         443
+///
+///       *) When Client::Config::enable_default_port_hack is true
+///
+enum class ProtocolEnvelope { realm, realms, ws, wss };
 
 
 // These integer types are selected so that they accomodate the requirements of
