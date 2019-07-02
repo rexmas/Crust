@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Crust"
-  s.version          = "0.11.0"
+  s.version          = "0.11.1"
   s.summary          = "Flexible Swift JSON object mapping with support for Realm, etc."
 
 # This description is used to generate tags and improve search results.
