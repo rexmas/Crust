@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '8.0'
   s.requires_arc = true
 
-  s.dependency 'JSONValueRX', '~> 5.0.0'
+  s.dependency 'JSONValueRX', '~> 5.1.0'
   s.source_files = 'Crust/**/*.swift'
   s.resource_bundles = {
   }
