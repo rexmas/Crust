@@ -22,7 +22,7 @@ class TransformableMapping: Transform {
     }
     
     func toJSON(_ obj: MappedObject) -> JSONValue {
-        return .number(Double(obj.value.hash))
+        return .number(.fraction(Double(obj.value.hash)))
     }
 }
 
@@ -114,7 +114,7 @@ class TransformTests: XCTestCase {
         let mapper = Mapper()
         let object = try! mapper.map(from: json, using: TransformableMapping(), keyedBy: Set([RootKey()]))
         
-        XCTAssertEqual(object.value, "1.0")
+        XCTAssertEqual(object.value, "1")
     }
     
     func testMappingToJSON() {
@@ -123,7 +123,7 @@ class TransformTests: XCTestCase {
         let mapper = Mapper()
         let json = try! mapper.mapFromObjectToJSON(object, mapping: TransformableMapping(), keyedBy: Set([RootKey()]))
         
-        XCTAssertEqual(json, JSONValue.number(Double(object.value.hash)))
+        XCTAssertEqual(json, JSONValue.number(.fraction(Double(object.value.hash))))
     }
     
     func testCustomTransformOverridesDefaultOne(){

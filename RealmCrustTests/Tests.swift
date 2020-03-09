@@ -88,7 +88,7 @@ public class PrimaryKeyMapping: Transform {
     }
     
     public func toJSON(_ obj: MappedObject) -> JSONValue {
-        return JSONValue.number(Double(obj)!)
+        return JSONValue.number(.int(Int64(obj)!))
     }
 }
 
